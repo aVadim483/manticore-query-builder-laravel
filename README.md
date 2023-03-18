@@ -1,0 +1,1 @@
+# manticore-query-builder-laravel
