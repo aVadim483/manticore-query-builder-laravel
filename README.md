@@ -1,10 +1,6 @@
-[![Latest Stable Version](https://poser.pugx.org/avadim/manticore-query-builder-php/v/stable)](https://packagist.org/packages/avadim/manticore-query-builder-php)
-[![Total Downloads](https://poser.pugx.org/avadim/manticore-query-builder-php/downloads)](https://packagist.org/packages/avadim/manticore-query-builder-php)
-[![Build Status](https://scrutinizer-ci.com/g/EvilFreelancer/laravel-manticoresearch/badges/build.png?b=master)](https://scrutinizer-ci.com/g/EvilFreelancer/laravel-manticoresearch/build-status/master)
-[![Code Coverage](https://scrutinizer-ci.com/g/EvilFreelancer/laravel-manticoresearch/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/EvilFreelancer/laravel-manticoresearch/?branch=master)
-[![Code Climate](https://codeclimate.com/github/EvilFreelancer/laravel-manticoresearch/badges/gpa.svg)](https://codeclimate.com/github/EvilFreelancer/laravel-manticoresearch)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/EvilFreelancer/laravel-manticoresearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/EvilFreelancer/laravel-manticoresearch/?branch=master)
-[![License](https://poser.pugx.org/avadim/manticore-query-builder-php/license)](https://packagist.org/packages/avadim/manticore-query-builder-php)
+[![Latest Stable Version](https://poser.pugx.org/avadim/manticore-query-builder-laravel/v/stable)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![Total Downloads](https://poser.pugx.org/avadim/manticore-query-builder-laravel/downloads)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![License](https://poser.pugx.org/avadim/manticore-query-builder-laravel/license)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
 
 # Laravel ManticoreSearch plugin
 
@@ -12,7 +8,7 @@ An easiest way to use the [ManticoreSearch Query Builder](https://github.com/aVa
 in your Laravel or Lumen applications.
 
 ```sh
-composer require avadim/manticore-query-builder-php
+composer require avadim/manticore-query-builder-laravel
 ```
 
 * [Installation](#Installation)
