@@ -1,6 +1,7 @@
-[![Latest Stable Version](https://poser.pugx.org/avadim/manticore-query-builder-laravel/v/stable)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
-[![Total Downloads](https://poser.pugx.org/avadim/manticore-query-builder-laravel/downloads)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
-[![License](https://poser.pugx.org/avadim/manticore-query-builder-laravel/license)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![Latest Stable Version](http://poser.pugx.org/avadim/manticore-query-builder-laravel/v)](https://packagist.org/packages/avadim/manticore-query-builder-laravel) 
+[![Total Downloads](http://poser.pugx.org/avadim/manticore-query-builder-laravel/downloads)](https://packagist.org/packages/avadim/manticore-query-builder-laravel) 
+[![License](http://poser.pugx.org/avadim/manticore-query-builder-laravel/license)](https://packagist.org/packages/avadim/manticore-query-builder-laravel) 
+[![PHP Version Require](http://poser.pugx.org/avadim/manticore-query-builder-laravel/require/php)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
 
 # ManticoreSearch Query Builder for Laravel
 

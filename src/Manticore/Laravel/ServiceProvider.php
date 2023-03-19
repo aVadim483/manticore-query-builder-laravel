@@ -8,7 +8,6 @@ use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Lumen\Application as LumenApplication;
-use Manticoresearch\Client;
 
 /**
  * Class ServiceProvider

@@ -24,10 +24,6 @@
         "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
         "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0"
     },
-    "suggest": {
-        "ext-curl": "*",
-        "monolog/monolog":"*"
-    },
     "require-dev": {
         "orchestra/testbench": "^4.0|^5.0|^6.0",
         "phpunit/phpunit": "^8.0|^9.0"
@@ -44,7 +40,7 @@
                 "avadim\\Manticore\\Laravel\\ServiceProvider"
             ],
             "aliases": {
-                "ManticoreDb": "avadim\\Manticore\\Laravel\\Facade"
+                "ManticoreDb": "avadim\\Manticore\\QueryBuilder\\Builder"
             }
         }
     }
