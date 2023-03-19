@@ -4,21 +4,12 @@
 
 # ManticoreSearch Query Builder for Laravel
 
-This package adds functionalities to the Eloquent model and Query builder for MongoDB, using the original Laravel API
-
 An easiest way to use the [ManticoreSearch Query Builder](https://github.com/aVadim483/manticore-query-builder-php)
 in your Laravel or Lumen applications.
 
 ```sh
 composer require avadim/manticore-query-builder-laravel
 ```
-
-* [Installation](#Installation)
-    * [Laravel](#Laravel)
-    * [Lumen](#Lumen)
-* [How to use](#How-to-use)
-* [Logging](#Logging)
-* [Links](#Links)
 
 ## Installation
 
