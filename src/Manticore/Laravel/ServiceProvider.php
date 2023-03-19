@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace avadim\Manticore\Laravel;
 
+use avadim\Manticore\QueryBuilder\Builder as ManticoreBuilder;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -34,6 +35,8 @@ class ServiceProvider extends BaseServiceProvider
         }
 
         $this->mergeConfigFrom($source, 'manticore');
+
+        ManticoreBuilder::init(config('manticore'));
     }
 
     /**
