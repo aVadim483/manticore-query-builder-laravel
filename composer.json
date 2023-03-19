@@ -1,6 +1,6 @@
 {
     "name": "avadim/manticore-query-builder-laravel",
-    "description": "An easy way to use the official ManticoreSearch client in your Laravel applications",
+    "description": "ManticoreSearch Query Builder for your Laravel applications",
     "keywords": [
         "laravel",
         "manticoresoftware",
@@ -19,7 +19,7 @@
     "require": {
         "php": "^7.4|^8.1",
         "ext-json": "*",
-        "psr/log": ">=1.1",
+        "psr/log": "^1.1",
         "avadim/manticore-query-builder-php": "^1.10",
         "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
         "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0"
@@ -33,12 +33,6 @@
         "phpunit/phpunit": "^8.0|^9.0"
     },
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Paul Rock",
-            "email": "paul@drteam.rocks"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "avadim\\Manticore\\Laravel\\": "./src/Manticore/Laravel"
