@@ -5,7 +5,7 @@
 # ManticoreSearch Query Builder for Laravel
 
 An easiest way to use the [ManticoreSearch Query Builder](https://github.com/aVadim483/manticore-query-builder-php)
-in your Laravel or Lumen applications.
+in your Laravel or Lumen applications. This package allows you to build ManticoreSearch queries using a Laravel-like syntax.
 
 ```sh
 composer require avadim/manticore-query-builder-laravel
