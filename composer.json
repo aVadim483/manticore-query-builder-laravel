@@ -19,7 +19,7 @@
     "require": {
         "php": "^7.4|^8.1",
         "ext-json": "*",
-        "psr/log": "^1.1",
+        "psr/log": ">=1.1",
         "avadim/manticore-query-builder-php": "^1.10",
         "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
         "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0"

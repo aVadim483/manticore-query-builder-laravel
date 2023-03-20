@@ -114,6 +114,22 @@ class CreateManticoreProductsTable extends Migration
 }
 ```
 
+## Logging
+
+You can use logger instance for logging in this package.
+
+```php
+// Enable logging for all
+ManticoreDb::setLogger(\Log::getLogger());
+
+// Enable logging for the specified connection
+ManticoreDb::connection('test')->setLogger(\Log::getLogger());
+
+// Enable logging for the next query
+ManticoreDb::table('test')->match($match)->where($where)->setLogger(\Log::getLogger())->get();
+```
+
+
 More info about ManticoreSearch Query Builder see in 
 [documentation](https://github.com/aVadim483/manticore-query-builder-php/blob/main/docs/README.md)
 of the package
