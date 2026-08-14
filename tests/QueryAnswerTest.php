@@ -149,6 +149,35 @@ class QueryAnswerTest extends TestCase
     }
 
     /**
+     * weight() is 1 without a full-text match, so the column is not selected there - the row
+     * of a plain read matches the table and can be handed over as it is
+     */
+    public function testARowOfAPlainReadCarriesNoScore(): void
+    {
+        $row = ManticoreDb::table($this->table)->where('brand', 'acme')->first();
+
+        $this->assertFalse($row->has('_score'));
+        $this->assertSame(['_id', 'id', 'title', 'brand', 'price'], array_keys($row->toArray()));
+    }
+
+    public function testARowOfAFullTextQueryCarriesTheScore(): void
+    {
+        $row = ManticoreDb::table($this->table)->match('apple')->first();
+
+        $this->assertTrue($row->has('_score'));
+        $this->assertGreaterThan(0, $row->_score);
+    }
+
+    public function testTheScoreCanBeAskedForAndDroppedExplicitly(): void
+    {
+        $withScore = ManticoreDb::table($this->table)->where('brand', 'acme')->withScore()->first();
+        $withoutScore = ManticoreDb::table($this->table)->match('apple')->withoutScore()->first();
+
+        $this->assertTrue($withScore->has('_score'));
+        $this->assertFalse($withoutScore->has('_score'));
+    }
+
+    /**
      * The writes are inherited untouched, so they keep the scalar answers of the builder
      */
     public function testWritesStillAnswerWithScalars(): void
