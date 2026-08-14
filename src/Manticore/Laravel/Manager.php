@@ -57,7 +57,7 @@ class Manager
      *
      * @return Connection
      */
-    public function connection(string $name = null, LoggerInterface $logger = null): Connection
+    public function connection(?string $name = null, ?LoggerInterface $logger = null): Connection
     {
         $name = $name ?: $this->getDefaultConnection();
 
@@ -98,7 +98,7 @@ class Manager
      *
      * @return Connection
      */
-    protected function makeConnection(string $name, LoggerInterface $logger = null)
+    protected function makeConnection(string $name, ?LoggerInterface $logger = null)
     {
         $config = $this->getConfig();
         if (null === Arr::get($config, 'connections.' . $name)) {

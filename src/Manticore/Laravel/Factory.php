@@ -18,7 +18,7 @@ class Factory
      *
      * @return Connection
      */
-    public function make(array $connection, LoggerInterface $logger = null)
+    public function make(array $connection, ?LoggerInterface $logger = null)
     {
         ManticoreBuilder::init($connection, $logger);
 

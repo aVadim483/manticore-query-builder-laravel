@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+>
+    <testsuites>
+        <testsuite name="manticore-query-builder-laravel">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <php>
+        <!--
+            Address of the ManticoreSearch server used by the integration tests.
+            Tests that need a live server are skipped when this address is unreachable.
+        -->
+        <env name="MANTICORE_TEST_HOST" value="127.0.0.1"/>
+        <env name="MANTICORE_TEST_PORT" value="9306"/>
+    </php>
+</phpunit>

@@ -3,4 +3,6 @@
 /composer.lock
 /build/
 /.phpunit.result.cache
+/.phpunit.cache/
+/phpunit.xml
 /.php_cs.cache
