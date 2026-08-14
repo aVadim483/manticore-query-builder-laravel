@@ -81,6 +81,45 @@ $list = \ManticoreDb::connection('test')->showTables();
 
 ```
 
+## What the reads return
+
+The standalone [query builder](https://github.com/aVadim483/manticore-query-builder-php) answers
+with plain arrays — a collection there would mean an extra dependency in a framework-agnostic
+library. Inside Laravel the framework is a given, so this package answers the way Laravel does:
+
+```php
+// Illuminate\Support\Collection, keyed from zero
+$rows = \ManticoreDb::table('products')->match('galaxy')->get();
+
+$titles = $rows->map(fn ($row) => $row->title)->all();
+
+// A single row is a Row object
+$row = \ManticoreDb::table('products')->where('price', '<', 1000)->first();
+$row = \ManticoreDb::table('products')->find($id);
+
+// pluck() answers with a Collection too, keyed by the second column when it is given
+$titles = \ManticoreDb::table('products')->pluck('title');
+$titles = \ManticoreDb::table('products')->pluck('title', 'id');
+```
+
+A `Row` reads both ways, so the code written against the array answer of the standalone builder
+keeps working:
+
+```php
+$row->title;     // as an object, like in Laravel
+$row['title'];   // as an array, like in the standalone builder
+
+$row->toArray();
+$row->toJson();
+json_encode($rows);   // an array of objects, as expected of a JSON API
+```
+
+Writes are untouched and keep the answers of the builder: `insert()` returns `bool`,
+`update()` and `delete()` the number of affected rows, `insertGetId()` the id.
+
+Both entry points answer alike — the `\ManticoreDb` alias and the container service behind the
+facade share the same connection.
+
 Create a table of ManticoreSearch in Laravel migration
 ```php
 use avadim\Manticore\QueryBuilder\Schema\SchemaTable;
@@ -129,6 +168,18 @@ ManticoreDb::connection('test')->setLogger(\Log::getLogger());
 ManticoreDb::table('test')->match($match)->where($where)->setLogger(\Log::getLogger())->get();
 ```
 
+
+## Testing
+
+```sh
+composer install
+vendor/bin/phpunit
+```
+
+Some tests need a running ManticoreSearch server. By default they use `127.0.0.1:9306`, this can be
+changed with the `MANTICORE_TEST_HOST` and `MANTICORE_TEST_PORT` environment variables in `phpunit.xml.dist`.
+If the server is unreachable those tests are skipped, the rest of the suite still runs.
+Tables created by the tests are named `phpunit_*` and are dropped afterwards.
 
 More info about ManticoreSearch Query Builder see in 
 [documentation](https://github.com/aVadim483/manticore-query-builder-php/blob/main/docs/README.md)

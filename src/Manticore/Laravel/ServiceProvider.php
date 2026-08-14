@@ -36,6 +36,11 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->mergeConfigFrom($source, 'manticore');
 
+        // every connection of the builder is built of Laravel\Connection, and every query of it
+        // of Laravel\Query - so that reads answer with a Collection whichever entry point was
+        // used, the \ManticoreDb alias or the container service
+        ManticoreBuilder::setConnectionClass(Connection::class);
+
         ManticoreBuilder::init(config('manticore'));
     }
 
