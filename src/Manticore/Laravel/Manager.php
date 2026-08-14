@@ -6,6 +6,7 @@ namespace avadim\Manticore\Laravel;
 
 use \avadim\Manticore\QueryBuilder\Builder as ManticoreBuilder;
 use avadim\Manticore\QueryBuilder\Connection;
+use avadim\Manticore\QueryBuilder\ResultSet;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -13,6 +14,44 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Class Manager
+ *
+ * Unknown methods are proxied to the default connection by __call(), which is what the
+ * annotations below describe - they are the methods of Connection, so that an IDE knows about
+ * them. Reads of a query answer with a Collection of Row objects, see Laravel\Query.
+ *
+ * @method Query table(string $name)                                        table to build a query for
+ * @method Query index(string $name)                                        alias of table()
+ * @method Query sql(string $sql)                                           query out of raw SQL
+ * @method Query query()                                                    empty query of this connection
+ * @method array select(string $sql, ?array $bindings = [])                 run raw SQL and take the rows
+ * @method bool statement(string $sql)                                      run raw SQL, true when accepted
+ *
+ * @method mixed transaction(callable $callback, ?int $attempts = 1)        run the callback in a transaction
+ * @method bool beginTransaction()
+ * @method bool commit()
+ * @method bool rollBack()
+ * @method int transactionLevel()
+ *
+ * @method ResultSet create(string $name, $schema, ?array $options = [], ?bool $ifNotExists = false)
+ * @method ResultSet drop(string $name, ?bool $ifExists = false)
+ * @method bool hasTable(string $name)
+ * @method ResultSet addColumn(string $tableName, string $columnName, $type, $options = null)
+ * @method ResultSet dropColumn(string $tableName, $columnName)
+ * @method ResultSet modifyColumn(string $tableName, string $columnName, string $type)
+ * @method ResultSet alterSettings(string $tableName, array $settings)
+ * @method ResultSet rename(string $tableName, string $newName)             needs Manticore Buddy
+ *
+ * @method array showTables(?string $pattern = null)
+ * @method string showCreate(string $tableName)
+ * @method string showCreateTable(string $tableName)
+ * @method array showVariables(?string $pattern = null)
+ * @method array tableDescribe(string $tableName)
+ * @method array tableStatus(string $tableName)
+ * @method array tableSettings(string $tableName)
+ *
+ * @method ResultSet|null lastResultSet()                                   answer of the last statement
+ * @method Connection forgetSchema()                                        drop the cached DESCRIBE
+ * @method Connection setLogger($logger)
  *
  * @package avadim\Manticore\Laravel
  */
