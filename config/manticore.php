@@ -17,8 +17,8 @@ return [
             'username'      => env('MANTICORE_USER', null),
             'password'      => env('MANTICORE_PASS', null),
             'timeout'       => env('MANTICORE_TIMEOUT', 5),
-            'prefix'        => '',
-            'force_prefix'  => false,
+            'prefix'        => env('MANTICORE_PREFIX', ''),
+            'force_prefix'  => env('MANTICORE_FORCE_PREFIX', false),
         ],
     ],
 ];
