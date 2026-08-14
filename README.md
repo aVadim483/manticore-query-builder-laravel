@@ -143,10 +143,11 @@ Both accept the same arguments as in Laravel: `paginate($perPage, $columns, $pag
 ## Transactions
 
 Manticore serves `BEGIN` / `COMMIT` / `ROLLBACK` on real-time tables, so a transaction is
-written the way it is elsewhere in Laravel:
+written the way it is elsewhere in Laravel. Transactions live in the query builder itself, so
+the static call works too:
 
 ```php
-\ManticoreDb::connection()->transaction(function ($connection) {
+\ManticoreDb::transaction(function ($connection) {
     $connection->table('products')->insert($data);
     $connection->table('log')->insert($record);
 });
