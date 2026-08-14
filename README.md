@@ -1,7 +1,7 @@
-[![Latest Stable Version](http://poser.pugx.org/avadim/manticore-query-builder-laravel/v)](https://packagist.org/packages/avadim/manticore-query-builder-laravel) 
-[![Total Downloads](http://poser.pugx.org/avadim/manticore-query-builder-laravel/downloads)](https://packagist.org/packages/avadim/manticore-query-builder-laravel) 
-[![License](http://poser.pugx.org/avadim/manticore-query-builder-laravel/license)](https://packagist.org/packages/avadim/manticore-query-builder-laravel) 
-[![PHP Version Require](http://poser.pugx.org/avadim/manticore-query-builder-laravel/require/php)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![GitHub Release](https://img.shields.io/github/v/release/aVadim483/manticore-query-builder-laravel)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/avadim/manticore-query-builder-laravel?color=%23aa00aa)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![GitHub License](https://img.shields.io/github/license/aVadim483/manticore-query-builder-laravel)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
+[![Static Badge](https://img.shields.io/badge/php-%3E%3D7.4-005fc7)](https://packagist.org/packages/avadim/manticore-query-builder-laravel)
 
 # ManticoreSearch Query Builder for Laravel
 
