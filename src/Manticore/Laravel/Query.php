@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace avadim\Manticore\Laravel;
 
 use avadim\Manticore\QueryBuilder\Query as BaseQuery;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -71,6 +73,56 @@ class Query extends BaseQuery
     public function pluck(string $column, ?string $key = null): Collection
     {
         return new Collection(parent::pluck($column, $key));
+    }
+
+    /**
+     * The given page of the result, with the total number of rows alongside it
+     *
+     * @param int|null $perPage
+     * @param string|array $columns
+     * @param string $pageName
+     * @param int|null $page current page, taken from the request when not given
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginate($perPage = 15, $columns = '*', string $pageName = 'page', ?int $page = null): LengthAwarePaginator
+    {
+        $perPage = max(1, (int)$perPage);
+        $page = $page ?: max(1, (int)Paginator::resolveCurrentPage($pageName));
+        // count() rewrites the column list, so it goes to a copy
+        $total = $this->clone()->count();
+        $items = $total > 0 ? $this->forPage($page, $perPage)->get($columns) : new Collection();
+
+        return new LengthAwarePaginator($items, $total, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
+    /**
+     * The given page of the result, without counting the rest.
+     *
+     * One row more than asked for is selected, which is enough to tell whether there is a next
+     * page - and cheaper than the COUNT(*) of paginate().
+     *
+     * @param int|null $perPage
+     * @param string|array $columns
+     * @param string $pageName
+     * @param int|null $page
+     *
+     * @return \Illuminate\Pagination\Paginator
+     */
+    public function simplePaginate($perPage = 15, $columns = '*', string $pageName = 'page', ?int $page = null): Paginator
+    {
+        $perPage = max(1, (int)$perPage);
+        $page = $page ?: max(1, (int)Paginator::resolveCurrentPage($pageName));
+        // one row more than the page holds, and the offset is still counted by the page size
+        $items = $this->limit($perPage + 1)->offset(($page - 1) * $perPage)->get($columns);
+
+        return new Paginator($items, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
     }
 
     /**

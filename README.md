@@ -120,6 +120,55 @@ Writes are untouched and keep the answers of the builder: `insert()` returns `bo
 Both entry points answer alike — the `\ManticoreDb` alias and the container service behind the
 facade share the same connection.
 
+## Pagination
+
+```php
+// Illuminate\Pagination\LengthAwarePaginator, the page number taken from the request
+$products = \ManticoreDb::table('products')->match('galaxy')->paginate(15);
+
+// ... and without the COUNT(*) of the total, when the template only needs "next" and "previous"
+$products = \ManticoreDb::table('products')->simplePaginate(15);
+```
+
+```blade
+@foreach ($products as $product)
+    {{ $product->title }}
+@endforeach
+
+{{ $products->links() }}
+```
+
+Both accept the same arguments as in Laravel: `paginate($perPage, $columns, $pageName, $page)`.
+
+## Transactions
+
+Manticore serves `BEGIN` / `COMMIT` / `ROLLBACK` on real-time tables, so a transaction is
+written the way it is elsewhere in Laravel:
+
+```php
+\ManticoreDb::connection()->transaction(function ($connection) {
+    $connection->table('products')->insert($data);
+    $connection->table('log')->insert($record);
+});
+
+// ... or by hand
+$connection = \ManticoreDb::connection();
+$connection->beginTransaction();
+$connection->table('products')->insert($data);
+$connection->commit();   // or rollBack()
+```
+
+The callback receives the connection, and whatever it returns becomes the result of
+`transaction()`. An exception rolls the transaction back and is rethrown; a second argument
+sets how many times to try. Manticore has no savepoints, so a nested `transaction()` only
+counts a level deeper — the outermost commit is the one that writes.
+
+Any SQL statement can be run directly:
+
+```php
+\ManticoreDb::connection()->statement('FLUSH RAMCHUNK products');   // true when the server accepted it
+```
+
 Create a table of ManticoreSearch in Laravel migration
 ```php
 use avadim\Manticore\QueryBuilder\Schema\SchemaTable;

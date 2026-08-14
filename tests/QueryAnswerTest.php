@@ -157,7 +157,7 @@ class QueryAnswerTest extends TestCase
         $row = ManticoreDb::table($this->table)->where('brand', 'acme')->first();
 
         $this->assertFalse($row->has('_score'));
-        $this->assertSame(['_id', 'id', 'title', 'brand', 'price'], array_keys($row->toArray()));
+        $this->assertSame(['id', 'title', 'brand', 'price'], array_keys($row->toArray()));
     }
 
     public function testARowOfAFullTextQueryCarriesTheScore(): void
