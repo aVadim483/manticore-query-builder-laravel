@@ -331,6 +331,46 @@ class CreateManticoreProductsTable extends Migration
 Manticore has no transactional DDL, so a migration that fails halfway leaves behind whatever it
 had already created — write `down()` so that it can be run over a half-built table.
 
+A table already in use is changed the same way:
+
+```php
+class AddRatingToManticoreProducts extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        \ManticoreDb::addColumn('products', 'rating', 'int');
+        \ManticoreDb::addColumn('products', 'summary', 'text');
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        \ManticoreDb::dropColumn('products', 'rating');
+        \ManticoreDb::dropColumn('products', 'summary');
+    }
+}
+```
+
+Three things this differs in from a migration of a SQL database:
+
+* **One operation per statement.** The server takes no `ADD COLUMN a, ADD COLUMN b`, so the two
+  columns above are two statements — and the second failing leaves the first one added, since
+  there is nothing to roll back with.
+* **The rows written earlier keep an empty value** in the new column: adding it does not reindex
+  them. A full-text field added this way finds only the rows written after it, so the data has to
+  be written again for the column to mean anything.
+* **The cache of the schema is dropped for you**, but only in the connection that ran the
+  statement — see [Long-running workers](#long-running-workers) for the ones that did not.
+
 ## Long-running workers
 
 A connection remembers the schema of every table it has described, which saves a `DESCRIBE`

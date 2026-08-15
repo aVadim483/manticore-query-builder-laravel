@@ -4,6 +4,16 @@ All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [semantic versioning](https://semver.org/).
 
+## [2.1.1] - 2026-08-15
+
+### Documentation
+
+* The section on migrations shows how to change a table that is already in use — `addColumn()`
+  and `dropColumn()` in `up()` and `down()` — and what that differs in from a migration of a SQL
+  database: one operation per statement with nothing to roll back with, an empty value in the new
+  column for the rows written before it, and the cache of the schema dropped only in the
+  connection that ran the statement.
+
 ## [2.1.0] - 2026-08-15
 
 ### Changed
@@ -66,6 +76,7 @@ builder it is built on.
 
 The first release: service provider, facade, connection manager and the configuration file.
 
+[2.1.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v1.0.4...v2.0.0
 [1.0.4]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v1.0.3...v1.0.4
