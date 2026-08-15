@@ -22,6 +22,7 @@ composer require avadim/manticore-query-builder-laravel
 
 ## Содержание
 
+* [Смежные пакеты](#смежные-пакеты)
 * [Требования](#требования)
 * [Установка](#установка)
 * [Конфигурация](#конфигурация)
@@ -36,6 +37,17 @@ composer require avadim/manticore-query-builder-laravel
 * [Логирование](#логирование)
 * [Документация](#документация)
 * [Тесты](#тесты)
+
+## Смежные пакеты
+
+* [`avadim/manticore-query-builder-php`](https://github.com/aVadim483/manticore-query-builder-php) —
+  сам построитель запросов, без зависимостей от Laravel: синтаксис запроса, DSL схемы и пул
+  соединений живут там. Именно он нужен вне Laravel-приложения, и именно к нему относится правка
+  `match()`, `where()` или `insert()`.
+* [`avadim/manticore-laravel-scout`](https://github.com/aVadim483/manticore-laravel-scout) —
+  драйвер ManticoreSearch для [Laravel Scout](https://laravel.com/docs/scout), построенный на этом
+  пакете: полнотекстовый поиск по моделям Eloquent в виде `Post::search('manticore')->get()`, а за
+  актуальностью индекса следит наблюдатель Scout.
 
 ## Требования
 

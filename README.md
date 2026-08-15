@@ -22,6 +22,7 @@ Laravel expects.
 
 ## Contents
 
+* [Related packages](#related-packages)
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Configuration](#configuration)
@@ -36,6 +37,17 @@ Laravel expects.
 * [Logging](#logging)
 * [Documentation](#documentation)
 * [Testing](#testing)
+
+## Related packages
+
+* [`avadim/manticore-query-builder-php`](https://github.com/aVadim483/manticore-query-builder-php) —
+  the query builder itself, with no dependency on Laravel: the syntax of a query, the schema DSL
+  and the pool of connections live there. That is the one to use outside a Laravel application,
+  and the one a change to `match()`, `where()` or `insert()` belongs to.
+* [`avadim/manticore-laravel-scout`](https://github.com/aVadim483/manticore-laravel-scout) —
+  the ManticoreSearch driver for [Laravel Scout](https://laravel.com/docs/scout), built on this
+  package: full-text search of Eloquent models as `Post::search('manticore')->get()`, with the
+  index kept in step by the observer of Scout.
 
 ## Requirements
 
