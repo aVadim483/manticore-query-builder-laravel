@@ -20,7 +20,7 @@
         "php": "^7.4|^8.1",
         "ext-json": "*",
         "psr/log": ">=1.1",
-        "avadim/manticore-query-builder-php": "^2.0",
+        "avadim/manticore-query-builder-php": "^2.1",
         "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
         "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
         "illuminate/pagination": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0"

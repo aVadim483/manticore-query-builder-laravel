@@ -4,6 +4,15 @@ All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [semantic versioning](https://semver.org/).
 
+## [2.1.0] - 2026-08-15
+
+### Changed
+
+* Requires `avadim/manticore-query-builder-php` 2.1, where the `CALL *` statements of the server
+  became methods of the builder — `callSuggest()`, `callQsuggest()`, `callKeywords()`,
+  `callSnippets()` and `callPq()`. They are reached through this package as they are, e.g.
+  `\ManticoreDb::table('?posts')->callSuggest('mantikore')`.
+
 ## [2.0.0] - 2026-08-15
 
 The release the reads change shape in, so the major number goes up with the one of the query
@@ -57,6 +66,7 @@ builder it is built on.
 
 The first release: service provider, facade, connection manager and the configuration file.
 
+[2.1.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v1.0.4...v2.0.0
 [1.0.4]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v1.0.0...v1.0.3
