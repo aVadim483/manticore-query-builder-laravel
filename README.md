@@ -51,10 +51,13 @@ Laravel expects.
 
 ## Requirements
 
-* PHP 7.4 or above with the PDO and JSON extensions
-* Laravel 6 — 13, or Lumen
+* PHP 8.2 or above with the PDO and JSON extensions
+* Laravel 11, 12 or 13, or Lumen 11
 * [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.2 or above, installed along with this package
 * Manticore Search reachable over its SQL interface, port 9306 by default. The HTTP/JSON API is not used.
+
+Version 2.x runs on Laravel 6 to 13 and PHP 7.4, and stays where it is for an application that
+has not moved yet: an older Laravel is not broken by this, it simply keeps installing 2.x.
 
 A few things need more than the bare server: KNN vector search needs the KNN library, columnar
 storage the columnar one, `rename()` needs Manticore Buddy. What needs what is listed in the

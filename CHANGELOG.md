@@ -6,12 +6,32 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Breaking
+
+* **The package requires Laravel 11 and PHP 8.2.** The ranges of `illuminate/*` are narrowed to
+  `^11.0|^12.0|^13.0` and `php` to `^8.2`; Lumen 11 asks for the same two, so it is still served.
+
+  What the code can run on is not what changed - the suite passes on every Laravel from 6 to 13,
+  which is exactly why the range said so. What changed is what that range is worth. Laravel 10
+  and 11 are past their security support, and every release of 6 to 11 is flagged by an advisory,
+  so composer will not resolve one from scratch any more: a claim about them cannot be tested,
+  only asserted. PHP 8.2 is the oldest version still getting security fixes of its own, and
+  Laravel 11 is the major that sits on it.
+
+  An application on an older Laravel is not broken by this: composer never re-resolves a framework
+  that is already installed, so it keeps installing 2.x, which runs there. Version 2.x is where
+  Laravel 6 to 13 and PHP 7.4 stay.
+
+  For the sources this lifts the floor of the syntax: everything up to PHP 8.2 is now allowed in
+  `src/`, and the tests are free to use the attributes of PHPUnit 10.
+
 ### Added
 
-* Continuous integration: the sources are linted on PHP 7.4 and 8.1-8.4, which is what keeps
-  the declared floor of the package honest, and the whole suite runs against a Manticore
-  service container on the Laravel versions composer can still install - 12 on PHP 8.2 and 8.3,
-  13 on PHP 8.4.
+* Continuous integration: the whole suite runs against a Manticore service container on every
+  Laravel the package declares - 11 on PHP 8.2, 12 on 8.3, 13 on 8.4 and on 8.5, which is the
+  newest PHP the framework allows. Both ends of the range are checked rather than assumed. The
+  job of the floor turns `audit.block-insecure` off, because installing an EOL framework from
+  scratch is the one case composer refuses.
 * `.gitattributes` - the tests, the benchmarks and the CI config are no longer part of the
   package: they are read on GitHub, not from `vendor/`. Line endings are pinned to LF as well,
   so that a file does not depend on the machine it was committed from.
@@ -21,19 +41,20 @@ All notable changes to this package are documented here. The format follows
 * Requires `avadim/manticore-query-builder-php` 2.2, where non-ASCII text in a raw statement is no
   longer cut off, a statement the server refused is raised as an error instead of coming back as a
   successful empty result, and `timeout` limits the opening of the connection rather than being
-  applied to a handle already connected. The breaking changes of that release — a value that looks
+  applied to a handle already connected. The breaking changes of that release - a value that looks
   like `:word` is escaped instead of being read as a named parameter, and the rows of a join come
-  back as a list — touch nothing this package has: neither its classes, nor its tests, nor the
+  back as a list - touch nothing this package has: neither its classes, nor its tests, nor the
   examples of the readme use either.
-* The test suite runs on PHPUnit 13 as well: the range of `phpunit/phpunit` is widened to `^13.0`.
+* The range of `phpunit/phpunit` is `^10.5|^11.0|^12.0|^13.0`, and that of `orchestra/testbench`
+  `^9.0|^10.0|^11.0` - what the supported Laravel versions bring with them.
 * `psr/log` is required as `^1.1|^2.0|^3.0` instead of the unbound `>=1.1`, which would have let a
   future major of the interface in unchecked.
 
 ### Documentation
 
 * The section on long-running workers says when `forgetSchema()` is actually needed: what a stale
-  cache breaks — reads cast and writes format after the old column types, quietly rather than by
-  throwing — and the four cases that call for dropping it by hand, an `ALTER` through
+  cache breaks - reads cast and writes format after the old column types, quietly rather than by
+  throwing - and the four cases that call for dropping it by hand, an `ALTER` through
   `statement()`, a migration run by another process, a table altered by someone else, and another
   named connection of the same application. Plus the cases it is pointless in, and what dropping
   it costs.

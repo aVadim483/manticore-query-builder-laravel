@@ -6,38 +6,13 @@ on:
   pull_request:
 
 jobs:
-  # The package declares PHP 7.4 as its floor, while it is developed on 8.4, so nothing but a
-  # parser on the old version tells whether the source really stays inside it. No dependency of
-  # any kind is installed here: composer cannot put a Laravel next to PHP 7.4 any more (see the
-  # note in the job below), and linting needs none.
-  lint:
-    name: lint / PHP ${{ matrix.php }}
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['7.4', '8.1', '8.2', '8.3', '8.4']
-
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          coverage: none
-
-      - name: Lint the sources
-        run: find src config tests -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
-
-  # The suite itself, against a live server: every test that resolves a connection opens a real
-  # PDO connection, and without a server behind it two thirds of the suite would only be skipped.
+  # The whole suite against a live server, on every Laravel the package declares: every test that
+  # resolves a connection opens a real PDO connection, and without a server behind it two thirds
+  # of the suite would only be skipped.
   #
-  # The matrix holds what composer can still install. Laravel 6 to 11 is out of reach of CI, not
-  # of the package: every release of those majors is flagged by a security advisory, and composer
-  # refuses to install a flagged package unless "audit.block-insecure" is turned off. Turning it
-  # off to test an EOL framework is a decision for the maintainer, not a default of this file.
+  # The matrix runs the floor of the range (Laravel 11 on PHP 8.2), each major above it, and the
+  # newest PHP the framework allows (8.5), so both ends of what composer.json promises are checked
+  # rather than assumed.
   tests:
     name: tests / PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }}
     runs-on: ubuntu-latest
@@ -47,12 +22,16 @@ jobs:
       matrix:
         include:
           - php: '8.2'
-            laravel: '12'
-            testbench: '^10.0'
+            laravel: '11'
+            testbench: '^9.0'
+            eol: true
           - php: '8.3'
             laravel: '12'
             testbench: '^10.0'
           - php: '8.4'
+            laravel: '13'
+            testbench: '^11.0'
+          - php: '8.5'
             laravel: '13'
             testbench: '^11.0'
 
@@ -80,6 +59,16 @@ jobs:
           path: ~/.cache/composer/files
           key: composer-${{ matrix.php }}-${{ matrix.testbench }}-${{ hashFiles('composer.json') }}
           restore-keys: composer-${{ matrix.php }}-${{ matrix.testbench }}-
+
+      # Laravel 11 reached the end of its security support on March 12th, 2026, so every release
+      # of it is flagged by an advisory and composer refuses to install one from scratch. It is
+      # the floor of the package all the same: an application already running it installs this
+      # package without a word, because composer never re-resolves what is already there. Testing
+      # that floor is the one case that does ask for the framework from scratch, hence the flag -
+      # a dev-only dependency, in a runner thrown away at the end of the job.
+      - name: Allow the EOL framework of this job
+        if: matrix.eol
+        run: composer config audit.block-insecure false
 
       # the testbench pins the Laravel of the job; update, not install, because a library ships
       # no composer.lock and the current dependencies are what has to be checked
