@@ -6,3 +6,4 @@
 /.phpunit.cache/
 /phpunit.xml
 /.php_cs.cache
+/benchmarks/vendor/
