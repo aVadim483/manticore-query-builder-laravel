@@ -31,6 +31,7 @@ Laravel expects.
 * [What the reads return](#what-the-reads-return)
 * [When a query fails](#when-a-query-fails)
 * [Pagination](#pagination)
+* [Walking a large result](#walking-a-large-result)
 * [Transactions](#transactions)
 * [Migrations](#migrations)
 * [Long-running workers](#long-running-workers)
@@ -264,6 +265,47 @@ $products = \ManticoreDb::table('products')->simplePaginate(15);
 ```
 
 Both accept the same arguments as in Laravel: `paginate($perPage, $columns, $pageName, $page)`.
+
+## Walking a large result
+
+A result too large to be read at once is walked page by page. Every walk hands over the shapes
+the other reads answer with: a page is a `Collection`, a row is a `Row`.
+
+```php
+// pages of 500, until the result ends or the callback returns false
+\ManticoreDb::table('products')->orderBy('id')->chunk(500, function ($rows, $page) {
+    foreach ($rows as $row) {
+        // ... $row->title
+    }
+});
+
+// the same walk, but by the id column
+\ManticoreDb::table('products')->chunkById(500, function ($rows, $page) { /* ... */ });
+
+// row by row, with a running number
+\ManticoreDb::table('products')->each(function ($row, $number) { /* ... */ });
+
+// a generator of Row, asking the server for the next page only when it is reached
+foreach (\ManticoreDb::table('products')->orderBy('id')->lazy(500) as $row) {
+    // ...
+}
+
+// the only row that matches - a RuntimeException when there is none, or more than one
+$product = \ManticoreDb::table('products')->where('sku', $sku)->sole();
+```
+
+`cursor()` is an alias of `lazy()`. Both are generators rather than a `LazyCollection`, because
+that is what the query builder declares them to be; `LazyCollection::make($query->lazy())` wraps
+one where the methods of a collection are wanted.
+
+**`chunkById()` is the one to walk a whole result with.** `chunk()`, `each()` and `lazy()` page
+with `LIMIT`/`OFFSET`, so they run into the same `max_matches` the pagination does - a walk over
+more than a thousand rows throws `offset out of bounds` rather than ending early, and raising
+`maxMatches()` to the size of the whole result is what it would take to finish it. They also
+depend on the order of the result being fixed: two pages of a query without an `orderBy()` are two
+separate searches, and an unstable order between them shows the same row twice while another one
+is never seen. `chunkById()` has neither problem - it asks for the rows after the last id of the
+previous page, so nothing is skipped and no offset grows.
 
 ## Transactions
 

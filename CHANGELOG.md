@@ -25,6 +25,13 @@ All notable changes to this package are documented here. The format follows
   For the sources this lifts the floor of the syntax: everything up to PHP 8.2 is now allowed in
   `src/`, and the tests are free to use the attributes of PHPUnit 10.
 
+* **The walks of a result answer the way the other reads do.** `chunk()`, `chunkById()`,
+  `each()`, `lazy()`, `cursor()` and `sole()` were inherited from the query builder untouched, so
+  they handed out plain arrays while `get()` and `first()` of the same query answered with a
+  `Collection` of `Row`. They now hand over the same shapes: a page is a `Collection`, a row is a
+  `Row`. `foreach` over a page and `$row['title']` are unaffected; code that treated a page as an
+  array - `array_map()`, `array_column()`, `array_slice()` - works with the collection instead.
+
 ### Added
 
 * Continuous integration: the whole suite runs against a Manticore service container on every
@@ -58,6 +65,10 @@ All notable changes to this package are documented here. The format follows
   `statement()`, a migration run by another process, a table altered by someone else, and another
   named connection of the same application. Plus the cases it is pointless in, and what dropping
   it costs.
+* A section on walking a large result: what `chunk()`, `chunkById()`, `each()`, `lazy()`,
+  `cursor()` and `sole()` hand over, and why a walk over the whole of a result belongs to
+  `chunkById()` - the others page with `LIMIT`/`OFFSET`, which runs into `max_matches` and needs
+  the order of the result to be fixed, or a row comes twice while another never does.
 
 ## [2.1.1] - 2026-08-15
 

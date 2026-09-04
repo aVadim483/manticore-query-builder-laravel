@@ -76,6 +76,108 @@ class Query extends BaseQuery
     }
 
     /**
+     * Run the callback over the result page by page
+     *
+     * @param int $count rows per page
+     * @param callable $callback receives a Collection of Row and the page number; returning
+     *                           false stops the walk
+     *
+     * @return bool false when the walk was stopped by the callback
+     */
+    public function chunk(int $count, callable $callback): bool
+    {
+        return parent::chunk($count, function (array $rows, int $page) use ($callback) {
+            return $callback($this->newCollection($rows), $page);
+        });
+    }
+
+    /**
+     * Run the callback over the result page by page, walking by the id column
+     *
+     * @param int $count rows per page
+     * @param callable $callback receives a Collection of Row and the page number; returning
+     *                           false stops the walk
+     * @param string|null $column the column to walk by, the document id by default
+     *
+     * @return bool false when the walk was stopped by the callback
+     */
+    public function chunkById(int $count, callable $callback, ?string $column = 'id'): bool
+    {
+        return parent::chunkById($count, function (array $rows, int $page) use ($callback) {
+            return $callback($this->newCollection($rows), $page);
+        }, $column);
+    }
+
+    /**
+     * Run the callback over every row of the result.
+     *
+     * The walk of the query builder is written out again rather than inherited: it hands its
+     * pages to a callback typed array, and the pages of chunk() are a Collection here.
+     *
+     * @param callable $callback receives the Row and its number; returning false stops the walk
+     * @param int|null $count rows per page
+     *
+     * @return bool false when the walk was stopped by the callback
+     */
+    public function each(callable $callback, ?int $count = 1000): bool
+    {
+        $number = 0;
+
+        return $this->chunk((int)$count, static function (Collection $rows) use ($callback, &$number) {
+            foreach ($rows as $row) {
+                if ($callback($row, $number++) === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * The rows of the result as Row objects, one by one, fetched page by page as they are asked for.
+     *
+     * The generator is numbered from zero, the way the Collection of get() is: the keys of the
+     * query builder are document ids, and a walk without an order can meet the same id on two
+     * pages - which would cost a row when the generator is read into an array.
+     *
+     * @param int|null $count rows per page
+     *
+     * @return \Generator
+     */
+    public function lazy(?int $count = 1000): \Generator
+    {
+        $number = 0;
+
+        foreach (parent::lazy($count) as $row) {
+            yield $number++ => $this->newRow((array)$row);
+        }
+    }
+
+    /**
+     * Alias of lazy()
+     *
+     * @param int|null $count
+     *
+     * @return \Generator
+     */
+    public function cursor(?int $count = 1000): \Generator
+    {
+        return $this->lazy($count);
+    }
+
+    /**
+     * The only row matching the query
+     *
+     * @return Row
+     * @throws \RuntimeException when nothing matched, or more than one row did
+     */
+    public function sole(): Row
+    {
+        return $this->newRow((array)parent::sole());
+    }
+
+    /**
      * The given page of the result, with the total number of rows alongside it
      *
      * @param int|null $perPage
