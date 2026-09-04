@@ -4,6 +4,17 @@ All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Documentation
+
+* The section on long-running workers says when `forgetSchema()` is actually needed: what a stale
+  cache breaks — reads cast and writes format after the old column types, quietly rather than by
+  throwing — and the four cases that call for dropping it by hand, an `ALTER` through
+  `statement()`, a migration run by another process, a table altered by someone else, and another
+  named connection of the same application. Plus the cases it is pointless in, and what dropping
+  it costs.
+
 ## [2.1.1] - 2026-08-15
 
 ### Documentation

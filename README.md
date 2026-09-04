@@ -384,10 +384,44 @@ So a table altered from somewhere else needs the cache dropped:
 \ManticoreDb::forgetSchema();
 ```
 
+This drops the schemas of every table of the connection — there is no way to drop a single one.
+
 The builder keeps its own cache in step: `create()`, `alter()`, `addColumn()`, `dropColumn()`,
-`truncate()`, `rename()` and `drop()` drop the schema of the table they touched. What it cannot
-know about is a statement of yours — a migration run by another process, an `ALTER` sent through
-`statement()`, a table rebuilt by an indexer.
+`truncate()`, `rename()` and `drop()` drop the schema of the table they touched — but only in the
+connection that ran the statement.
+
+A stale cache throws nothing. The column types are needed in three places: reading casts the
+values of a row into PHP types, `insert()` and `update()` format the values for SQL. An unknown
+column is formatted after the type of the value itself and usually gets through, while a type that
+has changed — a column that was `string` and is now `integer` — gives either an error from the
+server or quietly wrong data.
+
+The condition for dropping the cache by hand is always the same: the schema was altered past your
+connection, and the connection outlived it. In practice that is four cases.
+
+* **An `ALTER` through `statement()`.** Raw SQL goes past the builder, which has no way to drop
+  the cache:
+
+  ```php
+  \ManticoreDb::connection()->statement('ALTER TABLE products ADD COLUMN rating int');
+  \ManticoreDb::forgetSchema();
+  ```
+
+* **A migration run by another process.** `php artisan migrate` is done, while the queue worker or
+  the Octane process started before it lives on with the old cache. The most common case: an
+  ordinary deployment looks exactly like this.
+* **A table altered by someone else** — an indexer, a neighbouring service, another application on
+  the same server.
+* **Another named connection of the same application.** Altered through `connection('admin')`,
+  read through `connection('default')` — those are two different caches.
+
+Under php-fpm, calling `forgetSchema()` in a controller is almost always pointless: the connection
+lives for one request, and the cache does not outlive the response. Tests are the other case: a
+test that alters tables through `statement()` and reuses the connection has to drop the cache in
+`setUp()`, or the next test sees the schema of the previous one.
+
+Dropping the cache costs one `DESCRIBE` per table on the next query. `DESCRIBE` goes out as a
+service query and never reaches the logger, so a stale cache leaves no trace in the log.
 
 ## Logging
 
