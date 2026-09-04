@@ -8,6 +8,10 @@ return [
 
     'defaultConnection' => env('MANTICORE_CONNECTION', 'default'),
 
+    // Logging channel of the application the queries are sent to, e.g. 'stack' or 'daily'.
+    // Nothing is logged while this is empty, which is the default.
+    'logChannel' => env('MANTICORE_LOG_CHANNEL'),
+
     'connections' => [
 
         // Default connection which will be used with environment variables

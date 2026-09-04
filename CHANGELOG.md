@@ -32,6 +32,11 @@ All notable changes to this package are documented here. The format follows
   `Row`. `foreach` over a page and `$row['title']` are unaffected; code that treated a page as an
   array - `array_map()`, `array_column()`, `array_slice()` - works with the collection instead.
 
+* **`Row` declares the types of its `ArrayAccess` methods.** `offsetGet(mixed $offset): mixed`
+  and the three beside it were untyped, with `#[\ReturnTypeWillChange]` to keep PHP 7.4 quiet -
+  which the floor of PHP 8.2 no longer needs. A class extending `Row` and overriding one of them
+  has to declare the same types.
+
 ### Added
 
 * Continuous integration: the whole suite runs against a Manticore service container on every
@@ -39,6 +44,23 @@ All notable changes to this package are documented here. The format follows
   newest PHP the framework allows. Both ends of the range are checked rather than assumed. The
   job of the floor turns `audit.block-insecure` off, because installing an EOL framework from
   scratch is the one case composer refuses.
+* `firstOrFail()` and `findOrFail()`, answering with a `Row` or raising
+  `Illuminate\Database\RecordsNotFoundException` - which Laravel turns into a 404 of its own
+  accord, so reading a document by something out of the route needs no check of its own. `sole()`
+  tells its two failures apart the way Laravel does as well: `RecordsNotFoundException` when
+  nothing matched, `MultipleRecordsFoundException` when more than one row did. Both are a
+  `RuntimeException`, which is what the query builder raised, so code catching that still works.
+  `illuminate/database`, where those two live, is required explicitly - Laravel and Lumen both
+  install it anyway.
+* `MANTICORE_LOG_CHANNEL` - the name of a logging channel of the application is enough to get the
+  queries into its log; the channel is a PSR-3 logger and the builder takes one. Nothing is logged
+  while the variable is empty, which is the default.
+* `Manager::forgetSchemas()` - drops the cached `DESCRIBE` of every connection the manager built,
+  where `forgetSchema()` reaches the default one alone. A worker that outlived a migration needs
+  the whole lot.
+* The benchmarks of the protocols are part of the repository now (`benchmarks/`, kept out of the
+  package by `.gitattributes`): five clients over the two protocols of the server, the question
+  being what the MySQL protocol of this package really saves against the HTTP of the official one.
 * `.gitattributes` - the tests, the benchmarks and the CI config are no longer part of the
   package: they are read on GitHub, not from `vendor/`. Line endings are pinned to LF as well,
   so that a file does not depend on the machine it was committed from.
@@ -54,6 +76,9 @@ All notable changes to this package are documented here. The format follows
   examples of the readme use either.
 * The range of `phpunit/phpunit` is `^10.5|^11.0|^12.0|^13.0`, and that of `orchestra/testbench`
   `^9.0|^10.0|^11.0` - what the supported Laravel versions bring with them.
+* The configuration is merged in `register()` rather than in `boot()`, so that it is there for
+  whoever reads it while the providers are still registering. Lumen still `configure()`s first,
+  because its call replaces the key instead of merging into it.
 * `psr/log` is required as `^1.1|^2.0|^3.0` instead of the unbound `>=1.1`, which would have let a
   future major of the interface in unchecked.
 
@@ -86,6 +111,9 @@ All notable changes to this package are documented here. The format follows
   `chunkById()` - the others page with `LIMIT`/`OFFSET`, which runs into `max_matches` and needs
   the order of the result to be fixed, or a row comes twice while another never does.
 * The section on pagination says what a deep page costs and what it asks the server for.
+* The readme covers what was added: the two `OrFail` reads and the exceptions of `sole()`,
+  `MANTICORE_LOG_CHANNEL` in the table of the environment variables and in the section on logging,
+  and `forgetSchemas()` where the cache of a long-running worker is described.
 
 ## [2.1.1] - 2026-08-15
 

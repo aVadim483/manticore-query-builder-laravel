@@ -42,6 +42,16 @@ class ConfigurationTest extends TestCase
         $this->assertFalse($connection['force_prefix']);
     }
 
+    /**
+     * The logging channel is opt-in: a package that starts writing to the log of an application
+     * it was just installed into would be a surprise
+     */
+    public function testNoLoggingChannelIsNamedByDefault(): void
+    {
+        $this->assertArrayHasKey('logChannel', config('manticore'));
+        $this->assertNull(config('manticore.logChannel'));
+    }
+
     public function testTheDefaultConnectionPointsToTheSphinxqlPort(): void
     {
         $this->assertSame(9306, (int)config('manticore.connections.default.port'));

@@ -121,6 +121,7 @@ MANTICORE_TIMEOUT=5
 | MANTICORE_TIMEOUT      | 5             | Timeout between requests                                           |
 | MANTICORE_PREFIX       |               | Prefix that replaces the placeholder `?` in front of a table name  |
 | MANTICORE_FORCE_PREFIX | false         | Prefix every table name, not only the ones written with `?`        |
+| MANTICORE_LOG_CHANNEL  |               | Logging channel the queries are sent to; nothing is logged while it is empty |
 
 A prefix keeps the tables of an application apart from the rest of a shared server:
 `table('?products')` reads the table `myapp_products` when the prefix is `myapp_`. With
@@ -200,6 +201,15 @@ $row = \ManticoreDb::table('products')->find($id);
 // pluck() answers with a Collection too, keyed by the second column when it is given
 $titles = \ManticoreDb::table('products')->pluck('title');
 $titles = \ManticoreDb::table('products')->pluck('title', 'id');
+```
+
+`first()` and `find()` answer with `null` when nothing matched. Where that is a 404 rather than a
+branch of the code, there are the two that say so:
+
+```php
+// Illuminate\Database\RecordsNotFoundException, which Laravel answers with a 404 of its own accord
+$row = \ManticoreDb::table('products')->where('sku', $sku)->firstOrFail();
+$row = \ManticoreDb::table('products')->findOrFail($id);
 ```
 
 A `Row` reads both ways, so the code written against the array answer of the standalone builder
@@ -298,7 +308,8 @@ foreach (\ManticoreDb::table('products')->orderBy('id')->lazy(500) as $row) {
     // ...
 }
 
-// the only row that matches - a RuntimeException when there is none, or more than one
+// the only row that matches - RecordsNotFoundException when there is none,
+// MultipleRecordsFoundException when there is more than one
 $product = \ManticoreDb::table('products')->where('sku', $sku)->sole();
 ```
 
@@ -438,6 +449,15 @@ So a table altered from somewhere else needs the cache dropped:
 ```
 
 This drops the schemas of every table of the connection — there is no way to drop a single one.
+An application that reads through more than one named connection has more than one cache, and the
+call above reaches the default one; the facade drops the lot:
+
+```php
+app('manticore')->forgetSchemas();   // every connection the manager built
+```
+
+(The manager knows the connections it built itself; one opened through `\ManticoreDb::connection()`
+is not among them and keeps its cache.)
 
 The builder keeps its own cache in step: `create()`, `alter()`, `addColumn()`, `dropColumn()`,
 `truncate()`, `rename()` and `drop()` drop the schema of the table they touched — but only in the
@@ -478,7 +498,16 @@ service query and never reaches the logger, so a stale cache leaves no trace in 
 
 ## Logging
 
-You can use logger instance for logging in this package.
+Naming a logging channel of the application is enough to see the queries in the log it writes:
+
+```dotenv
+MANTICORE_LOG_CHANNEL=stack
+```
+
+The channel is a PSR-3 logger, which is what the builder takes, so it is handed over as it is when
+the package boots. Nothing is logged while the variable is empty, and that is the default.
+
+A logger is attached by hand just as well, at whatever depth is needed:
 
 ```php
 // Enable logging for all

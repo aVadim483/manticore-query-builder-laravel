@@ -122,6 +122,7 @@ MANTICORE_TIMEOUT=5
 | MANTICORE_TIMEOUT      | 5                     | Таймаут запроса                                                 |
 | MANTICORE_PREFIX       |                       | Префикс, заменяющий подстановку `?` перед именем таблицы        |
 | MANTICORE_FORCE_PREFIX | false                 | Добавлять префикс ко всем именам, а не только к записанным с `?` |
+| MANTICORE_LOG_CHANNEL  |                       | Канал логирования, куда идут запросы; пока пусто — не логируется ничего |
 
 Префикс отделяет таблицы приложения от чужих на общем сервере: при префиксе `myapp_` запрос
 `table('?products')` читает таблицу `myapp_products`. С `MANTICORE_FORCE_PREFIX=true` знак `?`
@@ -201,6 +202,15 @@ $row = \ManticoreDb::table('products')->find($id);
 // pluck() тоже возвращает Collection, со вторым аргументом - с ключами по указанной колонке
 $titles = \ManticoreDb::table('products')->pluck('title');
 $titles = \ManticoreDb::table('products')->pluck('title', 'id');
+```
+
+`first()` и `find()` возвращают `null`, если ничего не нашлось. Там, где это не ветка кода, а 404,
+есть пара методов, которые так и говорят:
+
+```php
+// Illuminate\Database\RecordsNotFoundException — Laravel сам отвечает на него 404
+$row = \ManticoreDb::table('products')->where('sku', $sku)->firstOrFail();
+$row = \ManticoreDb::table('products')->findOrFail($id);
 ```
 
 `Row` читается и так и так, поэтому код, написанный под массивы отдельного построителя, продолжает
@@ -299,7 +309,8 @@ foreach (\ManticoreDb::table('products')->orderBy('id')->lazy(500) as $row) {
     // ...
 }
 
-// единственная подходящая строка — RuntimeException, если её нет или их больше одной
+// единственная подходящая строка: RecordsNotFoundException, если её нет,
+// MultipleRecordsFoundException, если их больше одной
 $product = \ManticoreDb::table('products')->where('sku', $sku)->sole();
 ```
 
@@ -437,7 +448,16 @@ class AddRatingToManticoreProducts extends Migration
 \ManticoreDb::forgetSchema();
 ```
 
-Сбрасываются схемы всех таблиц соединения — выборочно по одной нельзя.
+Сбрасываются схемы всех таблиц соединения — выборочно по одной нельзя. У приложения, читающего через
+несколько именованных соединений, и кешей несколько, а вызов выше добирается только до
+соединения по умолчанию; менеджер сбрасывает все:
+
+```php
+app('manticore')->forgetSchemas();   // все соединения, которые он создал
+```
+
+(Менеджер знает те соединения, которые создал сам; открытое через `\ManticoreDb::connection()` в
+их число не входит и свой кеш сохранит.)
 
 Свой кеш построитель поддерживает в актуальном состоянии сам: `create()`, `alter()`,
 `addColumn()`, `dropColumn()`, `truncate()`, `rename()` и `drop()` сбрасывают схему той таблицы,
@@ -477,7 +497,18 @@ class AddRatingToManticoreProducts extends Migration
 
 ## Логирование
 
-Пакет умеет писать запросы в логгер.
+Достаточно назвать канал логирования приложения — и запросы окажутся в том же логе, что и всё
+остальное:
+
+```dotenv
+MANTICORE_LOG_CHANNEL=stack
+```
+
+Канал — это PSR-3-логгер, а именно такой и нужен построителю запросов, поэтому он передаётся как
+есть при загрузке пакета. Пока переменная пуста — а это значение по умолчанию — не логируется
+ничего.
+
+Логгер можно назначить и руками, на любой глубине:
 
 ```php
 // Включить логирование всего

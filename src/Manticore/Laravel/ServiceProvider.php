@@ -14,10 +14,19 @@ use Laravel\Lumen\Application as LumenApplication;
  * Class ServiceProvider
  *
  * @package avadim\Manticore\Laravel
- * @codeCoverageIgnore
  */
 class ServiceProvider extends BaseServiceProvider
 {
+    /**
+     * The configuration file of the package, published as a stub and merged as the defaults
+     *
+     * @return string
+     */
+    protected function configPath(): string
+    {
+        return __DIR__ . '/../../../config/manticore.php';
+    }
+
     /**
      * Register the application services.
      *
@@ -25,16 +34,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot(): void
     {
-        $source = __DIR__ . '/../../../config/manticore.php';
-
         if ($this->app instanceof LaravelApplication) {
-            $this->publishes([$source => config_path('manticore.php')], 'config');
+            $this->publishes([$this->configPath() => config_path('manticore.php')], 'config');
         }
-        elseif ($this->app instanceof LumenApplication) {
-            $this->app->configure('manticore');
-        }
-
-        $this->mergeConfigFrom($source, 'manticore');
 
         // every connection of the builder is built of Laravel\Connection, and every query of it
         // of Laravel\Query - so that reads answer with a Collection whichever entry point was
@@ -42,6 +44,8 @@ class ServiceProvider extends BaseServiceProvider
         ManticoreBuilder::setConnectionClass(Connection::class);
 
         ManticoreBuilder::init(config('manticore'));
+
+        $this->attachLogger();
     }
 
     /**
@@ -53,6 +57,17 @@ class ServiceProvider extends BaseServiceProvider
     {
         $app = $this->app;
 
+        // Lumen reads no configuration of its own accord, and its configure() replaces the whole
+        // key rather than merging into it - so it goes first, and the defaults of the package
+        // fill in what the application left out
+        if ($app instanceof LumenApplication) {
+            $app->configure('manticore');
+        }
+
+        // merged here rather than in boot(), so that the configuration is there for whoever reads
+        // it while the providers are still registering
+        $this->mergeConfigFrom($this->configPath(), 'manticore');
+
         $app->singleton('manticore.factory', static function () {
             return new Factory();
         });
@@ -63,5 +78,25 @@ class ServiceProvider extends BaseServiceProvider
 
         $app->alias('manticore', Manager::class);
 
+    }
+
+    /**
+     * Send the queries of the builder to a logging channel of the application.
+     *
+     * Nothing is logged unless a channel is named - MANTICORE_LOG_CHANNEL of the environment, or
+     * "logChannel" of the configuration file. The logger of Laravel is a PSR-3 one, which is what
+     * the builder takes, so the channel is handed over as it is.
+     *
+     * @return void
+     */
+    protected function attachLogger(): void
+    {
+        $channel = config('manticore.logChannel');
+
+        if (!$channel || !$this->app->bound('log')) {
+            return;
+        }
+
+        ManticoreBuilder::setLogger($this->app->make('log')->channel($channel));
     }
 }
