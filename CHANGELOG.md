@@ -4,7 +4,14 @@ All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [semantic versioning](https://semver.org/).
 
-## [Unreleased]
+## [3.0.0] - 2026-09-04
+
+The release that says what the package supports instead of asserting it, and finishes the shape it
+was built for. The floor moves to Laravel 11 and PHP 8.2 - every version below that is either past
+its security support or unreachable to composer, so a claim about it could not be tested. The reads
+that were still handing out plain arrays now answer the way the rest of them do. And what a Laravel
+application expects of a query is there: the two `OrFail` reads, a pagination that survives a deep
+page, a logging channel out of the configuration, and a connection a worker can drop and open again.
 
 ### Breaking
 
@@ -198,6 +205,7 @@ builder it is built on.
 
 The first release: service provider, facade, connection manager and the configuration file.
 
+[3.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.1...v3.0.0
 [2.1.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v1.0.4...v2.0.0
