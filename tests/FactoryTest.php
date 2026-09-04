@@ -55,18 +55,56 @@ class FactoryTest extends TestCase
     }
 
     /**
-     * make() calls Builder::init(), which resets the logger when none is given
+     * make() of the config the builder already holds changes nothing about it, so a logger set
+     * through ManticoreDb::setLogger() stays where it was
      */
-    public function testMakeWithoutALoggerDetachesThePreviouslySetOne(): void
+    public function testMakeWithoutALoggerKeepsThePreviouslySetOne(): void
     {
         $this->requiresServer();
 
         $logger = new ArrayLogger();
+        $this->factory()->make(config('manticore'));
         ManticoreDb::setLogger($logger);
 
         $connection = $this->factory()->make(config('manticore'));
         $connection->showTables();
 
-        $this->assertSame([], $logger->records);
+        $this->assertNotEmpty($logger->records, 'The logger was detached by a repeated make().');
+    }
+
+    /**
+     * ... and the connections built so far are not thrown away either: Builder::init() empties
+     * the pool, so a second make() used to leave the caller of the first holding an object the
+     * builder no longer knows
+     */
+    public function testMakeOfTheSameConfigKeepsTheConnectionsAlreadyBuilt(): void
+    {
+        $this->requiresServer();
+
+        $factory = $this->factory();
+        $first = $factory->make(config('manticore'));
+
+        $second = $factory->make(config('manticore'));
+
+        $this->assertSame($first, $second);
+        $this->assertSame($first, ManticoreDb::connection(static::CONNECTION_MAIN));
+    }
+
+    /**
+     * A config that really differs is a reconfiguration, and that does rebuild the pool
+     */
+    public function testMakeOfAnotherConfigRebuildsTheConnections(): void
+    {
+        $this->requiresServer();
+
+        $factory = $this->factory();
+        $first = $factory->make(config('manticore'));
+
+        $config = config('manticore');
+        $config['defaultConnection'] = static::CONNECTION_ALT;
+        $second = $factory->make($config);
+
+        $this->assertNotSame($first, $second);
+        $this->assertSame($config, ManticoreDb::currentConfig());
     }
 }

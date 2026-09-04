@@ -266,6 +266,14 @@ $products = \ManticoreDb::table('products')->simplePaginate(15);
 
 Both accept the same arguments as in Laravel: `paginate($perPage, $columns, $pageName, $page)`.
 
+A server looks through `max_matches` rows of a result and no further - a thousand of them unless
+the configuration says otherwise - and a window past that is not an empty page but an error,
+`offset out of bounds`. A paginator of fifteen rows reaches it on page 68, having drawn a link to
+it a moment earlier. So both methods ask the server for exactly as many matches as the page they
+were given needs, and only when the page needs more than the default; an explicit `maxMatches()`
+of yours is left alone, whether it is larger or smaller. A deep page still costs the server the
+sorting of everything before it - that is the nature of `LIMIT`/`OFFSET`, not of this package.
+
 ## Walking a large result
 
 A result too large to be read at once is walked page by page. Every walk hands over the shapes

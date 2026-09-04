@@ -57,6 +57,22 @@ All notable changes to this package are documented here. The format follows
 * `psr/log` is required as `^1.1|^2.0|^3.0` instead of the unbound `>=1.1`, which would have let a
   future major of the interface in unchecked.
 
+### Fixed
+
+* **A page past `max_matches` is served instead of failing.** A server looks through a thousand
+  matches of a result unless told otherwise, and a `LIMIT` past that is an error - so
+  `paginate(15)` drew a link to page 68 and answered it with `offset out of bounds`, a 500 in the
+  middle of an ordinary pagination. Both `paginate()` and `simplePaginate()` now ask for exactly
+  as many matches as the page they were given needs, and only when it needs more than the default;
+  an explicit `maxMatches()` of the caller is left alone.
+* **A second connection no longer resets the first.** `Factory::make()` called `Builder::init()`
+  every time, which is the reconfiguration of the whole static builder: it emptied the pool of
+  connections and detached the logger. Since `Manager::connection()` goes through the factory, a
+  named connection threw away the connection built before it - leaving whoever held it with an
+  object the builder no longer knew - and a logger set through `ManticoreDb::setLogger()` was lost
+  on the next call. The builder is now reconfigured only when the config really differs, and a
+  logger given to `make()` is attached without touching the rest.
+
 ### Documentation
 
 * The section on long-running workers says when `forgetSchema()` is actually needed: what a stale
@@ -69,6 +85,7 @@ All notable changes to this package are documented here. The format follows
   `cursor()` and `sole()` hand over, and why a walk over the whole of a result belongs to
   `chunkById()` - the others page with `LIMIT`/`OFFSET`, which runs into `max_matches` and needs
   the order of the result to be fixed, or a row comes twice while another never does.
+* The section on pagination says what a deep page costs and what it asks the server for.
 
 ## [2.1.1] - 2026-08-15
 

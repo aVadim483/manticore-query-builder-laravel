@@ -24,6 +24,35 @@ use Illuminate\Support\Collection;
 class Query extends BaseQuery
 {
     /**
+     * What Manticore looks through per query unless it is told otherwise
+     */
+    protected const DEFAULT_MAX_MATCHES = 1000;
+
+    /**
+     * Whether max_matches was asked for by the caller - then pagination leaves it alone
+     *
+     * @var bool
+     */
+    protected $maxMatchesGiven = false;
+
+    /**
+     * The options of the query, watched for max_matches - see reachOffset()
+     *
+     * @param string $key
+     * @param string|int|null $value
+     *
+     * @return BaseQuery
+     */
+    public function option(string $key, $value = null): BaseQuery
+    {
+        if ('max_matches' === $key) {
+            $this->maxMatchesGiven = null !== $value;
+        }
+
+        return parent::option($key, $value);
+    }
+
+    /**
      * The rows of the query as a Collection, keyed from zero
      *
      * @param string|array|null $columns
@@ -193,7 +222,9 @@ class Query extends BaseQuery
         $page = $page ?: max(1, (int)Paginator::resolveCurrentPage($pageName));
         // count() rewrites the column list, so it goes to a copy
         $total = $this->clone()->count();
-        $items = $total > 0 ? $this->forPage($page, $perPage)->get($columns) : new Collection();
+        $items = $total > 0
+            ? $this->forPage($page, $perPage)->reachOffset(($page - 1) * $perPage, $perPage)->get($columns)
+            : new Collection();
 
         return new LengthAwarePaginator($items, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -218,13 +249,42 @@ class Query extends BaseQuery
     {
         $perPage = max(1, (int)$perPage);
         $page = $page ?: max(1, (int)Paginator::resolveCurrentPage($pageName));
+        $offset = ($page - 1) * $perPage;
         // one row more than the page holds, and the offset is still counted by the page size
-        $items = $this->limit($perPage + 1)->offset(($page - 1) * $perPage)->get($columns);
+        $items = $this->limit($perPage + 1)->offset($offset)->reachOffset($offset, $perPage + 1)->get($columns);
 
         return new Paginator($items, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Look far enough into the result to reach the page that was asked for.
+     *
+     * Manticore stops at max_matches - a thousand of them unless the server says otherwise - and
+     * a window past that is not an empty page but an error: "offset out of bounds". A paginator
+     * of fifteen rows meets it on page 68, having drawn a link to it a moment earlier. So the
+     * option is raised to exactly what the page needs, and only when the page needs it: a wider
+     * window costs the server the memory and the sorting of every match it holds.
+     *
+     * An explicit maxMatches() of the caller is left alone, whether it is larger or smaller.
+     *
+     * @param int $offset
+     * @param int $perPage
+     *
+     * @return $this
+     */
+    protected function reachOffset(int $offset, int $perPage): Query
+    {
+        $needed = $offset + $perPage;
+
+        if (!$this->maxMatchesGiven && $needed > static::DEFAULT_MAX_MATCHES) {
+            // not maxMatches(), which would count as an option of the caller
+            parent::option('max_matches', $needed);
+        }
+
+        return $this;
     }
 
     /**
