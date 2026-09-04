@@ -6,6 +6,19 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+* Requires `avadim/manticore-query-builder-php` 2.2, where non-ASCII text in a raw statement is no
+  longer cut off, a statement the server refused is raised as an error instead of coming back as a
+  successful empty result, and `timeout` limits the opening of the connection rather than being
+  applied to a handle already connected. The breaking changes of that release — a value that looks
+  like `:word` is escaped instead of being read as a named parameter, and the rows of a join come
+  back as a list — touch nothing this package has: neither its classes, nor its tests, nor the
+  examples of the readme use either.
+* The test suite runs on PHPUnit 13 as well: the range of `phpunit/phpunit` is widened to `^13.0`.
+* `psr/log` is required as `^1.1|^2.0|^3.0` instead of the unbound `>=1.1`, which would have let a
+  future major of the interface in unchecked.
+
 ### Documentation
 
 * The section on long-running workers says when `forgetSchema()` is actually needed: what a stale

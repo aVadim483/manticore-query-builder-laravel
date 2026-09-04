@@ -53,7 +53,7 @@ composer require avadim/manticore-query-builder-laravel
 
 * PHP 7.4 или выше с расширениями PDO и JSON
 * Laravel 6 — 13 либо Lumen
-* [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.1 или выше — ставится вместе с пакетом
+* [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.2 или выше — ставится вместе с пакетом
 * Доступный сервер Manticore Search по SQL-интерфейсу, по умолчанию порт 9306. HTTP/JSON API не используется.
 
 Некоторым возможностям одного сервера мало: векторному поиску KNN нужна библиотека KNN,
