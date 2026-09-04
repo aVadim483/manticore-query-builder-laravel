@@ -9,6 +9,8 @@ use avadim\Manticore\Laravel\Facade;
 use avadim\Manticore\Laravel\Query as LaravelQuery;
 use avadim\Manticore\Laravel\Row;
 use avadim\Manticore\QueryBuilder\Builder as ManticoreDb;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Support\Collection;
 
 /**
@@ -138,6 +140,56 @@ class QueryAnswerTest extends TestCase
 
         $this->assertInstanceOf(Row::class, $found);
         $this->assertSame('red apple', $found->title);
+    }
+
+    public function testFirstOrFailReturnsARow(): void
+    {
+        $row = ManticoreDb::table($this->table)->where('brand', 'acme')->firstOrFail();
+
+        $this->assertInstanceOf(Row::class, $row);
+        $this->assertSame('red apple', $row->title);
+    }
+
+    /**
+     * The exception is the one Laravel answers with a 404, so a controller needs no check of its
+     * own - and it is a RuntimeException, so code catching that keeps working
+     */
+    public function testFirstOrFailThrowsWhenNothingMatches(): void
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        ManticoreDb::table($this->table)->where('brand', 'nobody')->firstOrFail();
+    }
+
+    public function testFindOrFailReturnsARow(): void
+    {
+        $id = (int)ManticoreDb::table($this->table)->where('brand', 'acme')->first()->id;
+
+        $this->assertSame('red apple', ManticoreDb::table($this->table)->findOrFail($id)->title);
+    }
+
+    public function testFindOrFailThrowsWhenThereIsNoSuchId(): void
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        ManticoreDb::table($this->table)->findOrFail(999999);
+    }
+
+    public function testSoleTellsTheTwoFailuresApart(): void
+    {
+        $row = ManticoreDb::table($this->table)->where('brand', 'acme')->sole();
+        $this->assertSame('red apple', $row->title);
+
+        try {
+            ManticoreDb::table($this->table)->where('price', '>', 1)->sole();
+            $this->fail('Two matching rows did not raise MultipleRecordsFoundException.');
+        }
+        catch (MultipleRecordsFoundException $e) {
+            $this->assertSame(2, $e->count);
+        }
+
+        $this->expectException(RecordsNotFoundException::class);
+        ManticoreDb::table($this->table)->where('brand', 'nobody')->sole();
     }
 
     public function testTheFacadeAnswersTheSameWay(): void

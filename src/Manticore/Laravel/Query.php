@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace avadim\Manticore\Laravel;
 
 use avadim\Manticore\QueryBuilder\Query as BaseQuery;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
@@ -89,6 +91,45 @@ class Query extends BaseQuery
     public function find(int $id): ?Row
     {
         return parent::find($id);
+    }
+
+    /**
+     * The first row of the query, or an exception when there is none.
+     *
+     * The exception is the one Laravel turns into a 404 of its own accord, so a controller that
+     * reads a document by a name out of the route needs no check of its own.
+     *
+     * @return Row
+     * @throws \Illuminate\Database\RecordsNotFoundException
+     */
+    public function firstOrFail(): Row
+    {
+        $row = $this->first();
+
+        if (null === $row) {
+            throw new RecordsNotFoundException('No row matches the query.');
+        }
+
+        return $row;
+    }
+
+    /**
+     * The row with the given id, or an exception when there is none
+     *
+     * @param int $id
+     *
+     * @return Row
+     * @throws \Illuminate\Database\RecordsNotFoundException
+     */
+    public function findOrFail(int $id): Row
+    {
+        $row = $this->find($id);
+
+        if (null === $row) {
+            throw new RecordsNotFoundException('No row with the id ' . $id . '.');
+        }
+
+        return $row;
     }
 
     /**
@@ -196,14 +237,28 @@ class Query extends BaseQuery
     }
 
     /**
-     * The only row matching the query
+     * The only row matching the query.
+     *
+     * Both exceptions are the ones of Laravel - a RuntimeException each, as the one of the query
+     * builder was, and the first of them is turned into a 404 by the handler of the framework.
      *
      * @return Row
-     * @throws \RuntimeException when nothing matched, or more than one row did
+     * @throws \Illuminate\Database\RecordsNotFoundException when nothing matched
+     * @throws \Illuminate\Database\MultipleRecordsFoundException when more than one row did
      */
     public function sole(): Row
     {
-        return $this->newRow((array)parent::sole());
+        $rows = $this->limit(2)->get();
+
+        if ($rows->isEmpty()) {
+            throw new RecordsNotFoundException('No row matches the query.');
+        }
+
+        if ($rows->count() > 1) {
+            throw new MultipleRecordsFoundException($rows->count());
+        }
+
+        return $rows->first();
     }
 
     /**

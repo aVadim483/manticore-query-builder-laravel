@@ -161,6 +161,24 @@ class Manager
     }
 
     /**
+     * Drop the cached DESCRIBE of every connection this manager built.
+     *
+     * forgetSchema() proxied to the default connection drops the schemas of that one alone, which
+     * is not what a worker that outlived a migration needs. Connections opened through the static
+     * \ManticoreDb rather than through the manager are not in its list and keep their cache.
+     *
+     * @return $this
+     */
+    public function forgetSchemas(): Manager
+    {
+        foreach ($this->connections as $connection) {
+            $connection->forgetSchema();
+        }
+
+        return $this;
+    }
+
+    /**
      * Return all of the created connections.
      *
      * @return array

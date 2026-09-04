@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace avadim\Manticore\Laravel\Tests;
 
 use avadim\Manticore\Laravel\Facade;
+use avadim\Manticore\Laravel\Manager;
 use avadim\Manticore\QueryBuilder\Builder as ManticoreDb;
 use avadim\Manticore\QueryBuilder\Connection;
 use ReflectionProperty;
@@ -130,6 +131,43 @@ class UpstreamCompatibilityTest extends TestCase
         $this->assertInstanceOf(Connection::class, Facade::forgetSchema());
 
         $this->assertSame([], $this->cachedSchemas($connection));
+    }
+
+    /**
+     * forgetSchema() reaches the default connection alone, which is not enough for a worker that
+     * outlived a migration: every connection it holds has a cache of its own
+     */
+    public function testForgetSchemasDropsTheCacheOfEveryConnectionOfTheManager(): void
+    {
+        $manager = $this->app->make('manticore');
+
+        $main = $manager->connection(static::CONNECTION_MAIN);
+        $alt = $manager->connection(static::CONNECTION_ALT);
+
+        $altTable = $this->tableName('compat_alt');
+
+        $main->table($this->table)->insert(['title' => 'first', 'price' => 1.0]);
+        $alt->create($altTable, ['title' => 'text']);
+        $alt->table($altTable)->insert(['title' => 'of the other connection']);
+
+        $this->assertNotSame([], $this->cachedSchemas($main));
+        $this->assertNotSame([], $this->cachedSchemas($alt));
+
+        // the default connection alone, the way the facade reaches it
+        Facade::forgetSchema();
+
+        $this->assertSame([], $this->cachedSchemas($main));
+        $this->assertNotSame([], $this->cachedSchemas($alt), 'forgetSchema() must not reach the other connection.');
+
+        $main->table($this->table)->get();
+        $this->assertNotSame([], $this->cachedSchemas($main));
+
+        $this->assertInstanceOf(Manager::class, $manager->forgetSchemas());
+
+        $this->assertSame([], $this->cachedSchemas($main));
+        $this->assertSame([], $this->cachedSchemas($alt));
+
+        $alt->drop($altTable, true);
     }
 
     /**
