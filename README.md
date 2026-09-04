@@ -54,7 +54,7 @@ Laravel expects.
 
 * PHP 8.2 or above with the PDO and JSON extensions
 * Laravel 11, 12 or 13, or Lumen 11
-* [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.2 or above, installed along with this package
+* [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.3 or above, installed along with this package
 * Manticore Search reachable over its SQL interface, port 9306 by default. The HTTP/JSON API is not used.
 
 Version 2.x runs on Laravel 6 to 13 and PHP 7.4, and stays where it is for an application that
@@ -495,6 +495,21 @@ test that alters tables through `statement()` and reuses the connection has to d
 
 Dropping the cache costs one `DESCRIBE` per table on the next query. `DESCRIBE` goes out as a
 service query and never reaches the logger, so a stale cache leaves no trace in the log.
+
+A connection outlives more than its schema cache in a worker: the handle itself may be gone —
+closed by the server after a night of idling, or lost with the network — and every query through
+it fails from then on. The connection is dropped by name, and the next call for it opens a new one:
+
+```php
+app('manticore')->purge();                 // the default connection
+app('manticore')->purge('analytics');      // a named one
+
+$connection = app('manticore')->reconnect();   // ... and open it again in one call
+```
+
+Neither closes the object: whoever still holds one goes on using it, and the handle behind it is
+released with the last reference. Both drop the connection from the pool of the builder as well,
+so `\ManticoreDb::connection()` hands out the new one too.
 
 ## Logging
 

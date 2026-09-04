@@ -80,7 +80,7 @@ class AnnotationsTest extends TestCase
     {
         $annotated = $this->annotated(Facade::class);
 
-        foreach (['connection', 'getDefaultConnection', 'setDefaultConnection', 'getConnections', 'forgetSchemas'] as $name) {
+        foreach (['connection', 'getDefaultConnection', 'setDefaultConnection', 'getConnections', 'purge', 'reconnect', 'forgetSchemas'] as $name) {
             $this->assertContains($name, $annotated);
         }
     }
@@ -92,7 +92,7 @@ class AnnotationsTest extends TestCase
     {
         $manager = $this->annotated(Manager::class);
         $facade = $this->annotated(Facade::class);
-        $ownOfManager = ['connection', 'getDefaultConnection', 'setDefaultConnection', 'getConnections', 'forgetSchemas'];
+        $ownOfManager = ['connection', 'getDefaultConnection', 'setDefaultConnection', 'getConnections', 'purge', 'reconnect', 'forgetSchemas'];
 
         $this->assertSame([], array_values(array_diff($manager, $facade)));
         $this->assertSame($ownOfManager, array_values(array_diff($facade, $manager)));

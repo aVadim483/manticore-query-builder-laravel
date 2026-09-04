@@ -161,6 +161,44 @@ class Manager
     }
 
     /**
+     * Forget a connection, so that the next call for it opens a new one.
+     *
+     * A process that lives for one request never needs this. A queue worker does: a handle idle
+     * since yesterday may have been closed by the server, and every query through it fails from
+     * then on. So does an Octane process handing the application over to the next request.
+     *
+     * The connection object is not closed - whoever still holds one goes on using it, and the
+     * handle behind it is released with the last reference.
+     *
+     * @param string|null $name the default connection when no name is given
+     *
+     * @return bool whether there was a connection of that name to forget
+     */
+    public function purge(?string $name = null): bool
+    {
+        $name = $name ?: $this->getDefaultConnection();
+
+        unset($this->connections[$name]);
+
+        // the builder keeps a pool of its own, and it is the one connection() reads from
+        return ManticoreBuilder::forgetConnection($name);
+    }
+
+    /**
+     * Forget a connection and open it again
+     *
+     * @param string|null $name the default connection when no name is given
+     *
+     * @return Connection
+     */
+    public function reconnect(?string $name = null): Connection
+    {
+        $this->purge($name);
+
+        return $this->connection($name);
+    }
+
+    /**
      * Drop the cached DESCRIBE of every connection this manager built.
      *
      * forgetSchema() proxied to the default connection drops the schemas of that one alone, which

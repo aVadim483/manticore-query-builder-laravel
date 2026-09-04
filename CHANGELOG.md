@@ -55,6 +55,13 @@ All notable changes to this package are documented here. The format follows
 * `MANTICORE_LOG_CHANNEL` - the name of a logging channel of the application is enough to get the
   queries into its log; the channel is a PSR-3 logger and the builder takes one. Nothing is logged
   while the variable is empty, which is the default.
+* `Manager::purge()` and `Manager::reconnect()` - a connection is dropped by name and the next
+  call for it opens a new one. A process that lives for one request never needs either; a queue
+  worker whose handle the server closed overnight does, and so does an Octane process handing the
+  application over to the next request. Both reach the pool of the query builder as well, which is
+  what `\ManticoreDb::connection()` reads from - and what needed `forgetConnection()` of the
+  builder 2.3 to be reachable at all. Neither closes the object: whoever holds one goes on using
+  it.
 * `Manager::forgetSchemas()` - drops the cached `DESCRIBE` of every connection the manager built,
   where `forgetSchema()` reaches the default one alone. A worker that outlived a migration needs
   the whole lot.
@@ -67,13 +74,15 @@ All notable changes to this package are documented here. The format follows
 
 ### Changed
 
-* Requires `avadim/manticore-query-builder-php` 2.2, where non-ASCII text in a raw statement is no
-  longer cut off, a statement the server refused is raised as an error instead of coming back as a
-  successful empty result, and `timeout` limits the opening of the connection rather than being
-  applied to a handle already connected. The breaking changes of that release - a value that looks
-  like `:word` is escaped instead of being read as a named parameter, and the rows of a join come
-  back as a list - touch nothing this package has: neither its classes, nor its tests, nor the
-  examples of the readme use either.
+* Requires `avadim/manticore-query-builder-php` 2.3. Two releases of it are behind that: 2.2, where
+  non-ASCII text in a raw statement is no longer cut off, a statement the server refused is raised
+  as an error instead of coming back as a successful empty result, and `timeout` limits the opening
+  of the connection rather than being applied to a handle already connected; and 2.3, released
+  alongside this one for `Builder::forgetConnection()` - the pool of the builder had no way to drop
+  a single connection, only `init()` to throw away every one of them together with the config and
+  the logger. The breaking changes of 2.2 - a value that looks like `:word` is escaped instead of
+  being read as a named parameter, and the rows of a join come back as a list - touch nothing this
+  package has: neither its classes, nor its tests, nor the examples of the readme use either.
 * The range of `phpunit/phpunit` is `^10.5|^11.0|^12.0|^13.0`, and that of `orchestra/testbench`
   `^9.0|^10.0|^11.0` - what the supported Laravel versions bring with them.
 * The configuration is merged in `register()` rather than in `boot()`, so that it is there for
@@ -111,6 +120,8 @@ All notable changes to this package are documented here. The format follows
   `chunkById()` - the others page with `LIMIT`/`OFFSET`, which runs into `max_matches` and needs
   the order of the result to be fixed, or a row comes twice while another never does.
 * The section on pagination says what a deep page costs and what it asks the server for.
+* The section on long-running workers says what to do about the connection itself, not only about
+  its cache of schemas.
 * The readme covers what was added: the two `OrFail` reads and the exceptions of `sole()`,
   `MANTICORE_LOG_CHANNEL` in the table of the environment variables and in the section on logging,
   and `forgetSchemas()` where the cache of a long-running worker is described.

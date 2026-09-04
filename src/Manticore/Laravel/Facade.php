@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
  * @method static string getDefaultConnection()
  * @method static void setDefaultConnection(string $connection)
  * @method static array getConnections()                                    connections built so far
+ * @method static bool purge(?string $name = null)                          forget a connection, the next call opens a new one
+ * @method static BaseConnection reconnect(?string $name = null)             forget a connection and open it again
  * @method static Manager forgetSchemas()                                   drop the cached DESCRIBE of every connection
  *
  * @method static Query table(string $name)                                 table to build a query for
