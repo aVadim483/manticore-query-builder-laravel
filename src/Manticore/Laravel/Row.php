@@ -83,8 +83,7 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
      *
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->attributes[$offset]);
     }
@@ -94,8 +93,7 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
      *
      * @return mixed|null
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->attributes[$offset] ?? null;
     }
@@ -106,8 +104,7 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
      *
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         if (null === $offset) {
             $this->attributes[] = $value;
@@ -122,8 +119,7 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
      *
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->attributes[$offset]);
     }
@@ -131,7 +127,6 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
     /**
      * @return \Traversable
      */
-    #[\ReturnTypeWillChange]
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->attributes);
@@ -140,7 +135,6 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
     /**
      * @return int
      */
-    #[\ReturnTypeWillChange]
     public function count(): int
     {
         return count($this->attributes);
@@ -167,8 +161,7 @@ class Row implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
     /**
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->attributes;
     }
