@@ -6,6 +6,16 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+* Continuous integration: the sources are linted on PHP 7.4 and 8.1-8.4, which is what keeps
+  the declared floor of the package honest, and the whole suite runs against a Manticore
+  service container on the Laravel versions composer can still install - 12 on PHP 8.2 and 8.3,
+  13 on PHP 8.4.
+* `.gitattributes` - the tests, the benchmarks and the CI config are no longer part of the
+  package: they are read on GitHub, not from `vendor/`. Line endings are pinned to LF as well,
+  so that a file does not depend on the machine it was committed from.
+
 ### Changed
 
 * Requires `avadim/manticore-query-builder-php` 2.2, where non-ASCII text in a raw statement is no

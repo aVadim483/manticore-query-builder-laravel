@@ -1,0 +1,103 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # The package declares PHP 7.4 as its floor, while it is developed on 8.4, so nothing but a
+  # parser on the old version tells whether the source really stays inside it. No dependency of
+  # any kind is installed here: composer cannot put a Laravel next to PHP 7.4 any more (see the
+  # note in the job below), and linting needs none.
+  lint:
+    name: lint / PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.1', '8.2', '8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Lint the sources
+        run: find src config tests -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
+
+  # The suite itself, against a live server: every test that resolves a connection opens a real
+  # PDO connection, and without a server behind it two thirds of the suite would only be skipped.
+  #
+  # The matrix holds what composer can still install. Laravel 6 to 11 is out of reach of CI, not
+  # of the package: every release of those majors is flagged by a security advisory, and composer
+  # refuses to install a flagged package unless "audit.block-insecure" is turned off. Turning it
+  # off to test an EOL framework is a decision for the maintainer, not a default of this file.
+  tests:
+    name: tests / PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            laravel: '12'
+            testbench: '^10.0'
+          - php: '8.3'
+            laravel: '12'
+            testbench: '^10.0'
+          - php: '8.4'
+            laravel: '13'
+            testbench: '^11.0'
+
+    services:
+      manticore:
+        image: manticoresearch/manticore:latest
+        ports:
+          # the port the tests expect by default, see MANTICORE_TEST_HOST/MANTICORE_TEST_PORT
+          # in phpunit.xml.dist
+          - 9306:9306
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_mysql, mbstring, json
+          coverage: none
+
+      - name: Cache the composer files
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ matrix.php }}-${{ matrix.testbench }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ matrix.php }}-${{ matrix.testbench }}-
+
+      # the testbench pins the Laravel of the job; update, not install, because a library ships
+      # no composer.lock and the current dependencies are what has to be checked
+      - name: Install the dependencies
+        run: |
+          composer require --dev --no-update --no-interaction "orchestra/testbench:${{ matrix.testbench }}"
+          composer update --prefer-dist --no-progress --no-interaction
+
+      # the image promises no mysql or curl of its own, so the port is waited for from the
+      # outside rather than through a health check of the container
+      - name: Wait for Manticore
+        run: |
+          for i in $(seq 1 60); do
+            (echo > /dev/tcp/127.0.0.1/9306) >/dev/null 2>&1 && exit 0
+            sleep 1
+          done
+          echo 'Manticore did not answer on 127.0.0.1:9306'
+          exit 1
+
+      - name: Run the tests
+        run: vendor/bin/phpunit
