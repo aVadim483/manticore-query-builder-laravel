@@ -4,6 +4,15 @@ All notable changes to this package are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+* Requires `avadim/manticore-query-builder-php` `^2.6`, making separate row/metadata reads,
+  deferred insert IDs, MVA filters, geographic search and autocomplete available to every install.
+* English and Russian documentation now covers the 2.6 read/write APIs and their lifetimes,
+  connection settings, extension requirements and differences from Laravel Query Builder.
+
 ## [3.0.0] - 2026-09-04
 
 The release that says what the package supports instead of asserting it, and finishes the shape it

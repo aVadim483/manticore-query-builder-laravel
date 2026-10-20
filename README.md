@@ -28,8 +28,11 @@ Laravel expects.
 * [Installation](#installation)
 * [Configuration](#configuration)
 * [Quick start](#quick-start)
+* [Differences from Laravel Query Builder](#differences-from-laravel-query-builder)
 * [The alias, the facade and the container](#the-alias-the-facade-and-the-container)
 * [What the reads return](#what-the-reads-return)
+* [Search metadata](#search-metadata)
+* [Write results and deferred IDs](#write-results-and-deferred-ids)
 * [When a query fails](#when-a-query-fails)
 * [Pagination](#pagination)
 * [Walking a large result](#walking-a-large-result)
@@ -53,16 +56,17 @@ Laravel expects.
 
 ## Requirements
 
-* PHP 8.2 or above with the PDO and JSON extensions
+* PHP 8.2 or above with the PDO, PDO MySQL, mbstring and JSON extensions
 * Laravel 11, 12 or 13, or Lumen 11
-* [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.3 or above, installed along with this package
+* [avadim/manticore-query-builder-php](https://github.com/aVadim483/manticore-query-builder-php) 2.6 or above within 2.x, installed along with this package
 * Manticore Search reachable over its SQL interface, port 9306 by default. The HTTP/JSON API is not used.
 
 Version 2.x runs on Laravel 6 to 13 and PHP 7.4, and stays where it is for an application that
 has not moved yet: an older Laravel is not broken by this, it simply keeps installing 2.x.
 
 A few things need more than the bare server: KNN vector search needs the KNN library, columnar
-storage the columnar one, `rename()` needs Manticore Buddy. What needs what is listed in the
+storage the columnar one, `rename()` and `callAutocomplete()` need Manticore Buddy. Autocomplete
+also needs a table configured with infixes. What needs what is listed in the
 [requirements](https://github.com/aVadim483/manticore-query-builder-php#requirements) of the query builder.
 
 ## Installation
@@ -119,7 +123,7 @@ MANTICORE_TIMEOUT=5
 | MANTICORE_PORT         | 9306          | Port of the SQL interface of the server                            |
 | MANTICORE_USER         |               | Username                                                           |
 | MANTICORE_PASS         |               | Password                                                           |
-| MANTICORE_TIMEOUT      | 5             | Timeout between requests                                           |
+| MANTICORE_TIMEOUT      | 5             | Connection establishment timeout in seconds                         |
 | MANTICORE_PREFIX       |               | Prefix that replaces the placeholder `?` in front of a table name  |
 | MANTICORE_FORCE_PREFIX | false         | Prefix every table name, not only the ones written with `?`        |
 | MANTICORE_LOG_CHANNEL  |               | Logging channel the queries are sent to; nothing is logged while it is empty |
@@ -148,6 +152,46 @@ Everything between `table()` and the read — full-text `match()`, `where()`, ag
 search, `JOIN`, KNN vector search, the schema of a table — belongs to the query builder and is
 described in [its documentation](https://github.com/aVadim483/manticore-query-builder-php/blob/main/docs/README.md).
 The sections below cover what this package does differently.
+
+Version 2.6 also includes `whereMvaAny()` / `whereMvaAll()` for multi-value attributes,
+`withDistance()` / `whereGeoDistance()` / `orderByDistance()` for geographic search, and
+`callAutocomplete()` for suggestions. See the upstream [searching guide](https://github.com/aVadim483/manticore-query-builder-php/blob/v2.6.0/docs/searching.md)
+for their arguments and server requirements. Rows and metadata can be read separately, and
+write IDs can be loaded on demand, as described below.
+
+## Differences from Laravel Query Builder
+
+This package uses its own Manticore query builder and connection classes. It does not register
+a driver for `DB::connection('manticore')` or implement the complete
+[Laravel Query Builder API](https://laravel.com/docs/queries). Use `ManticoreDb` or the injected
+`Manager`; check the upstream documentation before moving an existing `DB::table()` chain here.
+
+| Area | Laravel Query Builder | This package |
+|---|---|---|
+| Result rows | `get()` returns a `Collection` of `stdClass` objects | A zero-based `Collection` of `Row` objects, with property and array access. A `Row` is a data container; changing it does not persist anything and it has no Eloquent relationships or `save()` method. |
+| Raw reads | `DB::select()` returns an array of `stdClass` objects | `ManticoreDb::select()` returns the upstream array result, without wrapping rows in `Row`. CALL helpers such as `callAutocomplete()` also return arrays. |
+| Search | Uses the database driver's full-text API | `match()` uses Manticore's query language; `whereKnn()`, MVA and geographic helpers, facets and search metadata follow Manticore semantics. `whereMvaAll()` tests every attribute element against the condition; it does not mean that every supplied value must be present. |
+| Failed SQL | Database errors normally throw `Illuminate\Database\QueryException` | Rejected reads throw upstream `QueryErrorException`; rejected writes return `false` or `0`. Inspect `lastResultSet()->error()` to distinguish an error from a write that changed no rows. |
+| Streaming | `lazy()` and `cursor()` return `LazyCollection`; `cursor()` uses a single query | Both methods return `Generator` and fetch pages with `LIMIT`/`OFFSET`. Use `chunkById()` for a full walk without growing offsets. |
+| Pagination | Uses the SQL database's pagination behavior | `paginate()` / `simplePaginate()` return Laravel paginators and raise `max_matches` for the requested window unless explicitly set. Other offset-based walks still need a suitable `maxMatches()` value. |
+| Upserts | Uses the database's native conflict handling with unique indexes | `upsert()` first looks up each row by `$uniqueBy`, merges the requested `$update` columns with an existing row and writes it with `REPLACE` by document ID, or inserts a new row. It costs a lookup per row and is not a single atomic conflict-handling statement. |
+| Schema | Uses Laravel `Schema` and its `Blueprint` | Use `ManticoreDb::create()` and upstream `SchemaTable`, plus Manticore ALTER helpers. The SQL wire protocol does not make Manticore a MySQL database. |
+| Transactions | Savepoints and retries depend on the database driver | Manticore has no savepoints: nested calls count levels, and rollback cancels the whole transaction. Returning `false` from a write does not throw and therefore does not trigger automatic rollback. Throw explicitly when a failed write must abort the transaction. |
+
+Raw expressions and bindings also use the upstream API. For example, bind a named parameter
+explicitly rather than treating a string such as `':price'` as a placeholder:
+
+```php
+$rows = \ManticoreDb::table('products')
+    ->where('price', '>', \ManticoreDb::param('price'))
+    ->bind(['price' => 100])
+    ->get();
+```
+
+Use `ManticoreDb::raw()` for an upstream raw expression. Laravel's `DB::raw()` objects and
+positional binding conventions are not interchangeable with this API. For plain visitor text,
+use `match(ManticoreDb::escapeMatch($text))`; pass Manticore query syntax directly only when it
+is intended to be interpreted as a search expression.
 
 ## The alias, the facade and the container
 
@@ -227,6 +271,66 @@ json_encode($rows);   // an array of objects, as expected of a JSON API
 
 Writes are untouched and keep the answers of the builder: `insert()` returns `bool`,
 `update()` and `delete()` the number of affected rows, `insertGetId()` the id.
+
+## Search metadata
+
+`get()` loads rows and `SHOW META`. `getRows()` skips `SHOW META` and still returns the same
+zero-based `Collection` of `Row` objects. When metadata is needed separately, read it immediately
+after the search, before another command runs on that connection:
+
+```php
+$query = \ManticoreDb::table('products')->match('galaxy')->limit(20);
+$rows = $query->getRows();
+$meta = $query->getMeta();
+
+$meta->totalFound();       // int|null
+$meta->total();            // int|null
+$meta->time();             // float|null
+$meta['total_found'];      // the same value as totalFound()
+$meta->toArray();
+```
+
+`Meta` is immutable, iterable and countable; absent fields return `null`. `getMeta()` executes
+`SHOW META` on the query's connection and replaces its last result set with that service result.
+To inspect metadata already loaded by `get()` without another SQL request, keep its result set:
+
+```php
+$rows = $query->get();
+$result = $query->lastResultSet();
+$meta = $result->metaObject();   // no SQL
+$loaded = $result->hasMeta();
+$values = $result->meta();      // existing array API
+```
+
+After `getRows()`, the search result has no loaded metadata; `hasMeta()` is false. A later
+`getMeta()` reads current connection metadata, rather than filling that earlier result set.
+
+## Write results and deferred IDs
+
+`insert()` and `replace()` return `bool`. Use `insertGetId()` / `replaceGetId()` for a single ID,
+or `insertResultSet()` / `replaceResultSet()` for the full result, including multiple IDs.
+These explicit ID/result methods fetch IDs immediately. See the upstream
+[writing guide](https://github.com/aVadim483/manticore-query-builder-php/blob/v2.6.0/docs/writing.md)
+for multi-row writes and error handling.
+
+By default, boolean writes also fetch IDs immediately. To avoid that service query when the IDs
+are usually unused, add `'lazy_insert_ids' => true` to the relevant connection in
+`config/manticore.php`. This optional setting is disabled by default and has no dedicated
+environment variable in this package.
+
+```php
+$query = \ManticoreDb::table('products');
+if (!$query->insert(['title' => 'Galaxy', 'price' => 100])) {
+    throw new \RuntimeException((string)$query->lastResultSet()->error());
+}
+$result = $query->lastResultSet();
+$id = $result->result();   // loads IDs here when lazy_insert_ids is enabled
+```
+
+Fetch deferred IDs before **any next command on the same client/connection**, even a read or
+service query. An expired result throws `LogicException`; loaded IDs are cached. If ID loading
+fails after a successful write, `result()` throws and remembers the error while the write's
+success status remains unchanged. Custom clients without deferred-ID support keep eager loading.
 
 ## When a query fails
 
