@@ -60,8 +60,19 @@ $rows = $connection->select('SELECT id FROM products WHERE price > ?', [100]); /
 параметры остаются привязанными через PDO. SQL, параметры, события и исключения Laravel сохраняют
 исходные значения. Это работает для позиционных и именованных параметров. INF и NAN отклоняются.
 
-`option($name, $value)` пока принимает конечные числа. Повторная установка заменяет значение,
-`option($name, null)` удаляет настройку. Выражения и списки весов ещё не реализованы.
+`option($name, $value)` принимает конечные числа, экранированные строки и карты положительных
+целых весов для `field_weights` / `index_weights`. Повторная установка заменяет значение,
+`option($name, null)` удаляет настройку. Названия ranker проверяются.
+
+```php
+$query->fieldWeights(['title' => 10, 'body' => 2])->ranker('bm25')->withScore();
+$query->ranker('expr', 'sum(lcs*user_weight)*1000+bm25');
+$query->option('comment', 'catalog search');
+```
+
+Для `expr` и `export` обязательна непустая формула; остальные встроенные ranker её не принимают.
+Формулы экранируются как SQL-строки и выполняются движком выражений ранжирования Manticore.
+Справочник: [поисковые настройки Manticore](https://manual.manticoresearch.com/Searching/Options).
 
 `insert()`, `insertGetId()`, `update()` атрибутов и `delete()` используют выполнение запросов
 и обработку ошибок Laravel. Ошибки SQL, включая отказ записи, бросают

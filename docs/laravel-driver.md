@@ -59,8 +59,19 @@ float parameters are rendered as checked numeric literals during execution; othe
 remain PDO-bound. Laravel's SQL, bindings, events and exceptions retain the original parameters.
 This applies to both positional and named parameters. Non-finite values are rejected.
 
-`option($name, $value)` currently accepts finite numeric values. Setting an option again replaces
-its value; `option($name, null)` removes it. Expression and map options are not implemented yet.
+`option($name, $value)` accepts finite numbers, escaped strings, and positive integer maps for
+`field_weights` / `index_weights`. Setting an option again replaces its value;
+`option($name, null)` removes it. Rankers use validated names, never unescaped SQL.
+
+```php
+$query->fieldWeights(['title' => 10, 'body' => 2])->ranker('bm25')->withScore();
+$query->ranker('expr', 'sum(lcs*user_weight)*1000+bm25');
+$query->option('comment', 'catalog search');
+```
+
+`expr` and `export` require a non-empty formula; other built-in rankers take no formula.
+Formula strings are SQL-escaped and interpreted by Manticore's ranking expression engine.
+See [Manticore search options](https://manual.manticoresearch.com/Searching/Options).
 
 `insert()`, `insertGetId()`, attribute `update()` and `delete()` use Laravel execution and error handling.
 SQL errors throw `Illuminate\Database\QueryException`, including rejected writes.

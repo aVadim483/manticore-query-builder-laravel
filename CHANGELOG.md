@@ -8,6 +8,9 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
+* Native search options now support escaped strings, field/index weight maps and built-in or
+  expression rankers through `fieldWeights()` and `ranker()`, with live score verification.
+
 * Experimental native Laravel Database driver on `dev-4.x`: `DB::connection('manticore')`,
   a Laravel Query Builder with bound `match()` and numeric `option()`, standard result objects,
   raw bindings, CRUD, insert IDs, lazy collections, cursors and connection lifecycle events.

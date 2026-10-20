@@ -14,7 +14,7 @@ use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 
 class ManticoreQueryBuilder extends Builder
 {
-    /** @var array<string, int|float> */
+    /** @var array<string, int|float|string|array|Ranker> */
     public array $manticoreOptions = [];
 
     /** @var array<string, array{sql: string, visible: bool}> */
@@ -415,20 +415,26 @@ class ManticoreQueryBuilder extends Builder
         return $this;
     }
 
-    /** Numeric search options; expression and map options will be added separately. */
-    public function option(string $name, int|float|null $value = null): static
+    public function fieldWeights(array $weights): static
+    {
+        return $this->option('field_weights', $weights);
+    }
+
+    public function ranker(string $name, ?string $expression = null): static
+    {
+        return $this->option('ranker', new Ranker(strtolower($name), $expression));
+    }
+
+    public function option(string $name, int|float|string|array|Ranker|null $value = null): static
     {
         if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name)) {
             throw new InvalidArgumentException('Invalid Manticore option name.');
         }
-        if (is_float($value) && !is_finite($value)) {
-            throw new InvalidArgumentException('Manticore options must be finite numbers.');
-        }
-
         $name = strtolower($name);
         if ($value === null) {
             unset($this->manticoreOptions[$name]);
         } else {
+            SearchOptions::compile($name, $value, $this->grammar);
             $this->manticoreOptions[$name] = $value;
         }
 

@@ -32,8 +32,7 @@ class ManticoreGrammar extends Grammar
             }
             $options = [];
             foreach ($searchOptions as $name => $value) {
-                // Names and finite numeric values are validated by option(). No user SQL here.
-                $options[] = $name.'='.json_encode($value, JSON_THROW_ON_ERROR);
+                $options[] = SearchOptions::compile($name, $value, $this);
             }
             if ($options) {
                 $sql .= ' option '.implode(', ', $options);

@@ -51,6 +51,19 @@ class DatabaseDriverSearchIntegrationTest extends DatabaseTestCase
         }
     }
 
+    public function testFieldWeightsAndRankerControlReturnedScores(): void
+    {
+        $db = DB::connection('manticore');
+        $query = $db->table($this->searchTable)->match('galaxy')->withScore()->select('id')->orderBy('id');
+        $plain = (clone $query)->ranker('wordcount')->fieldWeights(['title' => 1])->get();
+        $weighted = (clone $query)->ranker('wordcount')->fieldWeights(['title' => 10])->get();
+        $this->assertCount(2, $weighted);
+        $this->assertSame((int)$plain[0]->_score * 10, (int)$weighted[0]->_score);
+        $expression = (clone $query)->ranker('expr', '42')->search();
+        $this->assertSame(42, (int)$expression->rows()[0]->_score);
+        $this->assertSame(2, $expression->meta()->totalFound());
+    }
+
     public function testSearchCapturesMetadataBeforeQueryListenersChangeIt(): void
     {
         $db = DB::connection('manticore');
