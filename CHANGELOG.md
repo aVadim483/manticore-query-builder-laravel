@@ -6,6 +6,24 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+* Experimental native Laravel Database driver on `dev-4.x`: `DB::connection('manticore')`,
+  a Laravel Query Builder with bound `match()` and numeric `option()`, standard result objects,
+  raw bindings, CRUD, insert IDs, lazy collections, cursors and connection lifecycle events.
+  The standalone `DatabaseServiceProvider` does not initialize the legacy query builder.
+  Advanced search and the complete 4.x migration remain under development.
+* Native REPLACE, event-safe insert IDs and single-level transactions with explicit failure
+  handling, no automatic write retries and preservation of callback/rollback errors.
+* Native Schema Builder and migrations: CREATE/DROP, ADD/DROP columns, introspection,
+  Manticore Blueprint types and CREATE settings, with unsupported DDL rejected explicitly.
+* Schema-cached conversion of JSON, MVA/MVA64, vectors, booleans and numbers across normal
+  queries, search results and lazy reads. DDL and reconnect invalidate the connection cache.
+* Native driver search results with immutable metadata snapshots, score, MVA ANY/ALL filters,
+  geographic filtering/ordering and JSON coordinate paths. Deep SELECT windows automatically
+  raise `max_matches` unless explicitly configured. Numeric bindings preserve fractional writes;
+  the connector requires emulated prepares to avoid rounding in native prepared UPDATE on 28.6.6.
+
 ### Changed
 
 * Requires `avadim/manticore-query-builder-php` `^2.6`, making separate row/metadata reads,

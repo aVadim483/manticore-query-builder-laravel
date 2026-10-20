@@ -12,6 +12,14 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProviderTest extends TestCase
 {
+    public function testThePackageAlsoRegistersTheNativeConnection(): void
+    {
+        config(['database.connections.manticore' => ['driver' => 'manticore', 'host' => '127.0.0.1', 'port' => 1]]);
+        $connection = $this->app->make('db')->connection('manticore');
+        $this->assertInstanceOf(\avadim\Manticore\Laravel\Database\ManticoreConnection::class, $connection);
+        $this->assertInstanceOf(\Closure::class, $connection->getRawPdo());
+    }
+
     public function testItBindsTheManagerAsSingleton(): void
     {
         $this->assertTrue($this->app->bound('manticore'));

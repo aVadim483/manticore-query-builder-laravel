@@ -21,6 +21,10 @@ The query builder is a separate package and is where the syntax of a query lives
 framework: the service provider and the config file, named connections, and answers of the shape
 Laravel expects.
 
+The `dev-4.x` branch also includes an experimental native
+[`DB::connection('manticore')` driver](docs/laravel-driver.md). Its configuration, standard Laravel
+result types and current limitations are documented separately; the API below remains available.
+
 ## Contents
 
 * [Related packages](#related-packages)

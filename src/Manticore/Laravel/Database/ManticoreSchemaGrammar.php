@@ -1,0 +1,134 @@
+<?php
+
+declare(strict_types=1);
+
+namespace avadim\Manticore\Laravel\Database;
+
+use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Database\Schema\Grammars\Grammar;
+use LogicException;
+use InvalidArgumentException;
+
+class ManticoreSchemaGrammar extends Grammar
+{
+    public function compileBlueprint(ManticoreBlueprint $blueprint): array
+    {
+        if ($blueprint->temporary || $blueprint->engine || $blueprint->charset || $blueprint->collation) {
+            throw new LogicException('Temporary tables, SQL engines, charsets and collations are not supported.');
+        }
+        $commands = [];
+        foreach ($blueprint->getCommands() as $command) {
+            if ($command instanceof ColumnDefinition) {
+                continue;
+            }
+            if (!in_array($command->name, ['create', 'drop', 'dropIfExists', 'dropColumn'], true)) {
+                throw new LogicException('Unsupported Manticore schema command: '.$command->name);
+            }
+            $commands[] = $command;
+        }
+        // Validate all columns before returning even the first SQL statement.
+        $definitions = [];
+        $columnDefinitions = [];
+        foreach ($blueprint->getColumns() as $column) {
+            if (!$blueprint->creating() && strtolower($column->name) === 'id') {
+                throw new LogicException('The implicit document id cannot be added or changed.');
+            }
+            $definition = $this->columnDefinition($column);
+            $columnDefinitions[spl_object_id($column)] = $definition;
+            if ($definition !== null) {
+                $definitions[] = $definition;
+            }
+        }
+        $table = $this->wrapTable($blueprint);
+        if ($blueprint->creating()) {
+            if (count($commands) !== 1) {
+                throw new LogicException('A Manticore CREATE blueprint cannot mix schema commands.');
+            }
+            $sql = 'create table '.$table.' ('.implode(', ', $definitions).')';
+            foreach ($blueprint->manticoreSettings as $name => $value) {
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name) || (is_float($value) && !is_finite($value))) {
+                    throw new InvalidArgumentException('Invalid Manticore table setting.');
+                }
+                $sql .= ' '.$name.'='.$this->escape($value);
+            }
+
+            return [$sql];
+        }
+        if ($blueprint->manticoreSettings) {
+            throw new LogicException('Table settings are currently supported only on CREATE.');
+        }
+        $sql = [];
+        foreach ($blueprint->getDriverOperations() as $command) {
+            if ($command instanceof ColumnDefinition) {
+                $definition = $columnDefinitions[spl_object_id($command)];
+                if ($definition !== null) {
+                    $sql[] = 'alter table '.$table.' add column '.$definition;
+                }
+                continue;
+            }
+            if ($command->name === 'drop' || $command->name === 'dropIfExists') {
+                if ($definitions || count($commands) !== 1) {
+                    throw new LogicException('A Manticore DROP blueprint cannot mix schema commands.');
+                }
+                $sql[] = 'drop table '.($command->name === 'dropIfExists' ? 'if exists ' : '').$table;
+            } elseif ($command->name === 'dropColumn') {
+                foreach ($command->columns as $column) {
+                    if (strtolower($column) === 'id') {
+                        throw new LogicException('The document id cannot be dropped.');
+                    }
+                    $sql[] = 'alter table '.$table.' drop column '.$this->wrap($column);
+                }
+            }
+        }
+        return $sql;
+    }
+
+    protected function columnDefinition(ColumnDefinition $column): ?string
+    {
+        $attributes = $column->getAttributes();
+        $allowed = ['type', 'name', 'length', 'autoIncrement', 'unsigned', 'precision', 'stored', 'indexed'];
+        foreach ($attributes as $key => $value) {
+            if (!in_array($key, $allowed, true) && !($key === 'nullable' && $value === false)) {
+                throw new LogicException('Unsupported Manticore column modifier: '.$key);
+            }
+        }
+        if (strtolower($column->name) === 'id') {
+            if (!in_array($column->type, ['integer', 'bigInteger'], true)) {
+                throw new LogicException('The implicit document id is always a 64-bit integer.');
+            }
+
+            return null;
+        }
+        if ($column->autoIncrement || ($column->unsigned && $column->type === 'bigInteger')) {
+            throw new LogicException('Auto-increment and unsigned bigint are only supported for the document id.');
+        }
+        $type = match ($column->type) {
+            'string' => 'string', 'text' => 'text', 'integer' => 'int', 'bigInteger' => 'bigint',
+            'float' => 'float', 'boolean' => 'bool', 'timestamp' => 'timestamp', 'json' => 'json',
+            'multi' => 'multi', 'multi64' => 'multi64', 'floatVector' => 'float_vector',
+            default => throw new LogicException('Unsupported Manticore column type: '.$column->type),
+        };
+        if ($column->type === 'timestamp' && $column->precision) {
+            throw new LogicException('Manticore timestamps do not support fractional precision.');
+        }
+        if (($column->stored !== null || $column->indexed !== null) && $type !== 'text') {
+            throw new LogicException('Stored/indexed modifiers are supported only for text fields.');
+        }
+        $sql = $this->wrap($column->name).' '.$type;
+        if ($type === 'text' && ($column->stored !== null || $column->indexed !== null)) {
+            $stored = $column->stored ?? true;
+            $indexed = $column->indexed ?? true;
+            if (!$stored && !$indexed) {
+                throw new LogicException('A text field must be stored or indexed.');
+            }
+            $sql .= ($stored ? ' stored' : '').($indexed ? ' indexed' : '');
+        }
+
+        return $sql;
+    }
+
+    protected function wrapValue($value)
+    {
+        return $value === '*' ? $value : '`'.str_replace('`', '``', $value).'`';
+    }
+}

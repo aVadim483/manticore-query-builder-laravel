@@ -68,6 +68,8 @@ class ServiceProvider extends BaseServiceProvider
         // it while the providers are still registering
         $this->mergeConfigFrom($this->configPath(), 'manticore');
 
+        $this->app->register(DatabaseServiceProvider::class);
+
         $app->singleton('manticore.factory', static function () {
             return new Factory();
         });
