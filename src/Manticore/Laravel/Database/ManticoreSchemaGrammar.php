@@ -86,7 +86,7 @@ class ManticoreSchemaGrammar extends Grammar
     protected function columnDefinition(ColumnDefinition $column): ?string
     {
         $attributes = $column->getAttributes();
-        $allowed = ['type', 'name', 'length', 'autoIncrement', 'unsigned', 'precision', 'stored', 'indexed'];
+        $allowed = ['type', 'name', 'length', 'autoIncrement', 'unsigned', 'precision', 'stored', 'indexed', 'knnDimensions', 'knnSimilarity'];
         foreach ($attributes as $key => $value) {
             if (!in_array($key, $allowed, true) && !($key === 'nullable' && $value === false)) {
                 throw new LogicException('Unsupported Manticore column modifier: '.$key);
@@ -115,6 +115,14 @@ class ManticoreSchemaGrammar extends Grammar
             throw new LogicException('Stored/indexed modifiers are supported only for text fields.');
         }
         $sql = $this->wrap($column->name).' '.$type;
+        if ($column->knnDimensions !== null || $column->knnSimilarity !== null) {
+            if ($type !== 'float_vector' || !is_int($column->knnDimensions) || $column->knnDimensions <= 0
+                || !in_array($column->knnSimilarity, ['l2', 'cosine', 'ip'], true)) {
+                throw new InvalidArgumentException('KNN indexing requires a float vector, positive dimensions and l2/cosine/ip similarity.');
+            }
+            $sql .= " knn_type='hnsw' knn_dims=".$this->escape((string)$column->knnDimensions)
+                .' hnsw_similarity='.$this->escape($column->knnSimilarity);
+        }
         if ($type === 'text' && ($column->stored !== null || $column->indexed !== null)) {
             $stored = $column->stored ?? true;
             $indexed = $column->indexed ?? true;

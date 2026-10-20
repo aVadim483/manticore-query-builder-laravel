@@ -12,6 +12,9 @@ class ManticoreGrammar extends Grammar
 {
     public function compileSelect(Builder $query)
     {
+        if ($query instanceof ManticoreQueryBuilder && $query->hasKnn()) {
+            $this->assertKnnConditions($query);
+        }
         if ($query->unions || $query->joins || $query->lock !== null
             || isset($query->groupLimit) || $query->distinct) {
             throw new LogicException('Unions, joins, locks, group limits and DISTINCT are not supported by this Manticore driver yet.');
@@ -63,6 +66,33 @@ class ManticoreGrammar extends Grammar
         }
 
         return $left.'?';
+    }
+
+    protected function assertKnnConditions(Builder $query, bool $nested = false): void
+    {
+        $count = 0;
+        foreach ($query->wheres ?? [] as $where) {
+            if (strtolower($where['boolean']) !== 'and') {
+                throw new LogicException('KNN queries require AND filters; OR trees are not supported.');
+            }
+            if ($where['type'] === 'Knn' && ($nested || ++$count > 1)) {
+                throw new LogicException('KNN must appear once at the top level.');
+            }
+            if ($where['type'] === 'Nested') {
+                $this->assertKnnConditions($where['query'], true);
+            }
+        }
+    }
+
+    protected function whereKnn(Builder $query, $where): string
+    {
+        $vector = implode(', ', array_map(fn ($value) => json_encode($value, JSON_THROW_ON_ERROR), $where['vector']));
+        $options = [];
+        foreach ($where['options'] as $name => $value) {
+            $options[] = $name.'='.json_encode($value, JSON_THROW_ON_ERROR);
+        }
+        return 'KNN('.$this->wrap($where['column']).', '.$where['k'].', ('.$vector.')'
+            .($options ? ', {'.implode(', ', $options).'}' : '').')';
     }
 
     protected function compileColumns(Builder $query, $columns)
@@ -129,7 +159,7 @@ class ManticoreGrammar extends Grammar
     protected function assertPlainWrite(Builder $query): void
     {
         if ($query->joins || $query->orders || $query->limit !== null || $query->offset !== null
-            || ($query instanceof ManticoreQueryBuilder && ($query->manticoreOptions || $query->getSearchExpressions()))) {
+            || ($query instanceof ManticoreQueryBuilder && ($query->manticoreOptions || $query->getSearchExpressions() || $query->hasKnn()))) {
             throw new LogicException('Manticore UPDATE and DELETE do not support joins, ordering, limits, offsets, search options or computed search expressions in this driver.');
         }
     }

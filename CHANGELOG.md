@@ -8,6 +8,9 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
+* Native KNN vector queries with validated vectors/options, distance selection/ordering,
+  AND attribute/full-text filters and HNSW vector declarations in the Schema Builder.
+
 * Native search options now support escaped strings, field/index weight maps and built-in or
   expression rankers through `fieldWeights()` and `ranker()`, with live score verification.
 

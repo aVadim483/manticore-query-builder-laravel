@@ -39,9 +39,14 @@ class ManticoreBlueprint extends Blueprint
         return $this->addColumn('multi64', $column);
     }
 
-    public function floatVector(string $column)
+    public function floatVector(string $column, ?int $dimensions = null, string $similarity = 'l2')
     {
-        return $this->addColumn('floatVector', $column);
+        $definition = $this->addColumn('floatVector', $column);
+        if ($dimensions !== null) {
+            $definition->knnDimensions = $dimensions;
+            $definition->knnSimilarity = $similarity;
+        }
+        return $definition;
     }
 
     public function setting(string $name, int|float|string $value): static

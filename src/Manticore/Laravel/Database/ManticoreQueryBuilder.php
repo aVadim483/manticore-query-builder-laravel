@@ -197,6 +197,64 @@ class ManticoreQueryBuilder extends Builder
         return $this->addSearchExpression($alias, 'WEIGHT()', true);
     }
 
+    public function knn(string $column, array $vector, int $k = 10, array $options = []): static
+    {
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $column) || $k <= 0
+            || !array_is_list($vector) || !$vector) {
+            throw new InvalidArgumentException('KNN requires an attribute, positive k and non-empty vector list.');
+        }
+        foreach ($vector as $value) {
+            if ((!is_int($value) && !is_float($value)) || !is_finite((float)$value)) {
+                throw new InvalidArgumentException('KNN vectors require finite numbers.');
+            }
+        }
+        foreach ($options as $name => &$value) {
+            if (in_array($name, ['rescore', 'early_termination', 'prefilter'], true) && is_bool($value)) {
+                $value = (int)$value;
+            }
+            $valid = match ($name) {
+                'ef' => is_int($value) && $value > 0,
+                'oversampling' => (is_int($value) || is_float($value)) && is_finite((float)$value) && $value >= 1,
+                'rescore', 'early_termination', 'prefilter' => $value === 0 || $value === 1,
+                default => false,
+            };
+            if (!$valid) {
+                throw new InvalidArgumentException('Invalid or unsupported KNN option: '.$name);
+            }
+        }
+        unset($value);
+        if ($this->hasKnn()) {
+            throw new LogicException('Only one KNN condition is supported.');
+        }
+        $this->wheres[] = compact('column', 'vector', 'k', 'options') + ['type' => 'Knn', 'boolean' => 'and'];
+        $this->limit($k);
+
+        return $this;
+    }
+
+    public function hasKnn(): bool
+    {
+        foreach ($this->wheres ?? [] as $where) {
+            if ($where['type'] === 'Knn' || ($where['type'] === 'Nested' && $where['query'] instanceof self && $where['query']->hasKnn())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function withKnnDistance(string $alias = '_knn_distance'): static
+    {
+        return $this->addSearchExpression($alias, 'KNN_DIST()', true);
+    }
+
+    public function orderByKnnDistance(string $direction = 'asc'): static
+    {
+        $alias = '__manticore_knn_distance';
+        $this->searchExpressions[$alias] = ['sql' => 'KNN_DIST()', 'visible' => false];
+
+        return $this->orderBy($alias, $direction);
+    }
+
     public static function escapeMatch(string $text): string
     {
         $replacements = [];

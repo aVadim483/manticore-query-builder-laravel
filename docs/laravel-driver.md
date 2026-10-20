@@ -145,6 +145,30 @@ Filter/order helpers work without `withDistance()` as well: their internal compu
 removed from returned rows, including search results and cursors. Nested geo filters, aggregates
 and pagination include the required expressions. Existing ordering is preserved by `orderByDistance()`.
 
+## KNN vector search
+
+Create an indexed vector with `$table->floatVector('embedding', 3, 'l2')`; dimensions must be
+positive and similarity must be `l2`, `cosine` or `ip`. Omitting dimensions creates an ordinary,
+unindexed float vector. HNSW queries require the server's KNN library.
+
+```php
+$result = $connection->table('products')
+    ->knn('embedding', [1.0, 0.0, 0.0], 20, ['ef' => 100])
+    ->withKnnDistance()->select('id', 'title')
+    ->match('galaxy')->where('stock', '>', 0)
+    ->orderByKnnDistance()->search();
+```
+
+`knn()` sets LIMIT to k; a subsequent `limit()` can override the returned row count. It compiles
+the backwards-compatible `KNN(field, k, vector, options)` syntax. The server controls candidate
+selection; k is not a promise of exactly k rows after filtering or across chunks. Only one
+top-level KNN condition with AND filters is accepted. OR trees, nested KNN and KNN writes are rejected.
+Vectors must be non-empty finite numeric lists; dimension mismatches are reported by Manticore.
+Options are `ef`, `oversampling`, `rescore`, `early_termination` and `prefilter`; availability depends
+on the server version. `withKnnDistance()` adds `_knn_distance` (or a custom alias), and
+`orderByKnnDistance()` sorts via an internal column removed from returned rows.
+See [Manticore KNN](https://manual.manticoresearch.com/Searching/KNN).
+
 ## Deep pages
 
 `paginate()` and `simplePaginate()` use Laravel's paginators. A SELECT window beyond the standard
@@ -243,7 +267,7 @@ version and compatibility with `latest` will be fixed before a release.
   WHERE EXISTS subqueries and aggregates with HAVING are also rejected.
 - UPDATE and DELETE reject ordering, limits, offsets, joins, search options and computed search expressions, rather than
   silently discarding them. Updating full-text fields requires separate Manticore handling.
-- Native atomic `upsert()`, KNN, facets, highlighting and CALL helpers remain under development.
+- Native atomic `upsert()`, facets, highlighting and CALL helpers remain under development.
 - Read/write splitting and Eloquent compatibility have not been established.
 
 Existing `ManticoreDb`, `Manager` and `Row` keep the legacy behavior described in the main README.
