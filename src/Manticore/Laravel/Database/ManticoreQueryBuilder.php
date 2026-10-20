@@ -20,6 +20,8 @@ class ManticoreQueryBuilder extends Builder
     /** @var array<string, array{sql: string, visible: bool}> */
     protected array $searchExpressions = [];
     protected array $readCasts = [];
+    protected array $searchFacets = [];
+    protected array $facetCasts = [];
 
     protected function plainTable(): ?string
     {
@@ -30,10 +32,15 @@ class ManticoreQueryBuilder extends Builder
     protected function prepareReadCasts(): void
     {
         $this->readCasts = [];
+        $this->facetCasts = [];
         if ($this->connection->getConfig('cast_attributes') === false || $this->connection->pretending() || $this->plainTable() === null) {
             return;
         }
         $schema = $this->connection->getTableSchema($this->plainTable());
+        foreach ($this->searchFacets as $name => $facet) {
+            $type = $schema[$facet['column']]['type'] ?? null;
+            $this->facetCasts[$name] = in_array($type, ['multi', 'multi64', 'mva', 'mva64'], true) ? 'bigint' : $type;
+        }
         foreach ($this->columns ?? ['*'] as $column) {
             if ($column === '*' || (is_string($column) && str_ends_with($column, '.*'))) {
                 foreach ($schema as $name => $info) {
@@ -56,6 +63,9 @@ class ManticoreQueryBuilder extends Builder
     protected function runSelect()
     {
         $this->applyBeforeQueryCallbacks();
+        if ($this->searchFacets) {
+            throw new LogicException('Queries with facets must be executed through search().');
+        }
         $this->prepareReadCasts();
 
         return parent::runSelect();
@@ -63,8 +73,14 @@ class ManticoreQueryBuilder extends Builder
 
     public function cursor()
     {
+        if ($this->searchFacets) {
+            throw new LogicException('Queries with facets must be executed through search().');
+        }
         return new LazyCollection(function () {
             $this->applyBeforeQueryCallbacks();
+            if ($this->searchFacets) {
+                throw new LogicException('Queries with facets must be executed through search().');
+            }
             $this->prepareReadCasts();
             foreach ($this->connection->cursor($this->toSql(), $this->getBindings(), !$this->useWritePdo) as $row) {
                 $row = $this->applyAfterQueryCallbacks(new Collection($this->processReadRows([$row])))->first();
@@ -176,11 +192,22 @@ class ManticoreQueryBuilder extends Builder
         try {
             $this->applyBeforeQueryCallbacks();
             $this->prepareReadCasts();
-            $result = $this->connection->search($this->toSql(), $this->getBindings(), !$this->useWritePdo);
+            $result = $this->connection->search($this->toSql(), $this->getBindings(), !$this->useWritePdo, array_keys($this->searchFacets));
             $rows = $this->processor->processSelect($this, $result->rows()->all());
             $rows = $this->applyAfterQueryCallbacks(new Collection($rows));
 
-            return new SearchResult($rows, $result->meta());
+            $facets = $result->facets();
+            foreach ($facets as $name => $buckets) {
+                foreach ($buckets as $bucket) {
+                    if (isset($this->facetCasts[$name]) && property_exists($bucket, $name)) {
+                        $bucket->$name = AttributeCodec::decode($this->facetCasts[$name], $bucket->$name);
+                    }
+                    if (property_exists($bucket, 'count(*)')) {
+                        $bucket->{'count(*)'} = (int)$bucket->{'count(*)'};
+                    }
+                }
+            }
+            return new SearchResult($rows, $result->meta(), $facets);
         } finally {
             $this->columns = $original;
         }
@@ -195,6 +222,51 @@ class ManticoreQueryBuilder extends Builder
     public function withScore(string $alias = '_score'): static
     {
         return $this->addSearchExpression($alias, 'WEIGHT()', true);
+    }
+
+    public function facet(string $column, ?string $alias = null, int $limit = 20, string $sort = 'count', string $direction = 'desc'): static
+    {
+        $alias ??= str_replace('.', '_', $column);
+        $direction = strtolower($direction);
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*$/D', $column)
+            || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $alias) || $limit < 1
+            || !in_array($sort, ['count', 'value'], true) || !in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidArgumentException('A facet requires an attribute/JSON path, alias, positive limit and valid ordering.');
+        }
+        if (isset($this->searchFacets[$alias])) {
+            throw new InvalidArgumentException('A facet alias must be unique.');
+        }
+        $this->searchFacets[$alias] = compact('column', 'alias', 'limit', 'sort', 'direction');
+        return $this;
+    }
+
+    public function getFacets(): array
+    {
+        return $this->searchFacets;
+    }
+
+    public function withHighlight(string|array $fields = [], array $options = [], ?string $query = null, string $alias = '_highlight'): static
+    {
+        $fields = is_string($fields) ? ($fields === '' ? [] : explode(',', $fields)) : $fields;
+        if (!array_is_list($fields)) {
+            throw new InvalidArgumentException('Highlight fields must be a list.');
+        }
+        foreach ($fields as $field) {
+            if (!is_string($field) || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $field)) {
+                throw new InvalidArgumentException('Highlight fields require column names.');
+            }
+        }
+        $settings = [];
+        foreach ($options as $name => $value) {
+            if (!is_string($name) || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name)
+                || !is_scalar($value) || (is_float($value) && !is_finite($value))) {
+                throw new InvalidArgumentException('Highlight options require valid names and finite scalar values.');
+            }
+            $settings[] = $name.'='.$this->grammar->escape($value);
+        }
+        $sql = 'HIGHLIGHT({'.implode(', ', $settings).'}, '.$this->grammar->escape(implode(',', $fields))
+            .($query === null ? '' : ', '.$this->grammar->escape($query)).')';
+        return $this->addSearchExpression($alias, $sql, true);
     }
 
     public function knn(string $column, array $vector, int $k = 10, array $options = []): static

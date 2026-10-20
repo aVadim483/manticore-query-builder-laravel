@@ -22,6 +22,9 @@ class ManticoreGrammar extends Grammar
         if ($query->aggregate && $query->havings) {
             throw new LogicException('Aggregates with HAVING require a Manticore-specific implementation.');
         }
+        if ($query instanceof ManticoreQueryBuilder && $query->getFacets() && ($query->aggregate || $query->groups || $query->havings)) {
+            throw new LogicException('Facets cannot be combined with main-query aggregates, grouping or HAVING.');
+        }
 
         $sql = parent::compileSelect($query);
         if ($query instanceof ManticoreQueryBuilder) {
@@ -39,6 +42,15 @@ class ManticoreGrammar extends Grammar
             }
             if ($options) {
                 $sql .= ' option '.implode(', ', $options);
+            }
+            foreach ($query->getFacets() as $facet) {
+                $column = str_contains($facet['column'], '.') ? $facet['column'] : $this->wrap($facet['column']);
+                $sql .= ' facet '.$column;
+                if ($facet['column'] !== $facet['alias']) {
+                    $sql .= ' as '.$this->wrap($facet['alias']);
+                }
+                $sql .= ' order by '.($facet['sort'] === 'count' ? 'count(*)' : $this->wrap($facet['alias']))
+                    .' '.$facet['direction'].' limit '.$facet['limit'];
             }
         }
 
@@ -159,7 +171,7 @@ class ManticoreGrammar extends Grammar
     protected function assertPlainWrite(Builder $query): void
     {
         if ($query->joins || $query->orders || $query->limit !== null || $query->offset !== null
-            || ($query instanceof ManticoreQueryBuilder && ($query->manticoreOptions || $query->getSearchExpressions() || $query->hasKnn()))) {
+            || ($query instanceof ManticoreQueryBuilder && ($query->manticoreOptions || $query->getSearchExpressions() || $query->hasKnn() || $query->getFacets()))) {
             throw new LogicException('Manticore UPDATE and DELETE do not support joins, ordering, limits, offsets, search options or computed search expressions in this driver.');
         }
     }

@@ -16,6 +16,8 @@ jobs:
   tests:
     name: tests / PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }}
     runs-on: ubuntu-latest
+    env:
+      MANTICORE_TEST_BUDDY: '1'
 
     strategy:
       fail-fast: false

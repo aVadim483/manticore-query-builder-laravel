@@ -169,6 +169,65 @@ on the server version. `withKnnDistance()` adds `_knn_distance` (or a custom ali
 `orderByKnnDistance()` sorts via an internal column removed from returned rows.
 See [Manticore KNN](https://manual.manticoresearch.com/Searching/KNN).
 
+## Facets and highlighting
+
+```php
+$result = $connection->table('products')->match('galaxy')->limit(20)
+    ->withHighlight('title', ['before_match' => '<em>', 'after_match' => '</em>'])
+    ->facet('category', 'categories', 10, 'count', 'desc')
+    ->facet('details.brand', 'brands', 20, 'value', 'asc')
+    ->search(['id', 'title']);
+
+$result->rows()[0]->_highlight; // highlighted string
+$result->facet('categories'); // Collection<stdClass>, columns: categories, count(*)
+$result->facets(); // array keyed by facet name
+```
+
+`facet(column, alias, limit, sort, direction)` accepts an attribute, MVA or JSON path, an optional
+unique alias, a positive bucket limit, `count` / `value` sorting and `asc` / `desc`. Main-query
+filters also apply to facets; the main row limit does not limit their counts. Buckets and metadata
+are captured before query listeners run. MVA buckets contain individual values; counts are integers.
+JSON path values retain PDO types. Missing facet names throw `OutOfBoundsException`.
+Facets require `search()`; `get()`, cursors, pagination/aggregate counts, main GROUP BY/HAVING and
+writes with facets are rejected. Raw facet expressions, distinct counts and per-facet filter
+overrides are not yet exposed by this helper.
+
+`withHighlight(fields, options, query, alias)` accepts a field name, a list of fields or an empty
+list for all stored fields. It adds `_highlight` by default, keeps the expression after `select()`,
+and works with `get()`, `search()` and cursors. Without an explicit highlight query, Manticore uses
+the search MATCH. Options and an optional alternate query are escaped; the result is a string
+using Manticore's field/snippet separators. Source fields must be stored. HTML sanitization is
+an application concern; choose markers and stripping options appropriate for the output context.
+See [facets](https://manual.manticoresearch.com/Searching/Faceted_search) and
+[highlighting](https://manual.manticoresearch.com/Searching/Highlighting).
+
+## CALL helpers and autocomplete
+
+```php
+$keywords = $connection->keywords('gal*', 'products', ['stats' => 1]);
+$suggestions = $connection->suggest('galaxi', 'products');
+$lastWord = $connection->qsuggest('a galaxi', 'products');
+$snippets = $connection->snippets(['galaxy phone', 'galaxy tablet'], 'products', 'galaxy');
+$completions = $connection->autocomplete('gal', 'products', ['fuzziness' => 0]);
+
+// All row-producing sets, including empty sets, as array<Collection<stdClass>>:
+$sets = $connection->call('KEYWORDS', ['galaxy', 'products'], ['stats' => 1]);
+```
+
+Named helpers return the first result set as a collection and apply the connection's table prefix.
+Generic `call()` binds positional scalar arguments and non-empty flat lists; named options are
+compiled as bound `value AS name` arguments. It uses exact supplied arguments, without applying
+table prefixes. Every result set is consumed and the cursor closed before query events run.
+Procedure output retains PDO types. Standard Laravel query logs, `pretend()` and `QueryException`
+are supported; failures never cause automatic retries or silent empty-result fallback.
+
+KEYWORDS, SUGGEST, QSUGGEST and SNIPPETS work without Buddy. AUTOCOMPLETE requires Buddy and
+`min_infix_len` on the table, for example `$table->setting('min_infix_len', 2)`. The helper passes
+server errors through when these requirements are missing. See
+[Manticore autocomplete](https://manual.manticoresearch.com/Searching/Autocomplete).
+Local native tests run without Buddy; set `MANTICORE_TEST_BUDDY=1` to require its live test.
+CI sets this flag, so autocomplete errors fail the job instead of being skipped.
+
 ## Deep pages
 
 `paginate()` and `simplePaginate()` use Laravel's paginators. A SELECT window beyond the standard
@@ -267,7 +326,8 @@ version and compatibility with `latest` will be fixed before a release.
   WHERE EXISTS subqueries and aggregates with HAVING are also rejected.
 - UPDATE and DELETE reject ordering, limits, offsets, joins, search options and computed search expressions, rather than
   silently discarding them. Updating full-text fields requires separate Manticore handling.
-- Native atomic `upsert()`, facets, highlighting and CALL helpers remain under development.
+- Native atomic `upsert()` remains unsupported. Advanced facet controls and hybrid fusion are
+  not yet exposed by dedicated helpers.
 - Read/write splitting and Eloquent compatibility have not been established.
 
 Existing `ManticoreDb`, `Manager` and `Row` keep the legacy behavior described in the main README.

@@ -8,6 +8,12 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
+* Native faceted search with named result collections, attribute/MVA/JSON facets, explicit
+  bucket ordering/limits and metadata captured before query listeners run.
+* Stored-field highlighting, generic bound CALL statements and KEYWORDS/SUGGEST/QSUGGEST/
+  SNIPPETS/AUTOCOMPLETE helpers; all result sets are drained before events. Buddy autocomplete
+  is required in CI and can be enabled locally with `MANTICORE_TEST_BUDDY=1`.
+
 * Native KNN vector queries with validated vectors/options, distance selection/ordering,
   AND attribute/full-text filters and HNSW vector declarations in the Schema Builder.
 
@@ -31,6 +37,8 @@ All notable changes to this package are documented here. The format follows
   the connector requires emulated prepares to avoid rounding in native prepared UPDATE on 28.6.6.
 
 ### Changed
+
+* Native CREATE table settings are consistently quoted, including numeric setting values.
 
 * Requires `avadim/manticore-query-builder-php` `^2.6`, making separate row/metadata reads,
   deferred insert IDs, MVA filters, geographic search and autocomplete available to every install.

@@ -172,6 +172,66 @@ $result = $connection->table('products')
 `orderByKnnDistance()` сортирует по служебной колонке, которая удаляется из результата.
 Справочник: [KNN в Manticore](https://manual.manticoresearch.com/Searching/KNN).
 
+## Фасеты и подсветка
+
+```php
+$result = $connection->table('products')->match('galaxy')->limit(20)
+    ->withHighlight('title', ['before_match' => '<em>', 'after_match' => '</em>'])
+    ->facet('category', 'categories', 10, 'count', 'desc')
+    ->facet('details.brand', 'brands', 20, 'value', 'asc')
+    ->search(['id', 'title']);
+
+$result->rows()[0]->_highlight; // строка с подсветкой
+$result->facet('categories'); // Collection<stdClass>, колонки categories и count(*)
+$result->facets(); // массив по именам фасетов
+```
+
+`facet(column, alias, limit, sort, direction)` принимает атрибут, MVA или JSON-путь, необязательный
+уникальный псевдоним, положительный лимит бакетов, сортировку `count` / `value` и `asc` / `desc`.
+Фильтры основного запроса действуют и на фасеты; лимит строк не ограничивает их счётчики.
+Бакеты и метаданные сохраняются до вызова обработчиков событий. MVA-бакеты содержат отдельные
+значения, счётчики — целые числа. Значения JSON-путей сохраняют типы PDO. Неизвестное имя фасета
+вызывает `OutOfBoundsException`. Фасеты требуют `search()`: `get()`, курсоры, подсчёт для пагинации,
+агрегаты, основной GROUP BY/HAVING и запись с фасетами отклоняются. Сырые выражения фасетов,
+distinct-счётчики и отдельные фильтры каждого фасета пока не представлены в этом API.
+
+`withHighlight(fields, options, query, alias)` принимает имя поля, список полей или пустой список
+для всех сохранённых полей. По умолчанию добавляет `_highlight`, сохраняется после `select()`
+и работает в `get()`, `search()` и курсорах. Без отдельного поискового выражения используется MATCH
+основного запроса. Настройки и альтернативный запрос экранируются. Результат — строка с разделителями
+полей и фрагментов Manticore; исходные поля должны храниться на сервере. Для вывода HTML приложение
+само выбирает подходящие маркеры, настройки удаления HTML и обработку исходного содержимого.
+Справочники: [фасеты](https://manual.manticoresearch.com/Searching/Faceted_search),
+[подсветка](https://manual.manticoresearch.com/Searching/Highlighting).
+
+## CALL-методы и автодополнение
+
+```php
+$keywords = $connection->keywords('gal*', 'products', ['stats' => 1]);
+$suggestions = $connection->suggest('galaxi', 'products');
+$lastWord = $connection->qsuggest('a galaxi', 'products');
+$snippets = $connection->snippets(['galaxy phone', 'galaxy tablet'], 'products', 'galaxy');
+$completions = $connection->autocomplete('gal', 'products', ['fuzziness' => 0]);
+
+// Все наборы строк, включая пустые, как array<Collection<stdClass>>:
+$sets = $connection->call('KEYWORDS', ['galaxy', 'products'], ['stats' => 1]);
+```
+
+Именованные методы возвращают первый набор строк как коллекцию и добавляют префикс соединения
+к имени таблицы. Универсальный `call()` принимает позиционные скалярные аргументы и непустые
+плоские списки; именованные настройки передаются как параметры `value AS name`. Он использует
+аргументы в точности как переданы, без добавления префикса. Все наборы читаются, а курсор
+закрывается до событий запросов. Типы результата соответствуют PDO. Работают журнал запросов,
+`pretend()` и `QueryException` Laravel. Ошибки не вызывают автоматический повтор или подмену
+ответа пустой коллекцией.
+
+KEYWORDS, SUGGEST, QSUGGEST и SNIPPETS работают без Buddy. Для AUTOCOMPLETE нужны Buddy и
+`min_infix_len` у таблицы, например `$table->setting('min_infix_len', 2)`. Если условия не выполнены,
+метод передаёт ошибку сервера. Справочник:
+[автодополнение Manticore](https://manual.manticoresearch.com/Searching/Autocomplete).
+Локальные нативные тесты работают без Buddy; `MANTICORE_TEST_BUDDY=1` включает обязательную
+проверку автодополнения. В CI этот флаг установлен, ошибка Buddy завершит проверку с ошибкой.
+
 ## Глубокие страницы
 
 `paginate()` и `simplePaginate()` возвращают пагинаторы Laravel. Если окно SELECT превышает
@@ -272,7 +332,8 @@ Schema Builder и сырые CREATE/ALTER/DROP/TRUNCATE/RENAME сбрасыва�
   Также отклоняются подзапросы WHERE EXISTS и агрегаты с HAVING.
 - UPDATE и DELETE отклоняют сортировку, лимит, смещение, JOIN, поисковые настройки и вычисляемые выражения поиска,
   чтобы не игнорировать их молча. Обновлению полнотекстовых полей нужна отдельная обработка.
-- Атомарный `upsert()`, фасеты, подсветка и CALL-методы ещё разрабатываются.
+- Атомарный `upsert()` не поддерживается. Расширенные настройки фасетов и гибридное объединение
+  результатов пока не представлены отдельными методами.
 - Разделение чтения и записи и совместимость с Eloquent пока не подтверждены.
 
 Существующие `ManticoreDb`, `Manager` и `Row` сохраняют поведение, описанное в основном README.

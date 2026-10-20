@@ -102,21 +102,35 @@ class ManticoreConnection extends Connection
     }
 
     /** Capture both answers before query-event listeners can change session metadata. */
-    public function search(string $sql, array $bindings = [], bool $useReadPdo = true): SearchResult
+    public function search(string $sql, array $bindings = [], bool $useReadPdo = true, array $facetNames = []): SearchResult
     {
         $metaTime = 0.0;
         $metaError = null;
-        $result = $this->run($sql, $bindings, function ($sql, $bindings) use ($useReadPdo, &$metaTime, &$metaError) {
+        $result = $this->run($sql, $bindings, function ($sql, $bindings) use ($useReadPdo, $facetNames, &$metaTime, &$metaError) {
             if ($this->pretending()) {
-                return new SearchResult(new Collection(), new Meta());
+                return new SearchResult(new Collection(), new Meta(), array_fill_keys($facetNames, new Collection()));
             }
 
             $pdo = $this->getPdoForSelect($useReadPdo);
             $statement = $this->prepared($pdo->prepare($sql));
             $this->bindValues($statement, $this->prepareBindings($bindings));
             $statement->execute();
-            $rows = $statement->fetchAll(PDO::FETCH_OBJ);
-            $statement->closeCursor();
+            $facets = [];
+            try {
+                $rows = $statement->fetchAll(PDO::FETCH_OBJ);
+                foreach ($facetNames as $name) {
+                    if (!$statement->nextRowset()) {
+                        throw new RuntimeException('Manticore did not return the requested facet: '.$name);
+                    }
+                    $facets[$name] = new Collection($statement->fetchAll(PDO::FETCH_OBJ));
+                }
+                // Drain every result before SHOW META or user event listeners can run SQL.
+                while ($statement->nextRowset()) {
+                    $statement->fetchAll(PDO::FETCH_OBJ);
+                }
+            } finally {
+                $statement->closeCursor();
+            }
 
             $start = microtime(true);
             try {
@@ -130,7 +144,7 @@ class ManticoreConnection extends Connection
             }
             $metaTime = (microtime(true) - $start) * 1000;
 
-            return new SearchResult(new Collection($rows), $meta);
+            return new SearchResult(new Collection($rows), $meta, $facets);
         });
 
         if ($metaError !== null) {
@@ -143,6 +157,70 @@ class ManticoreConnection extends Connection
         }
 
         return $result;
+    }
+
+    /** @return array<int, Collection<int, \stdClass>> All row-producing result sets. */
+    public function call(string $procedure, array $arguments = [], array $options = []): array
+    {
+        [$sql, $bindings] = ProcedureCall::compile($procedure, $arguments, $options, $this->getQueryGrammar());
+        return $this->run($sql, $bindings, function ($sql, $bindings) {
+            if ($this->pretending()) {
+                return [];
+            }
+            $statement = $this->prepared($this->getPdo()->prepare($sql));
+            $this->bindValues($statement, $this->prepareBindings($bindings));
+            try {
+                $statement->execute();
+                $sets = [];
+                do {
+                    if ($statement->columnCount() > 0) {
+                        $sets[] = new Collection($statement->fetchAll(PDO::FETCH_OBJ));
+                    }
+                } while ($statement->nextRowset());
+                return $sets;
+            } finally {
+                $statement->closeCursor();
+            }
+        });
+    }
+
+    private function callForTable(string $procedure, string $text, string $table, array $options): Collection
+    {
+        $table = $this->procedureTable($table);
+        return $this->call($procedure, [$text, $table], $options)[0] ?? new Collection();
+    }
+
+    private function procedureTable(string $table): string
+    {
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $table)) {
+            throw new InvalidArgumentException('A CALL helper requires a logical table name.');
+        }
+        return $this->getTablePrefix().$table;
+    }
+
+    public function keywords(string $text, string $table, array $options = []): Collection
+    {
+        return $this->callForTable('KEYWORDS', $text, $table, $options);
+    }
+
+    public function suggest(string $text, string $table, array $options = []): Collection
+    {
+        return $this->callForTable('SUGGEST', $text, $table, $options);
+    }
+
+    public function qsuggest(string $text, string $table, array $options = []): Collection
+    {
+        return $this->callForTable('QSUGGEST', $text, $table, $options);
+    }
+
+    public function autocomplete(string $text, string $table, array $options = []): Collection
+    {
+        return $this->callForTable('AUTOCOMPLETE', $text, $table, $options);
+    }
+
+    public function snippets(string|array $documents, string $table, string $query, array $options = []): Collection
+    {
+        return $this->call('SNIPPETS', [$documents, $this->procedureTable($table), $query], $options)[0] ?? new Collection();
     }
 
     public function query()

@@ -49,7 +49,7 @@ class ManticoreSchemaGrammar extends Grammar
                 if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name) || (is_float($value) && !is_finite($value))) {
                     throw new InvalidArgumentException('Invalid Manticore table setting.');
                 }
-                $sql .= ' '.$name.'='.$this->escape($value);
+                $sql .= ' '.$name.'='.$this->escape((string)$value);
             }
 
             return [$sql];

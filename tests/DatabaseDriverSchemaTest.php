@@ -32,7 +32,7 @@ class DatabaseDriverSchemaTest extends DatabaseTestCase
             $table->floatVector('embedding');
             $table->setting('min_infix_len', 2);
         }));
-        $this->assertSame("create table `app_products` (`title` text, `brand` string, `price` float, `active` bool, `published_at` timestamp, `info` json, `tags` multi, `categories` multi64, `embedding` float_vector) min_infix_len=2", $log[0]['query']);
+        $this->assertSame("create table `app_products` (`title` text, `brand` string, `price` float, `active` bool, `published_at` timestamp, `info` json, `tags` multi, `categories` multi64, `embedding` float_vector) min_infix_len='2'", $log[0]['query']);
         $this->assertFalse($connection->getSchemaGrammar()->supportsSchemaTransactions());
     }
 
