@@ -11,6 +11,8 @@ not compatibility aliases that redirect old calls automatically.
 The connection change alone does not rename, recreate or reindex existing Manticore tables.
 Keep their physical names and verify the prefix before moving application traffic. For the full
 supported API and server requirements, see the [native driver reference](laravel-driver.md).
+The guide has been exercised on a [live Laravel 12 application](migration-app-verification.md);
+that report records the application changes and checks without modifying the installed package.
 
 ## 1. Inventory and entry points
 
@@ -107,6 +109,8 @@ Both builders' `select()` configures columns; it does not execute the query. The
 | `sql($sql)->bind($params)->get()` | `$db->select($sql, $params)`; returns raw PDO values |
 | Upstream `raw()` / `param()` / query `bind()` | `DB::raw()` for trusted SQL; pass bindings directly to `whereRaw()` / `selectRaw()` or connection methods |
 | `findOrFail($id)` | `where('id', $id)->firstOrFail()`; Laravel Query Builder has no `findOrFail()` |
+| Catch `RecordsNotFoundException` after `firstOrFail()` / `findOrFail()` | Catch `Illuminate\Database\RecordNotFoundException` (singular) after native `firstOrFail()`; review exception mappings |
+| `where('details.color', 'red')` for a JSON path | `whereRaw('details.color = ?', ['red'])`; Laravel can treat dotted names as qualified table/column identifiers and add the table prefix |
 | `whereKnn($column, $k, $vector)` | `knn($column, $vector, $k)`; it also sets LIMIT to k |
 | `highlight($options, $fields, $query)` | `withHighlight($fields, $options, $query)` |
 | `facet($column, $callback)` | `facet($column, $alias, $limit, $sort, $direction)->search()` |
@@ -159,6 +163,13 @@ $metadata = $result->meta()->toArray();
 and is already loaded. `get()` does not fetch SHOW META; `getMeta()` reads current session state
 and can be affected by any intervening SQL. There is no native `lastResultSet()` or deferred metadata object.
 Facet results live in `$result->facet($name)` / `$result->facets()`.
+
+The old builder automatically added `_score` to MATCH reads and could add convenience aliases
+such as `_count` beside `count(*)`. Native reads require explicit `withScore()` and do not invent
+the old `_count` alias. Add application DTO fields if clients depend on that JSON shape. Column
+order may change when computed fields are added. Numeric fields returned by native CALL helpers
+(for example `qpos`, `docs`, `distance`) can remain PDO strings; cast them explicitly in a DTO when
+the old application serialized integers.
 
 Builder reads/writes cast JSON, MVA/MVA64, vectors, booleans and numbers using cached DESCRIBE.
 Timestamp inputs accept `DateTimeInterface` and reads return epoch integers. Integers outside
@@ -213,6 +224,9 @@ Replace `cursor(500)` with `lazy(500)` to retain the old page-by-page behavior. 
 takes no chunk size and performs one SELECT; it is bounded by the server result window, not an
 unlimited table scan. Both methods return a LazyCollection, so remove wrappers that require a
 Generator or `iterator_to_array()` and use collection methods such as `all()` / `take()` instead.
+Add a deterministic `orderBy()` before Laravel `lazy()` / offset chunk walks: Laravel requires it.
+For one SELECT over more than the default result limit, specify `limit()` explicitly as well as
+the required result window; `max_matches` alone does not increase the number of returned rows.
 For a large changing table prefer `lazyById()` / `chunkById()`, preserve IDs and group OR filters.
 Laravel's `each()` callback index can restart per offset chunk; use `eachById()` or your own counter
 if the old globally increasing index matters. Review callbacks type-hinting `Row` or Generator.
@@ -229,6 +243,12 @@ Manual `beginTransaction()`, `commit()` and `rollBack()` use Laravel's exception
 remove old boolean-success checks. Uncertain BEGIN/COMMIT/ROLLBACK failures disconnect the session,
 and SQL is not replayed automatically. `TransactionRollbackException` exposes both `callbackError`
 and `rollbackError` when rollback also fails. Primary-database and Manticore writes are not one transaction.
+
+Manticore transactions cover **INSERT, REPLACE and DELETE**, not in-place **UPDATE**. UPDATE is
+not rolled back even inside `transaction()`; the current driver does not reject it there.
+Use a full-document REPLACE when the change must participate in rollback. This server limitation
+also exists under 3.x; do not assume Laravel changes it. See the
+[Manticore transaction reference](https://manual.manticoresearch.com/Data_creation_and_modification/Transactions).
 
 ## 7. SchemaTable and migrations
 

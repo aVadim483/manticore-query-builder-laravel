@@ -6,6 +6,19 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+* A live Laravel 12 migration verification report: 32 application scenarios on 3.0.0 and
+  4.0.0-alpha.1, 11 browser checks per version and six additional native checks, preserving
+  the same 2105-document dataset without editing vendor code.
+
+### Fixed
+
+* Migration guidance now covers JSON-path filters, singular `RecordNotFoundException`,
+  required ordering for lazy reads, old score/count aliases and PDO numeric CALL fields.
+* Transaction examples and production smoke use REPLACE: Manticore's in-place UPDATE is
+  not rolled back by a transaction. This existing server limitation is documented explicitly.
+
 ## [4.0.0-alpha.1] - 2026-10-21
 
 First alpha of the native Laravel Database driver. This is a breaking upgrade from 3.x,

@@ -10,6 +10,8 @@ API 3.x и Composer-зависимость от `avadim/manticore-query-builder-
 Смена соединения сама по себе не переименовывает, не пересоздаёт и не переиндексирует таблицы.
 Сохраните физические имена и проверьте префиксы перед переключением приложения.
 Полный API и требования к серверу описаны в [справочнике драйвера](laravel-driver.md).
+Руководство проверено на [живом Laravel-приложении](migration-app-verification.md):
+в отчёте зафиксированы изменения приложения и результаты без правок установленного пакета.
 
 ## 1. Поиск старых вызовов и точки входа
 
@@ -107,6 +109,8 @@ $rows = $db->table('products')->select(['id', 'title'])->match($text)->get();
 | `sql($sql)->bind($params)->get()` | `$db->select($sql, $params)` с исходными значениями PDO |
 | Старые `raw()`, `param()`, `bind()` | `DB::raw()` для доверенного SQL; параметры передаются в `whereRaw()`, `selectRaw()` или методы соединения |
 | `findOrFail($id)` | `where('id', $id)->firstOrFail()`; в Laravel Query Builder нет `findOrFail()` |
+| Перехват `RecordsNotFoundException` после `firstOrFail()` / `findOrFail()` | После нативного `firstOrFail()` перехватывайте `Illuminate\Database\RecordNotFoundException` (единственное число); проверьте обработчики исключений |
+| `where('details.color', 'red')` для JSON-пути | `whereRaw('details.color = ?', ['red'])`; Laravel может трактовать точку как разделитель таблицы/колонки и добавить префикс |
 | `whereKnn($column, $k, $vector)` | `knn($column, $vector, $k)`; также задаёт LIMIT k |
 | `highlight($options, $fields, $query)` | `withHighlight($fields, $options, $query)` |
 | `facet($column, $callback)` | `facet($column, $alias, $limit, $sort, $direction)->search()` |
@@ -158,6 +162,13 @@ $metadata = $result->meta()->toArray();
 `get()` не запрашивает SHOW META; `getMeta()` читает текущее состояние сессии, которое может
 измениться после любого промежуточного SQL. Нативных `lastResultSet()` и отложенных метаданных нет.
 Фасеты доступны через `$result->facet($name)` / `$result->facets()`.
+
+Старый билдер автоматически добавлял `_score` при MATCH и мог создавать вспомогательный
+псевдоним `_count` рядом с `count(*)`. В новом явно вызывайте `withScore()`; старый `_count`
+сам не появляется. Если клиент зависит от такой JSON-структуры, восстановите поля в DTO
+приложения. Порядок колонок при добавлении вычисляемых полей может меняться. Числовые поля
+нативных CALL-помощников (`qpos`, `docs`, `distance`) могут оставаться строками PDO:
+приводите их явно, если старое приложение сериализовало целые числа.
 
 Билдер преобразует JSON, MVA/MVA64, векторы, bool и числа по кэшированному DESCRIBE.
 На запись timestamp принимает `DateTimeInterface`, на чтение возвращает целое Unix-время.
@@ -211,6 +222,9 @@ Laravel `updateOrInsert()` выполняет несколько запросо�
 Новый `cursor()` не принимает размер порции и выполняет один SELECT; он ограничен окном
 результатов сервера. Оба метода возвращают LazyCollection: замените требования Generator
 и `iterator_to_array()` методами коллекции `all()` / `take()`.
+Перед Laravel `lazy()` и обходами порциями по offset задавайте детерминированный `orderBy()`:
+Laravel требует сортировку. Для одного SELECT с большой выдачей явно задавайте `limit()`;
+один `max_matches` не увеличивает число возвращаемых строк.
 Для большой изменяемой таблицы предпочтительны `lazyById()` / `chunkById()`; сохраняйте ID
 и группируйте OR-фильтры. Индекс callback у Laravel `each()` может начинаться заново в каждой
 порции; если нужен сквозной индекс, используйте `eachById()` либо собственный счётчик.
@@ -228,6 +242,12 @@ Laravel `updateOrInsert()` выполняет несколько запросо�
 удалите старые проверки bool. Неопределённые ошибки BEGIN/COMMIT/ROLLBACK закрывают соединение;
 SQL автоматически не повторяется. При ошибке callback и отката `TransactionRollbackException`
 содержит `callbackError` и `rollbackError`. Записи в основной базе и Manticore не образуют общую транзакцию.
+
+Транзакции Manticore охватывают **INSERT, REPLACE и DELETE**, но не выполняемый на месте
+**UPDATE**. UPDATE не откатывается даже внутри `transaction()`; текущий драйвер его там
+не запрещает. Для изменений с откатом используйте полную замену документа через REPLACE.
+Ограничение сервера действует и в 3.x; Laravel его не меняет.
+См. [документацию транзакций Manticore](https://manual.manticoresearch.com/Data_creation_and_modification/Transactions).
 
 ## 7. SchemaTable и миграции
 

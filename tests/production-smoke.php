@@ -64,7 +64,10 @@ if (in_array('--live', $argv, true)) {
             || $row->tags !== [1, 2] || $result->meta()->totalFound() !== 1) {
             throw new RuntimeException('Production CRUD, casts or search metadata failed.');
         }
-        $db->transaction(fn () => $db->table($table)->where('id', 42)->update(['price' => 25.5]));
+        $db->transaction(fn () => $db->table($table)->replace([
+            'id' => 42, 'title' => 'galaxy phone', 'details' => ['brand' => 'acme'],
+            'tags' => [1, 2], 'price' => 25.5,
+        ]));
         if ((float)$db->table($table)->find(42)->price !== 25.5) {
             throw new RuntimeException('Production transaction failed.');
         }

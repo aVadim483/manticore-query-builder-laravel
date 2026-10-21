@@ -8,7 +8,7 @@
 A native Laravel Database driver for ManticoreSearch. Use Laravel's database manager, Query Builder,
 collections, pagination, query events and Schema Builder over PDO's MySQL protocol.
 
-Version `4.0.0-alpha.1` is prepared for early testing on `dev-4.x`; it is not a stable release.
+Version `4.0.0-alpha.1` is available for early testing; it is not a stable release.
 See the [alpha release notes](docs/releases/4.0.0-alpha.1.md) for scope and unverified integrations.
 The 3.x wrapper API and its dependency on `avadim/manticore-query-builder-php` have been removed.
 Existing applications should follow the [3.x migration guide](docs/upgrading-3.x-to-4.x.md).
@@ -38,20 +38,21 @@ Support for older servers, Lumen and general Eloquent compatibility is not estab
 
 ## Installation
 
-To test the development branch while the alpha release is being prepared:
-
-```sh
-composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
-```
-
-After tag `v4.0.0-alpha.1` is published and available on Packagist, install that exact alpha:
+To install the published alpha:
 
 ```sh
 composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.1
 ```
 
+To test subsequent development changes:
+
+```sh
+composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
+```
+
 An explicit alpha constraint avoids changing the whole application's `minimum-stability`.
-Real application migration and Scout compatibility have not yet been validated.
+A live Laravel 12 demonstration application's migration has been [verified](docs/migration-app-verification.md).
+Scout adapter migration and other applications remain unverified.
 
 Laravel discovers `avadim\Manticore\Laravel\ServiceProvider` automatically.
 If package discovery is disabled, register that provider in `bootstrap/providers.php`.

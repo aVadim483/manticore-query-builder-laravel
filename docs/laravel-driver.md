@@ -254,7 +254,7 @@ $connection->table('products')->replace([
     'id' => 42, 'title' => 'Galaxy', 'price' => 199.5,
 ]);
 $connection->transaction(function () use ($connection) {
-    $connection->table('products')->where('id', 42)->update(['price' => 189.5]);
+    $connection->table('products')->replace(['id' => 42, 'title' => 'Galaxy', 'price' => 189.5]);
 });
 ```
 
@@ -264,6 +264,11 @@ or ROLLBACK disconnect the uncertain session; SQL and transaction callbacks are 
 If both the callback and rollback fail, `TransactionRollbackException` exposes `callbackError`
 and `rollbackError`. A failure retrieving an ID can follow a successful write; it never causes
 another INSERT. UPDATE remains subject to Manticore's supported attribute operations.
+
+Only INSERT, REPLACE and DELETE participate in Manticore transactions. In-place UPDATE is
+not rolled back; the current driver does not reject UPDATE inside a transaction. Use a
+complete-document REPLACE for changes that need rollback, including all attributes to retain.
+See [Manticore transactions](https://manual.manticoresearch.com/Data_creation_and_modification/Transactions).
 
 ## Schema and migrations
 

@@ -75,3 +75,7 @@ and the observed `latest` on Laravel 13, each with 130 tests / 628 assertions an
 The production-only Illuminate 13.38.0 consumer passed on both servers. For these local runs,
 the executables and bundled modules were extracted from the official images and run as
 isolated user services; Docker container startup and other PHP versions are covered by CI.
+
+A subsequent [live application migration](migration-app-verification.md) verifies a deployed
+Laravel 12 application on 3.0.0 and the published 4.0.0-alpha.1, including browser forms and
+preserved search data. This is separate from the package-level matrix above.

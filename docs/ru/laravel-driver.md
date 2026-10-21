@@ -259,7 +259,7 @@ $connection->table('products')->replace([
     'id' => 42, 'title' => 'Galaxy', 'price' => 199.5,
 ]);
 $connection->transaction(function () use ($connection) {
-    $connection->table('products')->where('id', 42)->update(['price' => 189.5]);
+    $connection->table('products')->replace(['id' => 42, 'title' => 'Galaxy', 'price' => 189.5]);
 });
 ```
 
@@ -270,6 +270,11 @@ DDL внутри транзакции и число попыток, отличн
 сохраняет обе ошибки в `callbackError` и `rollbackError`. Ошибка получения ID возможна после
 успешной записи и не приводит к повторному INSERT. UPDATE ограничен операциями над атрибутами,
 которые поддерживает Manticore.
+
+В транзакциях Manticore участвуют только INSERT, REPLACE и DELETE. UPDATE на месте не
+откатывается; текущий драйвер не запрещает UPDATE внутри транзакции. Для изменений с откатом
+используйте REPLACE полного документа, передавая все сохраняемые атрибуты.
+См. [транзакции Manticore](https://manual.manticoresearch.com/Data_creation_and_modification/Transactions).
 
 ## Схема и миграции
 
