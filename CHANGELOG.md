@@ -69,6 +69,9 @@ All notable changes to this package are documented here. The format follows
 
 ### Changed
 
+* The supported Manticore floor is 28.6.6. CI crosses every PHP/Laravel combination with a
+  digest-pinned minimum image and `latest`, checking actual versions and Buddy/KNN readiness.
+
 * Native CREATE table settings are consistently quoted, including numeric setting values.
 
 * README examples and benchmarks now use the native driver. Historical 3.x benchmark results

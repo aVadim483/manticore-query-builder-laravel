@@ -38,8 +38,40 @@ selecting another framework version.
 On 2026-10-21, the full suite passed on PHP 8.4.19 with Laravel 11.57.0, 12.70.1 and 13.30.1
 against Manticore 29.9.0, Buddy 4.4.3 and Columnar/KNN 14.2.1: 130 tests per framework,
 without failures or skips. PHP-version coverage remains the responsibility of CI.
-These checks do not establish a minimum supported Manticore version or Eloquent compatibility.
+General Eloquent compatibility remains unverified.
 
 The [benchmarks](../benchmarks/README.md) have a separate smoke check using 100 documents for
 each insertion client and 120 documents / 5 queries per search profile. All four search clients
 must return the same number of rows. Small smoke runs validate scripts, not performance claims.
+
+## Server compatibility
+
+The supported minimum is **Manticore 28.6.6**, the earliest server verified for this driver.
+Older versions are outside the support policy; they are not automatically rejected on every
+connection. Server features still need their corresponding modules and table settings.
+See the [official 28.6.6 release notes](https://manticoresearch.com/blog/manticore-search-28-6-6/).
+
+CI crosses all four PHP/Laravel runtime combinations with these two server targets:
+
+| Target | Image | Purpose |
+| --- | --- | --- |
+| Minimum | `manticoresearch/manticore:28.6.6@sha256:341f333906fb2183fe585ad66de3486f372b2bbdd39e0e001d280a54f06d893a` | Reproducible floor, including its bundled modules |
+| Latest | `manticoresearch/manticore:latest` | Detect changes in the current official stable image |
+
+Run `php tests/check-server.php` before the suite. It checks SHOW STATUS, rejects a server below
+28.6.6, waits for Buddy and KNN, and prints the full server/module versions. Set
+`MANTICORE_TEST_EXPECTED_VERSION=28.6.6` to ensure the minimum job has the exact expected version.
+`MANTICORE_TEST_IMAGE` labels the report; `MANTICORE_TEST_SERVER_REPORT` optionally saves it
+to an existing directory. The full suite and production consumer must pass without skips.
+The driver does not add a version-check SQL round trip to application connections.
+
+The minimum image bundles Buddy 4.2.0 and Columnar/KNN 13.8.3. On 2026-10-21 the `latest`
+digest was `sha256:461b419739a2bbbffb4be0b32db26c41d7b435bf7fd1fce95b414ca5ccbb3775`, containing
+Manticore 29.9.0, Buddy 4.4.3 and Columnar/KNN 14.2.1. The `latest` CI job deliberately follows
+the tag; it is not frozen to this observed digest. A future tag change must be verified by CI.
+
+Compatibility runs on 2026-10-21 passed with PHP 8.4.19: the minimum on Laravel 11/12/13,
+and the observed `latest` on Laravel 13, each with 130 tests / 628 assertions and no skips.
+The production-only Illuminate 13.38.0 consumer passed on both servers. For these local runs,
+the executables and bundled modules were extracted from the official images and run as
+isolated user services; Docker container startup and other PHP versions are covered by CI.

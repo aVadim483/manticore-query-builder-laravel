@@ -28,12 +28,12 @@ Existing applications should follow the [3.x migration guide](docs/upgrading-3.x
 
 * PHP 8.2+ and Laravel 11–13, subject to each framework version's PHP requirements.
 * PHP extensions `pdo`, `pdo_mysql` and `json`.
-* ManticoreSearch with the MySQL protocol enabled, normally on port 9306.
+* ManticoreSearch 28.6.6+ with the MySQL protocol enabled, normally on port 9306.
 * Buddy for AUTOCOMPLETE; the KNN library and a vector index for KNN queries.
 
-The driver has been tested on Manticore 28.6.6 and 29.9.0, including Buddy 4.4.3 on 29.9.0.
-A minimum supported server version will be fixed before release. Lumen and general Eloquent
-compatibility are not established.
+The supported server floor is 28.6.6. CI tests its official image pinned by digest and the moving
+`latest` image; see the [server compatibility policy](docs/testing.md#server-compatibility).
+Support for older servers, Lumen and general Eloquent compatibility is not established.
 
 ## Installation
 

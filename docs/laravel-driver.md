@@ -415,8 +415,9 @@ See [Laravel cursor pagination](https://laravel.com/docs/13.x/pagination#cursor-
 
 ## Current boundaries
 
-The initial implementation has been exercised on Manticore 28.6.6. The minimum supported server
-version and compatibility with `latest` will be fixed before a release.
+The minimum supported server is Manticore 28.6.6. CI tests its pinned official image and `latest`
+with their bundled Buddy/KNN libraries. This is a support policy, not a claim that all older
+servers are incompatible. See [server compatibility](testing.md#server-compatibility).
 
 - Joins, unions, SELECT DISTINCT, locks and group limits are currently rejected by the driver.
   WHERE EXISTS subqueries and aggregates with HAVING are also rejected.
