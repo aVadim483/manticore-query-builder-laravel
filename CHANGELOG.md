@@ -6,6 +6,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Removed
+
+* The 3.x wrapper API: `ManticoreDb`, package Facade/Manager/Factory/Connection/Query/Row,
+  `config/manticore.php`, static connection pools and the standalone PHP-builder dependency.
+  Applications must migrate to `DB::connection('manticore')`; no compatibility aliases are installed.
+
 ### Fixed
 
 * Native cursors explicitly release PDO results on completion, fetch failures and early iterator
@@ -18,6 +24,9 @@ All notable changes to this package are documented here. The format follows
   parser rejects backtick-quoted aliases. Reproduced against Buddy 4.4.3 on Manticore 29.9.0.
 
 ### Added
+
+* English and Russian 3.x migration guides covering native connection configuration, API and
+  result replacements, IDs/errors, schema migrations, logging and worker lifecycle.
 
 * Native cursor pagination for stable integer/ID ordering, selected aliases and bidirectional
   encoded cursors, with validated boundary values and no growing offsets or total-count query.
@@ -43,8 +52,8 @@ All notable changes to this package are documented here. The format follows
 * Experimental native Laravel Database driver on `dev-4.x`: `DB::connection('manticore')`,
   a Laravel Query Builder with bound `match()` and numeric `option()`, standard result objects,
   raw bindings, CRUD, insert IDs, lazy collections, cursors and connection lifecycle events.
-  The standalone `DatabaseServiceProvider` does not initialize the legacy query builder.
-  Advanced search and the complete 4.x migration remain under development.
+  The auto-discovered `ServiceProvider` registers this driver; `DatabaseServiceProvider` remains
+  an alternative explicit entry point. General Eloquent compatibility remains unverified.
 * Native REPLACE, event-safe insert IDs and single-level transactions with explicit failure
   handling, no automatic write retries and preservation of callback/rollback errors.
 * Native Schema Builder and migrations: CREATE/DROP, ADD/DROP columns, introspection,
@@ -60,10 +69,10 @@ All notable changes to this package are documented here. The format follows
 
 * Native CREATE table settings are consistently quoted, including numeric setting values.
 
-* Requires `avadim/manticore-query-builder-php` `^2.6`, making separate row/metadata reads,
-  deferred insert IDs, MVA filters, geographic search and autocomplete available to every install.
-* English and Russian documentation now covers the 2.6 read/write APIs and their lifetimes,
-  connection settings, extension requirements and differences from Laravel Query Builder.
+* README examples and benchmarks now use the native driver. Historical 3.x benchmark results
+  are preserved separately and are not presented as native-driver measurements.
+* The full test suite uses the upstream-class guard bootstrap and boots the production provider;
+  CI fails if a required server-dependent test is skipped.
 
 ## [3.0.0] - 2026-09-04
 

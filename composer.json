@@ -1,6 +1,6 @@
 {
     "name": "avadim/manticore-query-builder-laravel",
-    "description": "ManticoreSearch Query Builder for your Laravel applications",
+    "description": "Native ManticoreSearch database driver for Laravel",
     "keywords": [
         "laravel",
         "manticoresoftware",
@@ -21,8 +21,6 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
-        "psr/log": "^1.1|^2.0|^3.0",
-        "avadim/manticore-query-builder-php": "^2.6",
         "illuminate/support": "^11.0|^12.0|^13.0",
         "illuminate/contracts": "^11.0|^12.0|^13.0",
         "illuminate/database": "^11.0|^12.0|^13.0",
@@ -51,10 +49,7 @@
         "laravel": {
             "providers": [
                 "avadim\\Manticore\\Laravel\\ServiceProvider"
-            ],
-            "aliases": {
-                "ManticoreDb": "avadim\\Manticore\\QueryBuilder\\Builder"
-            }
+            ]
         }
     }
 }

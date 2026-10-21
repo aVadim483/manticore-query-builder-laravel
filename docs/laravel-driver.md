@@ -2,7 +2,10 @@
 
 The `dev-4.x` branch includes an experimental driver built on Laravel's own Query Builder.
 It uses PDO directly; its implementation does not call the standalone PHP query builder.
-The package still installs that dependency while the existing 3.x API is retained during development.
+The 3.x wrapper API and its standalone builder dependency have been removed.
+
+For configuration and API replacements in existing applications, see the
+[3.x migration guide](upgrading-3.x-to-4.x.md).
 
 ## Configuration
 
@@ -27,7 +30,8 @@ Prefixes follow Laravel's rules: `prefix => 'app_'` prefixes `table('products')`
 The legacy `?products` placeholder is not used. A database name is not needed.
 
 The standalone `avadim\Manticore\Laravel\DatabaseServiceProvider` registers only the new driver,
-without initializing the legacy static builder. The existing package provider also registers it.
+as an alternative to the auto-discovered `ServiceProvider`. Both register the same native driver;
+one provider is sufficient.
 
 ## Queries and results
 
@@ -422,6 +426,5 @@ version and compatibility with `latest` will be fixed before a release.
   not yet exposed by dedicated helpers.
 - Read/write splitting and Eloquent compatibility have not been established.
 
-Existing `ManticoreDb`, `Manager` and `Row` keep the legacy behavior described in the main README.
-They do not share a PDO connection with the new driver. Do not mix both APIs inside one transaction
-or rely on one API to read the other's connection metadata.
+The old `ManticoreDb`, `Manager`, `Connection`, `Query`, `Row` and `Factory` API has been removed.
+Use the [migration guide](upgrading-3.x-to-4.x.md) to replace application calls and type hints.

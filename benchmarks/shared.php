@@ -19,17 +19,6 @@ declare(strict_types=1);
 
 require __DIR__.'/../vendor/autoload.php';
 
-// Официальный клиент живёт в отдельном manifest'е benchmarks/composer.json,
-// чтобы не попадать в зависимости самого пакета.
-$benchAutoload = __DIR__.'/vendor/autoload.php';
-
-if (!is_file($benchAutoload)) {
-    fwrite(STDERR, "Нет benchmarks/vendor. Выполните: cd benchmarks && composer install\n");
-    exit(1);
-}
-
-require $benchAutoload;
-
 // --- адреса демона ---------------------------------------------------------
 
 /**
@@ -76,27 +65,6 @@ function benchTableOptions(): array
         'min_infix_len' => 3,
         'index_exact_words' => 1,
         'html_strip' => 0,
-    ];
-}
-
-/**
- * Поля таблицы без id — в том виде, в каком их принимает билдер.
- *
- * @return array<string, string|array>
- */
-function benchTableFields(): array
-{
-    return [
-        'title_id' => 'bigint',
-        'name' => 'text',
-        'normalized' => 'text',
-        'type' => ['type' => 'string', 'attribute'],
-        'year' => 'integer',
-        'popularity' => 'float',
-        'num_votes' => 'bigint',
-        'source_mask' => 'integer',
-        'has_tmdb' => 'bool',
-        'is_primary' => 'bool',
     ];
 }
 
@@ -230,6 +198,11 @@ function benchPdo(): PDO
  */
 function benchHttpClient(): \Manticoresearch\Client
 {
+    $autoload = __DIR__.'/vendor/autoload.php';
+    if (!is_file($autoload)) {
+        throw new RuntimeException('Установите HTTP-клиент: composer --working-dir=benchmarks install');
+    }
+    require_once $autoload;
     $config = benchConfig();
 
     return new \Manticoresearch\Client([
@@ -239,30 +212,19 @@ function benchHttpClient(): \Manticoresearch\Client
     ]);
 }
 
-/**
- * Инициализация билдера.
- *
- * $connectionClass позволяет подсунуть соединение обёртки для Laravel — ровно
- * то, что делает ServiceProvider::boot(). Без контейнера и без приложения:
- * классу соединения достаточно autoload'а.
- */
-function benchBuilderInit(?string $connectionClass = null): void
+/** Создаёт то же нативное соединение, что и провайдер Laravel, без приложения. */
+function benchNativeConnection(): \avadim\Manticore\Laravel\Database\ManticoreConnection
 {
-    $config = benchConfig();
-
-    if ($connectionClass !== null) {
-        \avadim\Manticore\QueryBuilder\Builder::setConnectionClass($connectionClass);
-    }
-
-    \avadim\Manticore\QueryBuilder\Builder::init([
-        'defaultConnection' => 'default',
-        'connections' => [
-            'default' => [
-                'host' => $config['host'],
-                'port' => $config['sql_port'],
-            ],
-        ],
-    ]);
+    $server = benchConfig();
+    $config = [
+        'name' => 'manticore', 'driver' => 'manticore',
+        'host' => $server['host'], 'port' => $server['sql_port'],
+        'options' => [PDO::ATTR_PERSISTENT => true],
+    ];
+    return new \avadim\Manticore\Laravel\Database\ManticoreConnection(
+        static fn () => (new \avadim\Manticore\Laravel\Database\ManticoreConnector())->connect($config),
+        '', '', $config,
+    );
 }
 
 // --- печать ----------------------------------------------------------------

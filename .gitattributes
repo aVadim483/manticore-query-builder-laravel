@@ -12,8 +12,7 @@
 #
 # Composer installs a library from the dist archive that GitHub builds with git archive, and
 # everything marked here is left out of it: the tests, the benchmarks and the CI config are read
-# on GitHub, not from vendor/. The package itself is seven classes and a config file, so this is
-# the larger half of the repository.
+# on GitHub, not from vendor/. The native driver and its documentation remain in the archive.
 /tests            export-ignore
 /benchmarks       export-ignore
 /.github          export-ignore

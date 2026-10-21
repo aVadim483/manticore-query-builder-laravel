@@ -91,7 +91,4 @@ jobs:
           exit 1
 
       - name: Run the tests
-        run: vendor/bin/phpunit
-
-      - name: Verify the native driver has no legacy runtime dependency
-        run: vendor/bin/phpunit --bootstrap tests/native-bootstrap.php --filter DatabaseDriver
+        run: vendor/bin/phpunit --fail-on-skipped
