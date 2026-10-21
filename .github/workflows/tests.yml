@@ -92,3 +92,9 @@ jobs:
 
       - name: Run the tests
         run: vendor/bin/phpunit --fail-on-skipped
+
+      - name: Verify a production-only consumer
+        run: |
+          php tests/prepare-production.php ${{ matrix.laravel }}
+          composer update --working-dir=build/production --no-dev --prefer-dist --no-progress --no-interaction
+          php tests/production-smoke.php build/production/vendor/autoload.php --live

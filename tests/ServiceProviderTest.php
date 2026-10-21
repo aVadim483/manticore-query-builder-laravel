@@ -45,6 +45,9 @@ class ServiceProviderTest extends TestCase
         $this->assertNull(config('manticore'));
         $manifest = json_decode(file_get_contents(dirname(__DIR__).'/composer.json'), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame([ServiceProvider::class], $manifest['extra']['laravel']['providers']);
+        $this->assertArrayNotHasKey('aliases', $manifest['extra']['laravel']);
+        $this->assertArrayNotHasKey('avadim/manticore-query-builder-php', $manifest['require']);
+        $this->assertArrayNotHasKey('avadim/manticore-query-builder-php', $manifest['require-dev']);
     }
 
     public function testExplicitNativeProviderStillUsesTheSameConnectionPool(): void

@@ -191,5 +191,6 @@ Integration tests use `MANTICORE_TEST_HOST` / `MANTICORE_TEST_PORT` (127.0.0.1:9
 Set `MANTICORE_TEST_BUDDY=1` to require AUTOCOMPLETE. Tests skip unavailable server features locally;
 CI uses `--fail-on-skipped`. The default bootstrap rejects loading standalone PHP-builder classes.
 Tests also require `pdo_sqlite` for the primary migration repository.
+See [verification instructions](docs/testing.md) for isolated production consumers and test matrices.
 
 [Benchmarks](benchmarks/README.md) compare the native driver with PDO and the official HTTP client.

@@ -27,6 +27,8 @@ All notable changes to this package are documented here. The format follows
 
 * English and Russian 3.x migration guides covering native connection configuration, API and
   result replacements, IDs/errors, schema migrations, logging and worker lifecycle.
+* A production-only consumer smoke test verifies provider registration and live schema/CRUD,
+  casts, metadata and transactions without Testbench, the Laravel framework or the old builder.
 
 * Native cursor pagination for stable integer/ID ordering, selected aliases and bidirectional
   encoded cursors, with validated boundary values and no growing offsets or total-count query.

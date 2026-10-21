@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-require dirname(__DIR__).'/vendor/autoload.php';
+$autoload = getenv('MANTICORE_TEST_AUTOLOAD') ?: dirname(__DIR__).'/vendor/autoload.php';
+require $autoload;
 
 // All tests must remain independent of the standalone PHP builder.
 spl_autoload_register(static function (string $class): void {
