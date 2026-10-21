@@ -228,6 +228,35 @@ class ManticoreConnection extends Connection
         return new ManticoreQueryBuilder($this, $this->getQueryGrammar(), $this->getPostProcessor());
     }
 
+    public function cursor($query, $bindings = [], $useReadPdo = true, array $fetchUsing = [])
+    {
+        $statement = null;
+        try {
+            $this->run($query, $bindings, function ($sql, $parameters) use ($useReadPdo, &$statement) {
+                if ($this->pretending()) {
+                    return;
+                }
+                $statement = $this->prepared($this->getPdoForSelect($useReadPdo)->prepare($sql));
+                $this->bindValues($statement, $this->prepareBindings($parameters));
+                $statement->execute();
+            });
+            if ($statement === null) {
+                return;
+            }
+            while (($row = $statement->fetch(...$fetchUsing)) !== false) {
+                yield $row;
+            }
+        } catch (\PDOException $error) {
+            if ($error instanceof QueryException) {
+                throw $error;
+            }
+            throw new QueryException($this->getName(), $query, $bindings, $error);
+        } finally {
+            // Runs on exhaustion, exceptions and destruction of a suspended generator.
+            $statement?->closeCursor();
+        }
+    }
+
     protected function getDefaultQueryGrammar()
     {
         $grammar = new ManticoreGrammar($this);

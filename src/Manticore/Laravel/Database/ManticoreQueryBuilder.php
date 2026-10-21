@@ -82,7 +82,7 @@ class ManticoreQueryBuilder extends Builder
                 throw new LogicException('Queries with facets must be executed through search().');
             }
             $this->prepareReadCasts();
-            foreach ($this->connection->cursor($this->toSql(), $this->getBindings(), !$this->useWritePdo) as $row) {
+            foreach ($this->connection->cursor($this->toSql(), $this->getBindings(), !$this->useWritePdo, $this->fetchUsing ?? []) as $row) {
                 $row = $this->applyAfterQueryCallbacks(new Collection($this->processReadRows([$row])))->first();
                 if ($row !== null) {
                     yield $row;

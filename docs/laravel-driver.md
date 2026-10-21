@@ -339,6 +339,36 @@ when iterated and `take()` stops fetching later pages. Cast JSON/MVA attributes 
 Like Laravel, some offset methods mutate their builder; clone reusable queries before walking.
 Offset walks automatically grow `max_matches` as documented above; ID walks avoid growing offsets.
 
+## Cursor lifetime and buffering
+
+`cursor()` defers execution until iteration and runs one SELECT. It closes its PDO cursor on
+exhaustion, fetch errors and destruction of an early-stopped iterator. `take(1)`, a normal `break`
+and exceptions from collection callbacks release temporary iterators. If you retain the iterator
+yourself, release all references in `finally` when stopping early:
+
+```php
+$iterator = $connection->table('products')->orderBy('id')->limit(5000)->cursor()->getIterator();
+try {
+    foreach ($iterator as $row) {
+        // Process documents; breaking early is allowed.
+    }
+} finally {
+    unset($iterator);
+}
+```
+
+PDO buffers MySQL results by default, which allows another query during iteration. Configure
+`options => [PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false]` for an unbuffered connection. While an
+unbuffered iterator is active, use a separate connection for other queries, including queries
+from listeners/callbacks. PDO rejects concurrent SQL on that connection with error 2014; the
+driver reports `QueryException` and never discards the active result silently. After exhaustion
+or releasing the iterator, the same connection is usable again. Fetch failures also retain the
+original SQL and bindings. `pretend()` produces an empty cursor without connecting.
+
+A cursor is one bounded server query: Manticore's result window still applies. Use an explicit
+limit (which can raise `max_matches`) or `lazyById()` to walk an entire large table in pages.
+Streaming PHP rows alone does not disable PDO buffering or create a database snapshot.
+
 ## Current boundaries
 
 The initial implementation has been exercised on Manticore 28.6.6. The minimum supported server

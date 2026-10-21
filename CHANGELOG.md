@@ -8,6 +8,9 @@ All notable changes to this package are documented here. The format follows
 
 ### Fixed
 
+* Native cursors explicitly release PDO results on completion, fetch failures and early iterator
+  destruction, preserve fetch error context, and return empty results during `pretend()`.
+
 * Document ID null predicates compile to constants, allowing Laravel 13's initial ById
   boundary check without unsupported numeric NULL filters on Manticore.
 
