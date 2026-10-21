@@ -19,6 +19,12 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
+* Native cursor pagination for stable integer/ID ordering, selected aliases and bidirectional
+  encoded cursors, with validated boundary values and no growing offsets or total-count query.
+  Float keys are rejected because rounded SQL output can repeat or skip cursor boundaries.
+* Exact grouped pagination totals via captured metadata and document-bounded group windows,
+  including HAVING and multiple scalar grouping keys, without mutating source queries.
+
 * Integration coverage for large offset and ID walks beyond 1000 matches, reverse traversal,
   aliased/bigint IDs, early termination, lazy execution and deletion of processed documents.
 

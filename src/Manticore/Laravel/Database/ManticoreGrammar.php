@@ -12,6 +12,9 @@ class ManticoreGrammar extends Grammar
 {
     public function compileSelect(Builder $query)
     {
+        if (count($query->havings ?? []) > 1) {
+            throw new LogicException('Manticore supports a single HAVING condition per query.');
+        }
         if ($query instanceof ManticoreQueryBuilder && $query->hasKnn()) {
             $this->assertKnnConditions($query);
         }

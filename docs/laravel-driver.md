@@ -310,7 +310,8 @@ epoch seconds. Expressions pass through without serialization.
 Conversion applies to `get()`, `first()`, `pluck()`, `search()`, cursors and lazy collections,
 including simple selected column aliases. Types of computed expressions are not inferred.
 Raw `$connection->select()` retains PDO values. Set connection option `cast_attributes => false`
-to disable automatic conversion and schema discovery; then serialize structured writes yourself.
+to disable automatic conversion and its schema discovery; then serialize structured writes yourself.
+Schema introspection, cursor pagination and exact grouped pagination still inspect column types.
 
 Schema Builder and raw CREATE/ALTER/DROP/TRUNCATE/RENAME invalidate the cache, including on failure.
 Reconnect also clears it. After external DDL use `$connection->forgetSchema('products')` with the
@@ -368,6 +369,45 @@ original SQL and bindings. `pretend()` produces an empty cursor without connecti
 A cursor is one bounded server query: Manticore's result window still applies. Use an explicit
 limit (which can raise `max_matches`) or `lazyById()` to walk an entire large table in pages.
 Streaming PHP rows alone does not disable PDO buffering or create a database snapshot.
+
+## Cursor pagination and totals
+
+`cursorPaginate()` returns Laravel's `CursorPaginator`, using encoded next/previous cursors and
+lexicographic WHERE boundaries instead of growing offsets. It performs no total-count query.
+The default order is document ID ascending. Other ordering must use selected integer, boolean or timestamp
+attributes or their simple aliases; a final ID tie-breaker is added automatically when needed.
+Select every ordering column, including ID. Float/string, JSON/MVA and computed ordering, raw SELECT
+projections, offsets, grouping, facets and KNN are rejected by this pagination helper.
+
+```php
+$query = $connection->table('products')->select('id', 'stock', 'title')->orderBy('stock');
+$first = $query->cursorPaginate(50);
+$next = $query->cursorPaginate(50, ['*'], 'cursor', $first->nextCursor()?->encode());
+$previous = $query->cursorPaginate(50, ['*'], 'cursor', $next->previousCursor());
+```
+
+Manticore can round SQL float output (for example, 0.000000142857142857 becomes 0.00000014),
+so float ordering cannot provide a lossless cursor boundary; use integer keys or offset pagination.
+Cursor sizes must be positive integers. Malformed tokens, missing/null or fractional boundary values
+and integer boundaries outside PHP's integer range are rejected. Integer IDs above 2^53
+remain exact on 64-bit PHP. Reuse the same filters and ordering with a token; cursors do not create
+a snapshot across concurrent changes. The source query is cloned before pagination.
+
+`paginate()` uses an ordinary COUNT for document queries. For GROUP BY on one or more scalar
+attributes it instead captures the grouped query's SHOW META, including HAVING. A service COUNT
+first bounds the number of groups by matching documents; pagination clones use that `max_matches`
+and `accurate_aggregation=1` for both the count and data queries. This avoids Laravel's unsupported
+COUNT-over-subquery and prevents the default 1000-group window from truncating results. Source
+options/bindings are unchanged. Group columns must be direct scalar attribute names; MVA/JSON,
+raw group expressions and HAVING without GROUP BY are rejected. Manticore accepts a single
+HAVING condition; composing multiple HAVING clauses is rejected explicitly. High-cardinality grouping can
+require substantial server memory; use document cursor pagination for large document walks.
+
+Exact pagination counts reject KNN candidate queries, facets and nonzero cutoff. Use `search()`
+for their search metadata, or `simplePaginate()` when supported by the query and no total is needed.
+Search `total_found` for ordinary documents can be an estimate; it is not substituted for COUNT.
+See [Laravel cursor pagination](https://laravel.com/docs/13.x/pagination#cursor-pagination) and
+[Manticore grouping](https://manual.manticoresearch.com/Searching/Grouping).
 
 ## Current boundaries
 

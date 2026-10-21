@@ -91,6 +91,97 @@ class ManticoreQueryBuilder extends Builder
         });
     }
 
+    public function cursorPaginate($perPage = 15, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    {
+        if (!is_int($perPage) || $perPage < 1 || $perPage === PHP_INT_MAX) {
+            throw new InvalidArgumentException('Cursor page size must be a positive integer below PHP_INT_MAX.');
+        }
+        $query = clone $this;
+        $query->applyBeforeQueryCallbacks();
+        $cursor = CursorPagination::prepare($query, $columns, $cursorName, $cursor);
+        return $query->runCursorPagination($perPage, $columns, $cursorName, $cursor);
+    }
+
+    private function runCursorPagination($perPage, $columns, $cursorName, $cursor)
+    {
+        return parent::cursorPaginate($perPage, $columns, $cursorName, $cursor);
+    }
+
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
+    {
+        $query = clone $this;
+        $query->applyBeforeQueryCallbacks();
+        $query->assertPaginationCountSupported();
+        if ($query->groups || $query->havings) {
+            $query->prepareGroupedPagination();
+            $total = value($total) ?? $query->groupedPaginationTotal($columns);
+        }
+        return $query->runLaravelPagination($perPage, $columns, $pageName, $page, $total);
+    }
+
+    private function runLaravelPagination($perPage, $columns, $pageName, $page, $total)
+    {
+        return parent::paginate($perPage, $columns, $pageName, $page, $total);
+    }
+
+    public function getCountForPagination($columns = ['*'])
+    {
+        $query = clone $this;
+        $query->applyBeforeQueryCallbacks();
+        $query->assertPaginationCountSupported();
+        if ($query->groups || $query->havings) {
+            $query->prepareGroupedPagination();
+            return $query->groupedPaginationTotal($columns);
+        }
+        return $query->runLaravelPaginationCount($columns);
+    }
+
+    private function runLaravelPaginationCount($columns)
+    {
+        return parent::getCountForPagination($columns);
+    }
+
+    private function assertPaginationCountSupported(): void
+    {
+        if ($this->getFacets() || $this->hasKnn() || ($this->manticoreOptions['cutoff'] ?? 0) != 0) {
+            throw new LogicException('Exact pagination counts do not support facets, KNN or cutoff. Use search() or simplePaginate().');
+        }
+    }
+
+    private function prepareGroupedPagination(): void
+    {
+        $table = $this->plainTable();
+        if (!$this->groups || $table === null || $this->aggregate || $this->joins || $this->unions || $this->distinct) {
+            throw new LogicException('Grouped pagination requires scalar attributes of a single table.');
+        }
+        $schema = $this->connection->getTableSchema($table);
+        foreach ($this->groups as $column) {
+            if (!is_string($column) || !preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)$/D', $column, $parts)
+                || !in_array($schema[$parts[1]]['type'] ?? null, ['int', 'integer', 'uint', 'uint32', 'uint64', 'bigint', 'float', 'double', 'bool', 'boolean', 'timestamp', 'string'], true)) {
+                throw new LogicException('Grouped pagination supports scalar attributes, not MVA, JSON paths or raw grouping expressions.');
+            }
+        }
+        // A scalar tuple creates at most one group per matching document. This bounds the
+        // group heap without approximating COUNT(DISTINCT) or truncating the groups at 1000.
+        $documents = $this->cloneWithout(['columns', 'orders', 'limit', 'offset', 'groups', 'havings'])
+            ->cloneWithoutBindings(['select', 'order', 'groupBy', 'having'])->count();
+        $this->option('max_matches', max(1, (int)$documents));
+        $this->option('accurate_aggregation', 1);
+    }
+
+    private function groupedPaginationTotal($columns): int
+    {
+        $query = clone $this;
+        $query->columns ??= Arr::wrap($columns);
+        $query->offset = null;
+        $query->limit(1);
+        $result = $query->search();
+        if ($result->meta()->totalFound() === null || $result->meta()['total_relation'] !== 'eq') {
+            throw new LogicException('Manticore did not return an exact group count for pagination.');
+        }
+        return $result->meta()->totalFound();
+    }
+
     protected function encodeWriteRows(array $values): array
     {
         if (!$values) {
