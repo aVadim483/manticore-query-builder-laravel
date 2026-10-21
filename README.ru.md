@@ -8,7 +8,8 @@
 Нативный драйвер Laravel Database для ManticoreSearch. Используйте менеджер соединений Laravel,
 Query Builder, коллекции, пагинацию, события запросов и Schema Builder через MySQL-протокол PDO.
 
-Версия 4.x разрабатывается в ветке `dev-4.x`; стабильная 4.0 ещё не выпущена.
+Версия `4.0.0-alpha.1` подготовлена для раннего тестирования в `dev-4.x`; это не стабильный релиз.
+Возможности и непроверенные интеграции перечислены в [заметках к alpha](docs/ru/releases/4.0.0-alpha.1.md).
 Старый API обёртки 3.x и зависимость от `avadim/manticore-query-builder-php` удалены.
 Для существующих приложений подготовлено [руководство перехода с 3.x](docs/ru/upgrading-3.x-to-4.x.md).
 
@@ -37,11 +38,20 @@ Query Builder, коллекции, пагинацию, события запро
 
 ## Установка
 
-Для проверки разрабатываемой ветки:
+Для проверки ветки во время подготовки alpha:
 
 ```sh
 composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 ```
+
+После публикации тега `v4.0.0-alpha.1` и появления версии на Packagist можно установить точную alpha:
+
+```sh
+composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.1
+```
+
+Явное ограничение alpha не требует менять `minimum-stability` всего приложения.
+Миграция реального приложения и совместимость Scout пока не проверены.
 
 Laravel автоматически обнаруживает `avadim\Manticore\Laravel\ServiceProvider`.
 Если обнаружение пакетов отключено, зарегистрируйте его в `bootstrap/providers.php`.

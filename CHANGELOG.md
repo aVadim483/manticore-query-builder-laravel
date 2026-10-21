@@ -6,6 +6,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.0-alpha.1] - 2026-10-21
+
+First alpha of the native Laravel Database driver. This is a breaking upgrade from 3.x,
+intended for early testing. A real application migration and Scout adapter compatibility
+have not yet been validated; see the [release notes](docs/releases/4.0.0-alpha.1.md).
+
 ### Removed
 
 * The 3.x wrapper API: `ManticoreDb`, package Facade/Manager/Factory/Connection/Query/Row,
@@ -280,6 +286,8 @@ builder it is built on.
 
 The first release: service provider, facade, connection manager and the configuration file.
 
+[Unreleased]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v4.0.0-alpha.1...dev-4.x
+[4.0.0-alpha.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v3.0.0...v4.0.0-alpha.1
 [3.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.1...v3.0.0
 [2.1.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.0.0...v2.1.0
