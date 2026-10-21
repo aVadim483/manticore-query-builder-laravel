@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace avadim\Manticore\Laravel\Tests;
 
-use avadim\Manticore\Laravel\DatabaseServiceProvider;
+use avadim\Manticore\Laravel\ServiceProvider;
 use Orchestra\Testbench\TestCase;
 
-/** Native driver tests boot without the legacy provider, aliases or static connection pool. */
+/** Tests boot through the same provider Laravel discovers in installed applications. */
 abstract class DatabaseTestCase extends TestCase
 {
     protected function getPackageProviders($app): array
     {
-        return [DatabaseServiceProvider::class];
+        return [ServiceProvider::class];
     }
 
     protected function serverHost(): string

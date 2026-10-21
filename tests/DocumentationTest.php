@@ -11,7 +11,7 @@ namespace avadim\Manticore\Laravel\Tests;
  * renamed leaves a dead link in the table of contents, and the translation lags behind the
  * original. All three are cheap to check.
  */
-class DocumentationTest extends TestCase
+class DocumentationTest extends DatabaseTestCase
 {
     /** @var string */
     private $root;
@@ -66,7 +66,7 @@ class DocumentationTest extends TestCase
 
     public function testEveryEnvironmentVariableOfTheConfigIsDocumented(): void
     {
-        preg_match_all("/env\('(MANTICORE_\w+)'/", $this->read('config/manticore.php'), $matches);
+        preg_match_all("/env\('(MANTICORE_\w+)'/", $this->read('docs/laravel-driver.md'), $matches);
         $variables = array_unique($matches[1]);
 
         $this->assertNotEmpty($variables);
