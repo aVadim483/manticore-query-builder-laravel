@@ -6,6 +6,11 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+* Native CALL option names use validated unquoted identifiers because Buddy's AUTOCOMPLETE
+  parser rejects backtick-quoted aliases. Reproduced against Buddy 4.4.3 on Manticore 29.9.0.
+
 ### Added
 
 * Native faceted search with named result collections, attribute/MVA/JSON facets, explicit

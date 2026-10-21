@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace avadim\Manticore\Laravel\Database;
 
-use Illuminate\Database\Grammar;
 use InvalidArgumentException;
 
 final class ProcedureCall
 {
-    public static function compile(string $procedure, array $arguments, array $options, Grammar $grammar): array
+    public static function compile(string $procedure, array $arguments, array $options): array
     {
         if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $procedure) || !array_is_list($arguments)) {
             throw new InvalidArgumentException('A procedure requires a valid name and positional arguments.');
@@ -37,7 +36,8 @@ final class ProcedureCall
             if (!is_string($name) || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name)) {
                 throw new InvalidArgumentException('Invalid CALL option name.');
             }
-            $parts[] = $parameter($value).' AS '.$grammar->wrap($name);
+            // Buddy's CALL parser rejects quoted option aliases. The identifier was validated above.
+            $parts[] = $parameter($value).' AS '.$name;
         }
         return ['CALL '.strtoupper($procedure).'('.implode(', ', $parts).')', $bindings];
     }

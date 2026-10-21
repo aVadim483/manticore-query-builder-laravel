@@ -162,7 +162,7 @@ class ManticoreConnection extends Connection
     /** @return array<int, Collection<int, \stdClass>> All row-producing result sets. */
     public function call(string $procedure, array $arguments = [], array $options = []): array
     {
-        [$sql, $bindings] = ProcedureCall::compile($procedure, $arguments, $options, $this->getQueryGrammar());
+        [$sql, $bindings] = ProcedureCall::compile($procedure, $arguments, $options);
         return $this->run($sql, $bindings, function ($sql, $bindings) {
             if ($this->pretending()) {
                 return [];

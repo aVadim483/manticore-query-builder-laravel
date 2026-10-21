@@ -43,7 +43,7 @@ class DatabaseDriverCallsTest extends DatabaseTestCase
             $db->autocomplete("gal'", 'products', ['fuzziness' => 0]);
             $this->fail('An unavailable procedure was accepted.');
         } catch (\Illuminate\Database\QueryException $e) {
-            $this->assertSame('CALL AUTOCOMPLETE(?, ?, ? AS `fuzziness`)', $e->getSql());
+            $this->assertSame('CALL AUTOCOMPLETE(?, ?, ? AS fuzziness)', $e->getSql());
             $this->assertSame(["gal'", 'products', 0], $e->getBindings());
         }
     }
@@ -60,8 +60,8 @@ class DatabaseDriverCallsTest extends DatabaseTestCase
         });
         $this->assertStringContainsString('CALL KEYWORDS(', $log[0]['query']);
         $this->assertSame(["a'", 'app_products', 1], $log[0]['bindings']);
-        $compiled = \avadim\Manticore\Laravel\Database\ProcedureCall::compile('SNIPPETS', [['one', 'two'], 'products', 'word'], ['before_match' => '<em>'], $db->getQueryGrammar());
-        $this->assertSame('CALL SNIPPETS((?, ?), ?, ?, ? AS `before_match`)', $compiled[0]);
+        $compiled = \avadim\Manticore\Laravel\Database\ProcedureCall::compile('SNIPPETS', [['one', 'two'], 'products', 'word'], ['before_match' => '<em>']);
+        $this->assertSame('CALL SNIPPETS((?, ?), ?, ?, ? AS before_match)', $compiled[0]);
         $this->assertSame(['galaxy one', 'galaxy two', 'app_products', 'galaxy', '<em>'], $log[4]['bindings']);
         $this->assertStringContainsString('AUTOCOMPLETE', $log[3]['query']);
     }
