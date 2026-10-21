@@ -317,6 +317,28 @@ Reconnect also clears it. After external DDL use `$connection->forgetSchema('pro
 logical, unprefixed table name, or `$connection->forgetSchema()` for all tables. Schema discovery
 runs before the search SELECT so it does not overwrite its metadata snapshot.
 
+## Walking large result sets
+
+The native builder uses Laravel's `chunk()`, `each()`, `lazy()`, `chunkById()`, `eachById()`,
+`lazyById()`, `chunkByIdDesc()` and `lazyByIdDesc()`. Offset walks require an explicit stable
+`orderBy()`; ID walks order by the document ID automatically. Select the boundary column and,
+if aliased, pass both its original name and selected alias:
+
+```php
+$connection->table('products')->select('id as document_id', 'title')
+    ->lazyById(700, 'id', 'document_id')->each(function ($row) {
+        // Process one document.
+    });
+```
+
+Use ID walks when deleting processed documents or changing filtered attributes. Keep the ID
+unchanged and group OR conditions inside a closure, so Laravel's next-ID condition applies to
+the entire filter. These walks are not a snapshot against concurrent inserts or updates.
+Returning `false` from chunk/each callbacks stops further pages; lazy collections fetch only
+when iterated and `take()` stops fetching later pages. Cast JSON/MVA attributes remain available.
+Like Laravel, some offset methods mutate their builder; clone reusable queries before walking.
+Offset walks automatically grow `max_matches` as documented above; ID walks avoid growing offsets.
+
 ## Current boundaries
 
 The initial implementation has been exercised on Manticore 28.6.6. The minimum supported server

@@ -67,6 +67,30 @@ class ManticoreGrammar extends Grammar
         return 'MATCH('.$this->parameter($where['value']).')';
     }
 
+    protected function whereNull(Builder $query, $where)
+    {
+        return $this->isDocumentId($query, $where['column']) ? '0 = 1' : parent::whereNull($query, $where);
+    }
+
+    protected function whereNotNull(Builder $query, $where)
+    {
+        return $this->isDocumentId($query, $where['column']) ? '1 = 1' : parent::whereNotNull($query, $where);
+    }
+
+    private function isDocumentId(Builder $query, mixed $column): bool
+    {
+        if (!is_string($column)) {
+            return false;
+        }
+        if (strtolower($column) === 'id') {
+            return true;
+        }
+        if (is_string($query->from) && preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+(?:as\s+)?([a-zA-Z_][a-zA-Z0-9_]*))?$/iD', $query->from, $parts)) {
+            return in_array(strtolower($column), [strtolower($parts[1]).'.id', strtolower($parts[2] ?? $parts[1]).'.id'], true);
+        }
+        return false;
+    }
+
     protected function whereMva(Builder $query, $where)
     {
         $left = $where['quantifier'].'('.$this->wrap($where['column']).') '.$where['operator'].' ';

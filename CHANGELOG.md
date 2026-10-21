@@ -8,10 +8,16 @@ All notable changes to this package are documented here. The format follows
 
 ### Fixed
 
+* Document ID null predicates compile to constants, allowing Laravel 13's initial ById
+  boundary check without unsupported numeric NULL filters on Manticore.
+
 * Native CALL option names use validated unquoted identifiers because Buddy's AUTOCOMPLETE
   parser rejects backtick-quoted aliases. Reproduced against Buddy 4.4.3 on Manticore 29.9.0.
 
 ### Added
+
+* Integration coverage for large offset and ID walks beyond 1000 matches, reverse traversal,
+  aliased/bigint IDs, early termination, lazy execution and deletion of processed documents.
 
 * Native faceted search with named result collections, attribute/MVA/JSON facets, explicit
   bucket ordering/limits and metadata captured before query listeners run.
