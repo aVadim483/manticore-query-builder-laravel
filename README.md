@@ -170,6 +170,8 @@ Schema::connection('manticore')->create('products', function (ManticoreBlueprint
 
 CREATE, DROP and ALTER ADD/DROP use Laravel Schema Builder, including `multi64()`,
 `floatVector()` and CREATE `setting()`. Unsupported schema operations fail explicitly.
+On `dev-4.x` after alpha.1, [extended ALTER](docs/schema-alter.md) adds settings changes/inspection,
+int-to-bigint `change()` and table `rename()` with Buddy; these additions are not in alpha.1.
 Keep the migration repository in the primary SQL database; select Manticore inside individual migrations.
 DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.md).
 

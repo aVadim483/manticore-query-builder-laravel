@@ -53,6 +53,7 @@ if (in_array('--live', $argv, true)) {
             $blueprint->json('details');
             $blueprint->multi('tags');
             $blueprint->float('price');
+            $blueprint->integer('qty');
         });
         $id = $db->table($table)->insertGetId([
             'id' => 42, 'title' => 'galaxy phone', 'details' => ['brand' => 'acme'],
@@ -71,8 +72,20 @@ if (in_array('--live', $argv, true)) {
         if ((float)$db->table($table)->find(42)->price !== 25.5) {
             throw new RuntimeException('Production transaction failed.');
         }
+        $schema->table($table, static function (ManticoreBlueprint $blueprint) {
+            $blueprint->bigInteger('qty')->change();
+            $blueprint->setting('min_word_len', 2);
+        });
+        $schema->rename($table, $table.'_renamed');
+        if ($schema->getColumnType($table.'_renamed', 'qty') !== 'bigint'
+            || $schema->getSettings($table.'_renamed')['min_word_len'] !== '2'
+            || (float)$db->table($table.'_renamed')->find(42)->price !== 25.5) {
+            throw new RuntimeException('Production ALTER or RENAME failed.');
+        }
+        $schema->rename($table.'_renamed', $table);
     } finally {
         $schema->dropIfExists($table);
+        $schema->dropIfExists($table.'_renamed');
     }
 }
 

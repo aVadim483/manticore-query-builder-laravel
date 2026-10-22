@@ -79,3 +79,24 @@ isolated user services; Docker container startup and other PHP versions are cove
 A subsequent [live application migration](migration-app-verification.md) verifies a deployed
 Laravel 12 application on 3.0.0 and the published 4.0.0-alpha.1, including browser forms and
 preserved search data. This is separate from the package-level matrix above.
+
+## Extended Schema Builder verification
+
+On 2026-10-22, the unreleased [extended schema API](schema-alter.md) passed the full suite
+on PHP 8.4.19 in four combinations: Manticore 28.6.6 on Laravel 11/12/13, and Manticore
+29.9.0 on Laravel 13. Each run completed **147 tests / 749 assertions**, without skips.
+The production-only Illuminate 13.38.0 consumer passed on both servers, including
+settings inspection, integer widening and a round-trip table rename.
+
+Coverage includes preserved 32/64-bit values, fresh source-schema validation, columnar/type
+rejection, ordered settings, defaults omitted by the server, partial ALTER failures,
+cache invalidation after rename conflicts and real migration upgrade/rollback with the
+migration repository on SQLite. Rollback deliberately retains bigint instead of narrowing it.
+The protocol contract is recorded in [schema compatibility](schema-alter-compatibility.md).
+
+A separate Manticore 29.9.0 process with `buddy_path` empty passed
+`php tests/schema-no-buddy.php`: rename raises `QueryException` and preserves the original
+table and documents. Run this script separately with `MANTICORE_TEST_HOST` and
+`MANTICORE_TEST_PORT` pointing at a no-Buddy test instance; it rejects instances with Buddy.
+It is not part of the ordinary Buddy-enabled PHPUnit run. All temporary compatibility
+services were stopped after verification; the persistent application test server was retained.

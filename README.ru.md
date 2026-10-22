@@ -171,6 +171,8 @@ Schema::connection('manticore')->create('products', function (ManticoreBlueprint
 
 CREATE, DROP, ALTER ADD/DROP выполняются через Laravel Schema Builder. Доступны
 `multi64()`, `floatVector()`, настройки CREATE через `setting()`.
+В `dev-4.x` после alpha.1 [расширенный ALTER](docs/ru/schema-alter.md) добавляет изменение и чтение
+настроек, `change()` для int → bigint и `rename()` таблицы с Buddy; в alpha.1 этих дополнений нет.
 Неподдерживаемые операции схемы явно отклоняются.
 Таблицу учёта миграций оставьте в основной SQL-базе, выбирая Manticore в отдельных миграциях.
 DDL не транзакционен. См. [пример миграции](docs/ru/upgrading-3.x-to-4.x.md).

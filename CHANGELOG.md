@@ -8,6 +8,13 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
+* Extended Schema Builder on dev-4.x: ordered ALTER settings with validated names/value formats,
+  uncached normalized settings inspection, preflight-checked row-wise int-to-bigint `change()`,
+  and prefixed table renames through Buddy. Arbitrary conversions and implicit rebuilds are rejected.
+* Schema protocol, partial-failure/cache and real migration upgrade/rollback coverage, a separate
+  no-Buddy rename failure check, and production-only smoke coverage for the extended schema API.
+* English and Russian extended schema documentation distinguishing these unreleased APIs from alpha.1.
+
 * A live Laravel 12 migration verification report: 32 application scenarios on 3.0.0 and
   4.0.0-alpha.1, 11 browser checks per version and six additional native checks, preserving
   the same 2105-document dataset without editing vendor code.

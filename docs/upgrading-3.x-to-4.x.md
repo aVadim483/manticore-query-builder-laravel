@@ -282,9 +282,13 @@ Replace old `create()` / `drop($table, true)` / `hasTable()` with the named Sche
 `create()` / `dropIfExists()` / `hasTable()`. For `addColumn()` / `dropColumn()`, use
 `Schema::connection('manticore')->table('products', $callback)` and Blueprint methods.
 Use `multi()`, `multi64()` and `floatVector()` for native types; CREATE settings use `setting()`.
-Old schema arrays and options are not automatically translated. `modifyColumn()`, `rename()`,
-`alterSettings()` and arbitrary old SchemaTable modifiers have no equivalent typed helper yet;
-explicitly reviewed SQL may be executed with `$db->statement()` when the server supports it.
+Old schema arrays and options are not automatically translated. In published alpha.1,
+`modifyColumn()`, `rename()` and `alterSettings()` require explicitly reviewed `$db->statement()` SQL.
+On `dev-4.x` after alpha.1, use `bigInteger($column)->change()` for row-wise int-to-bigint,
+`$schema->rename($from, $to)` with Buddy and `setting()` inside `table()` for supported ALTER settings.
+Read reported settings with `$schema->getSettings($table)`; omitted defaults are not inferred.
+See [extended Schema Builder](schema-alter.md). Arbitrary old modifiers and type changes
+are not translated, and bigint widening has no automatic inverse in `down()`.
 DDL throws on failure and has no old ResultSet return contract.
 
 Keep the migration repository on the primary SQL database and invoke the normal migrator there;

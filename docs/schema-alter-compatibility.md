@@ -14,6 +14,11 @@ the supported server floor. No application tables were altered.
 | `SHOW TABLE t SETTINGS` | A `settings` row containing newline-separated `name = value` entries | Return reported settings as strings; absent defaults are not inferred |
 | `ALTER TABLE t RENAME new_t` | Preserves documents with Buddy available | Support Laravel `Schema::rename()`; require Buddy |
 
+DESCRIBE reports an SQL `int` attribute as `uint`. The source-type preflight handles
+that protocol spelling. Columnar attributes are deliberately excluded from widening.
+A separate 29.9.0 process with `buddy_path` empty verified that rename raises
+`QueryException` without changing the original table or its documents.
+
 Settings output is normalized by the server. For example, `rt_mem_limit='32M'`
 is reported as `33554432`. It is not an exact round trip of CREATE input or a
 complete list of defaults. Changing full-text settings does not reindex existing

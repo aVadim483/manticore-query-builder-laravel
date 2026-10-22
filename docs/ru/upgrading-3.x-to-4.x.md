@@ -283,8 +283,13 @@ return new class extends Migration {
 `Schema::connection('manticore')->table('products', $callback)` и методы Blueprint.
 Типы Manticore задаются через `multi()`, `multi64()`, `floatVector()`, настройки CREATE — `setting()`.
 Старые массивы схемы и модификаторы автоматически не переводятся.
-Типизированных аналогов `modifyColumn()`, `rename()`, `alterSettings()` пока нет;
-поддерживаемый сервером проверенный SQL можно выполнить через `$db->statement()`.
+В опубликованной alpha.1 для `modifyColumn()`, `rename()`, `alterSettings()` нужен проверенный SQL
+через `$db->statement()`. В `dev-4.x` после alpha.1 для расширения построчного int до bigint
+используйте `bigInteger($column)->change()`, для переименования — `$schema->rename($from, $to)`
+с Buddy, для поддерживаемых настроек ALTER — `setting()` внутри `table()`.
+`$schema->getSettings($table)` читает настройки сервера без подстановки пропущенных значений по умолчанию.
+См. [расширенный Schema Builder](schema-alter.md). Произвольные старые модификаторы и изменения
+типа автоматически не переводятся; расширение до bigint не имеет автоматического обратного `down()`.
 DDL выбрасывает исключения при ошибках и не возвращает старый ResultSet.
 
 Таблицу учёта миграций оставьте в основной SQL-базе и запускайте обычный migrator через неё.

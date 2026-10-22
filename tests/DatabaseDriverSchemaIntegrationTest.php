@@ -384,6 +384,42 @@ class DatabaseDriverSchemaIntegrationTest extends DatabaseTestCase
         $this->assertSame([], $repository->getRan());
     }
 
+    public function testExtendedSchemaMigrationPreservesDocumentsAcrossUpgradeAndRollback(): void
+    {
+        config(['manticore_driver_migration_table' => $this->schemaTable]);
+        $repository = $this->app->make('migration.repository');
+        $repository->createRepository();
+        $migrator = $this->app->make('migrator');
+        $directory = __DIR__.'/fixtures/driver-alter-migrations';
+        $schema = Schema::connection('manticore');
+        $db = DB::connection('manticore');
+        try {
+            $migrator->run([$directory.'/2026_10_22_000001_create_alter_catalog.php']);
+            $db->table($this->schemaTable)->insert(['id' => 1, 'title' => 'kept', 'qty' => 4294967295]);
+            $migrator->run([$directory]);
+            $name = $this->schemaTable.'_renamed';
+            $this->assertFalse($schema->hasTable($this->schemaTable));
+            $this->assertSame(4294967295, $db->table($name)->find(1)->qty);
+            $this->assertSame('bigint', $schema->getColumnType($name, 'qty'));
+            $this->assertSame('3', $schema->getSettings($name)['min_infix_len']);
+            $db->table($name)->where('id', 1)->update(['qty' => 9007199254740993]);
+            $this->assertCount(2, $repository->getRan());
+            $migrator->rollback([$directory]);
+            $this->assertFalse($schema->hasTable($name));
+            $this->assertSame(9007199254740993, $db->table($this->schemaTable)->find(1)->qty);
+            $this->assertSame('bigint', $schema->getColumnType($this->schemaTable, 'qty'));
+            $this->assertFalse($schema->hasColumn($this->schemaTable, 'active'));
+            $this->assertSame('2', $schema->getSettings($this->schemaTable)['min_infix_len']);
+            $this->assertCount(1, $repository->getRan());
+            $migrator->rollback([$directory]);
+            $this->assertFalse($schema->hasTable($this->schemaTable));
+            $this->assertSame([], $repository->getRan());
+            $this->assertSame('sqlite', $repository->getConnection()->getDriverName());
+        } finally {
+            $schema->dropIfExists($this->schemaTable.'_renamed');
+        }
+    }
+
     public function testSchemaPrefixesAndCastingCanBeConfiguredPerConnection(): void
     {
         $baseConfig = config('database.connections.manticore');

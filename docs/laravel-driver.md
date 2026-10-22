@@ -298,9 +298,12 @@ $schema->dropIfExists('products');
 Other supported column types are `integer`, `bigInteger`, `boolean` and `timestamp`.
 Laravel string lengths and float precision declarations do not impose SQL constraints;
 `float()` maps to Manticore's native float. TEXT supports `stored()` and `indexed()` flags.
-CREATE settings are escaped; ALTER currently supports adding and dropping columns, in declaration
-order. Changing types, renaming, nullable/default constraints, foreign keys, ordinary Laravel
-indexes and unsupported modifiers fail before any statement from that blueprint executes.
+CREATE settings are escaped; ALTER supports adding and dropping columns in declaration order.
+On `dev-4.x` after alpha.1, ALTER also supports validated `setting()`, settings inspection through
+`getSettings()`, row-wise int-to-bigint `change()` and table `rename()` with Buddy.
+See [extended Schema Builder](schema-alter.md) for examples, validation and rollback rules.
+Arbitrary type changes, column renaming, nullable/default constraints, foreign keys, ordinary
+Laravel indexes and unsupported modifiers fail before DDL executes.
 
 Use ordinary migrations with `protected $connection = 'manticore'` and explicit
 `Schema::connection('manticore')`. Keep Laravel's migration repository on the application's
