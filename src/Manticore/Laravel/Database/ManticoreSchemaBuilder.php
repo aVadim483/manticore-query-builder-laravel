@@ -8,12 +8,55 @@ use Closure;
 use Illuminate\Database\Schema\Builder;
 use LogicException;
 use UnexpectedValueException;
+use InvalidArgumentException;
 
 class ManticoreSchemaBuilder extends Builder
 {
     public function getGrammar(): ManticoreSchemaGrammar
     {
         return $this->grammar;
+    }
+
+    public function getCreateStatement(string $table): string
+    {
+        $row = $this->connection->selectFromWriteConnection('SHOW CREATE TABLE '.$this->grammar->wrapTable($table))[0] ?? null;
+        if ($row === null || !isset($row->{'Create Table'})) {
+            throw new UnexpectedValueException('SHOW CREATE TABLE did not return a definition.');
+        }
+        return $row->{'Create Table'};
+    }
+
+    /** HNSW metadata from the server's canonical CREATE, never inferred from module presence. */
+    public function getVectorDefinition(string $table, string $column): array
+    {
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $column)) {
+            throw new InvalidArgumentException('A vector column must be an attribute name.');
+        }
+        $ddl = $this->getCreateStatement($table);
+        if (!preg_match('/^\s*`?'.preg_quote($column, '/').'`?\s+float_vector\s+([^\r\n]+)/mi', $ddl, $line)
+            || !preg_match('/\bknn_type\s*=\s*\x27hnsw\x27/i', $line[1])
+            || !preg_match('/\bknn_dims\s*=\s*\x27([0-9]+)\x27/i', $line[1], $dimensions)
+            || !preg_match('/\bhnsw_similarity\s*=\s*\x27(l2|cosine|ip)\x27/i', $line[1], $metric)) {
+            throw new UnsupportedFeatureException('knn', 'The selected column has no supported manual HNSW definition.');
+        }
+        return ['dimensions' => (int)$dimensions[1], 'metric' => strtolower($metric[1])];
+    }
+
+    public function validateKnnVector(string $table, string $column, array $vector): array
+    {
+        if (!array_is_list($vector) || !$vector) {
+            throw new InvalidArgumentException('A KNN vector must be a non-empty list.');
+        }
+        foreach ($vector as $value) {
+            if ((!is_int($value) && !is_float($value)) || !is_finite((float)$value)) {
+                throw new InvalidArgumentException('KNN vector entries must be finite numbers.');
+            }
+        }
+        $definition = $this->getVectorDefinition($table, $column);
+        if (count($vector) !== $definition['dimensions'] || ($definition['metric'] === 'cosine' && !array_filter($vector))) {
+            throw new InvalidArgumentException('The vector must match HNSW dimensions and be nonzero for cosine.');
+        }
+        return $definition;
     }
 
     protected function createBlueprint($table, ?Closure $callback = null)

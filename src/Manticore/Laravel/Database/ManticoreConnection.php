@@ -18,6 +18,72 @@ use InvalidArgumentException;
 class ManticoreConnection extends Connection
 {
     protected array $schemaCache = [];
+    private ?ServerCapabilities $serverCapabilities = null;
+    private array $capabilityEvidence = [];
+
+    public function capabilities(): ServerCapabilities
+    {
+        if ($this->pretending()) {
+            throw new LogicException('Server capabilities cannot be discovered during pretend().');
+        }
+        if ($this->serverCapabilities === null) {
+            $status = [];
+            foreach ($this->selectFromWriteConnection('SHOW STATUS') as $row) {
+                $status[$row->Counter] = (string)$row->Value;
+            }
+            $this->serverCapabilities = new ServerCapabilities($status);
+        }
+        return $this->serverCapabilities;
+    }
+
+    public function forgetCapabilities(): static
+    {
+        $this->serverCapabilities = null;
+        $this->capabilityEvidence = [];
+        return $this;
+    }
+
+    /** Read-only, explicit probe. SQL/configuration errors are not negative capability evidence. */
+    public function probeCapability(string $feature, string $table, array $parameters = []): CapabilityEvidence
+    {
+        if (!in_array($feature, ['knn', 'fuzzy', 'autocomplete', 'keywords', 'suggest', 'qsuggest'], true)) {
+            throw new InvalidArgumentException('Unknown capability probe: '.$feature);
+        }
+        if (array_diff(array_keys($parameters), $feature === 'knn' ? ['column', 'vector'] : ['text'])
+            || (isset($parameters['text']) && !is_string($parameters['text']))) {
+            throw new InvalidArgumentException('Invalid capability probe parameters.');
+        }
+        if ($this->pretending()) {
+            throw new LogicException('Capability probes cannot run during pretend().');
+        }
+        $key = hash('sha256', serialize([$feature, $table, $parameters]));
+        if (isset($this->capabilityEvidence[$key])) {
+            return $this->capabilityEvidence[$key];
+        }
+        try {
+            if ($feature === 'knn') {
+                $column = $parameters['column'] ?? 'embedding';
+                $vector = $parameters['vector'] ?? [];
+                $this->getSchemaBuilder()->validateKnnVector($table, $column, $vector);
+                $this->table($table)->select('id')->knn($column, $vector, 1)->search();
+            } elseif ($feature === 'fuzzy') {
+                $this->table($table)->select('id')->match(ManticoreQueryBuilder::escapeMatch($parameters['text'] ?? 'probe'))
+                    ->option('fuzzy', 1)->limit(1)->search();
+            } else {
+                $this->$feature($parameters['text'] ?? 'probe', $table);
+            }
+        } catch (UnsupportedFeatureException $error) {
+            return $this->capabilityEvidence[$key] = new CapabilityEvidence($feature, $table, false, $error);
+        } catch (QueryException $error) {
+            // Restrict classification to explicit dependency failures; syntax, table and network
+            // errors retain their original QueryException and must not be cached as unsupported.
+            if (!preg_match('/(?:knn library (?:not loaded|is not loaded)|buddy (?:is )?(?:not available|not running|not enabled|disabled)|requires? (?:manticore )?buddy)/i', $error->getPrevious()?->getMessage() ?? '')) {
+                throw $error;
+            }
+            return $this->capabilityEvidence[$key] = new CapabilityEvidence($feature, $table, false, $error);
+        }
+        return $this->capabilityEvidence[$key] = new CapabilityEvidence($feature, $table, true);
+    }
 
     public function getTableSchema(string $table): array
     {
@@ -38,6 +104,7 @@ class ManticoreConnection extends Connection
 
     public function forgetSchema(?string $table = null): static
     {
+        $this->capabilityEvidence = [];
         if ($table === null) {
             $this->schemaCache = [];
         } else {
@@ -50,6 +117,7 @@ class ManticoreConnection extends Connection
     public function setPdo($pdo)
     {
         $this->forgetSchema();
+        $this->forgetCapabilities();
 
         return parent::setPdo($pdo);
     }
@@ -390,12 +458,14 @@ class ManticoreConnection extends Connection
         }
         if ($ddl) {
             $this->forgetSchema();
+            $this->capabilityEvidence = [];
         }
         try {
             return parent::run($query, $bindings, $callback);
         } finally {
             if ($ddl) {
                 $this->forgetSchema();
+                $this->capabilityEvidence = [];
             }
         }
     }
