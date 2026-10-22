@@ -8,8 +8,8 @@
 Нативный драйвер Laravel Database для ManticoreSearch. Используйте менеджер соединений Laravel,
 Query Builder, коллекции, пагинацию, события запросов и Schema Builder через MySQL-протокол PDO.
 
-Версия `4.0.0-alpha.1` доступна для раннего тестирования; это не стабильный релиз.
-Возможности и непроверенные интеграции перечислены в [заметках к alpha](docs/ru/releases/4.0.0-alpha.1.md).
+Версия `4.0.0-alpha.2` предназначена для раннего тестирования; это не стабильный релиз.
+Возможности и непроверенные интеграции перечислены в [заметках к alpha](docs/ru/releases/4.0.0-alpha.2.md).
 Старый API обёртки 3.x и зависимость от `avadim/manticore-query-builder-php` удалены.
 Для существующих приложений подготовлено [руководство перехода с 3.x](docs/ru/upgrading-3.x-to-4.x.md).
 
@@ -41,7 +41,7 @@ Query Builder, коллекции, пагинацию, события запро
 Для установки опубликованной alpha:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.1
+composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.2
 ```
 
 Для проверки последующих изменений в разработке:
@@ -178,6 +178,10 @@ CREATE, DROP, ALTER ADD/DROP выполняются через Laravel Schema Bu
 DDL не транзакционен. См. [пример миграции](docs/ru/upgrading-3.x-to-4.x.md).
 
 ## Отличия от Laravel Query Builder
+
+Alpha.2 добавляет [независимый поиск weighted RRF, явные проверки возможностей и
+замену RT-индекса в режиме обслуживания](docs/ru/hybrid-and-index-replacement.md) без Scout.
+`knn()->match()` сохраняет пересечение; замена индекса не обещает zero downtime.
 
 | Область | Поведение |
 | --- | --- |

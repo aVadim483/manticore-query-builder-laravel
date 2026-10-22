@@ -8,8 +8,8 @@
 A native Laravel Database driver for ManticoreSearch. Use Laravel's database manager, Query Builder,
 collections, pagination, query events and Schema Builder over PDO's MySQL protocol.
 
-Version `4.0.0-alpha.1` is available for early testing; it is not a stable release.
-See the [alpha release notes](docs/releases/4.0.0-alpha.1.md) for scope and unverified integrations.
+Version `4.0.0-alpha.2` is an early-testing prerelease; it is not a stable release.
+See the [alpha release notes](docs/releases/4.0.0-alpha.2.md) for scope and unverified integrations.
 The 3.x wrapper API and its dependency on `avadim/manticore-query-builder-php` have been removed.
 Existing applications should follow the [3.x migration guide](docs/upgrading-3.x-to-4.x.md).
 
@@ -41,7 +41,7 @@ Support for older servers, Lumen and general Eloquent compatibility is not estab
 To install the published alpha:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.1
+composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.2
 ```
 
 To test subsequent development changes:
@@ -176,6 +176,10 @@ Keep the migration repository in the primary SQL database; select Manticore insi
 DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.md).
 
 ## Differences from Laravel Query Builder
+
+Alpha.2 also provides [independent weighted RRF search, explicit capability probes and
+maintenance-only RT replacement](docs/hybrid-and-index-replacement.md), without requiring Scout.
+`knn()->match()` keeps its intersection semantics; replacement does not promise zero downtime.
 
 | Area | Behavior |
 | --- | --- |

@@ -6,7 +6,18 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.0-alpha.2] - 2026-10-22
+
 ### Added
+
+* Independent bounded text/vector search with weighted RRF, deterministic bigint ID tie-breaking,
+  preserved branch metadata and a separate HybridResult with explicitly scoped window pagination/totals.
+* Maintenance-only local RT replacement with server-observed state, resumable forward/rollback steps,
+  CREATE LIKE schema preparation and no automatic deletion; distributed/cluster swaps are not promised.
+* Lazy per-connection server/module evidence and explicit read-only KNN/fuzzy/CALL probes with bounded
+  caches, reconnect/DDL invalidation and original exception preservation.
+* Parallel-reader, injected interruption and actual second-rename failure tests, with standalone
+  production consumer coverage and bilingual contracts for downstream Scout integration.
 
 * Extended Schema Builder on dev-4.x: ordered ALTER settings with validated names/value formats,
   uncached normalized settings inspection, preflight-checked row-wise int-to-bigint `change()`,

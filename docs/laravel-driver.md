@@ -312,6 +312,9 @@ ALTER leaves earlier statements applied, so `down()` and recovery must account f
 
 ## Attribute conversion and schema cache
 
+For independent hybrid fusion, capability evidence and maintenance index replacement, see
+[the additional API reference](hybrid-and-index-replacement.md). These APIs were added after alpha.1.
+
 The Query Builder loads DESCRIBE once per table and connection before its first read or write.
 JSON arrays/objects are serialized on writes and decoded to associative arrays on reads;
 JSON null remains null. MVA/MVA64 and float vectors accept list arrays and return arrays.
@@ -431,7 +434,7 @@ servers are incompatible. See [server compatibility](testing.md#server-compatibi
   WHERE EXISTS subqueries and aggregates with HAVING are also rejected.
 - UPDATE and DELETE reject ordering, limits, offsets, joins, search options and computed search expressions, rather than
   silently discarding them. Updating full-text fields requires separate Manticore handling.
-- Native atomic `upsert()` remains unsupported. Advanced facet controls and hybrid fusion are
+- Native atomic `upsert()` remains unsupported. Advanced facet controls are
   not yet exposed by dedicated helpers.
 - Read/write splitting and Eloquent compatibility have not been established.
 

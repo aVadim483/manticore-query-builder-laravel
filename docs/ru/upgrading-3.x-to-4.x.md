@@ -251,6 +251,10 @@ SQL автоматически не повторяется. При ошибке 
 
 ## 7. SchemaTable и миграции
 
+Alpha.2 также добавляет [гибридное объединение, проверку возможностей и замену RT-индекса](hybrid-and-index-replacement.md).
+Это отдельные API: существующий KNN/MATCH сохраняет пересечение. Для объединения явно
+обрабатывайте HybridResult и totals окна; замена требует режима обслуживания силами приложения.
+
 ```php
 use avadim\Manticore\Laravel\Database\ManticoreBlueprint;
 use Illuminate\Database\Migrations\Migration;

@@ -252,6 +252,10 @@ also exists under 3.x; do not assume Laravel changes it. See the
 
 ## 7. SchemaTable and migrations
 
+Alpha.2 additionally introduces parent-only [hybrid fusion, capability evidence and RT replacement](hybrid-and-index-replacement.md).
+These are opt-in APIs; existing KNN/MATCH queries retain intersection semantics. Fusion consumers
+must use HybridResult/window totals explicitly, and replacement requires application-managed maintenance.
+
 ```php
 use avadim\Manticore\Laravel\Database\ManticoreBlueprint;
 use Illuminate\Database\Migrations\Migration;
