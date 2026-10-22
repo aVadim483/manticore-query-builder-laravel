@@ -10,6 +10,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use ReflectionMethod;
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Schema\ColumnDefinition;
+use LogicException;
 
 class ManticoreBlueprint extends Blueprint
 {
@@ -86,8 +88,34 @@ class ManticoreBlueprint extends Blueprint
     public function build(?Connection $connection = null, ?Grammar $grammar = null)
     {
         // Compile and validate the entire blueprint before executing any irreversible DDL.
-        foreach ($this->toSql() as $statement) {
+        $statements = $this->toSql();
+        if (!$this->driverConnection->pretending()) {
+            $this->validateColumnChanges();
+        }
+        foreach ($statements as $statement) {
             $this->driverConnection->statement($statement);
+        }
+    }
+
+    private function validateColumnChanges(): void
+    {
+        if (!array_filter($this->getColumns(), static fn ($column) => (bool)$column->change)) {
+            return;
+        }
+        // A previously cached schema may have been changed by another worker.
+        $schema = $this->driverConnection->forgetSchema($this->getTable())->getTableSchema($this->getTable());
+        foreach ($this->driverOperations as $operation) {
+            if ($operation instanceof ColumnDefinition) {
+                if ($operation->change && (!in_array($schema[$operation->name]['type'] ?? null, ['int', 'uint'], true)
+                    || str_contains($schema[$operation->name]['properties'] ?? '', 'columnar'))) {
+                    throw new LogicException('Manticore change() requires an existing row-wise int attribute: '.$operation->name);
+                }
+                $schema[$operation->name] = ['type' => $operation->type === 'integer' ? 'int' : $operation->type, 'properties' => ''];
+            } elseif ($operation->name === 'dropColumn') {
+                foreach ($operation->columns as $column) {
+                    unset($schema[$column]);
+                }
+            }
         }
     }
 }

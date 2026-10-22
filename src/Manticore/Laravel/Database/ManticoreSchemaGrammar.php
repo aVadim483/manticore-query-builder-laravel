@@ -30,6 +30,9 @@ class ManticoreSchemaGrammar extends Grammar
         $definitions = [];
         $columnDefinitions = [];
         foreach ($blueprint->getColumns() as $column) {
+            if ($column->change && ($blueprint->creating() || $column->type !== 'bigInteger')) {
+                throw new LogicException('Manticore change() only widens an existing int attribute to bigint.');
+            }
             if (!$blueprint->creating() && strtolower($column->name) === 'id') {
                 throw new LogicException('The implicit document id cannot be added or changed.');
             }
@@ -63,7 +66,7 @@ class ManticoreSchemaGrammar extends Grammar
             if ($command instanceof ColumnDefinition) {
                 $definition = $columnDefinitions[spl_object_id($command)];
                 if ($definition !== null) {
-                    $sql[] = 'alter table '.$table.' add column '.$definition;
+                    $sql[] = 'alter table '.$table.($command->change ? ' modify column ' : ' add column ').$definition;
                 }
                 continue;
             }
@@ -121,7 +124,7 @@ class ManticoreSchemaGrammar extends Grammar
     protected function columnDefinition(ColumnDefinition $column): ?string
     {
         $attributes = $column->getAttributes();
-        $allowed = ['type', 'name', 'length', 'autoIncrement', 'unsigned', 'precision', 'stored', 'indexed', 'knnDimensions', 'knnSimilarity'];
+        $allowed = ['type', 'name', 'length', 'autoIncrement', 'unsigned', 'precision', 'stored', 'indexed', 'knnDimensions', 'knnSimilarity', 'change'];
         foreach ($attributes as $key => $value) {
             if (!in_array($key, $allowed, true) && !($key === 'nullable' && $value === false)) {
                 throw new LogicException('Unsupported Manticore column modifier: '.$key);

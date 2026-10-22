@@ -145,4 +145,22 @@ class DatabaseDriverSchemaTest extends DatabaseTestCase
             $table->drop();
         });
     }
+
+    public function testChangeCompilesWithoutConnectingAndRejectsOtherTargets(): void
+    {
+        $db = $this->connection();
+        $log = $db->pretend(fn () => $db->getSchemaBuilder()->table('products', fn ($table) => $table->bigInteger('qty')->change()));
+        $this->assertSame('alter table `app_products` modify column `qty` bigint', $log[0]['query']);
+        foreach ([fn ($table) => $table->string('qty')->change(), fn ($table) => $table->integer('qty')->change(),
+            fn ($table) => $table->bigInteger('id')->change(), fn ($table) => $table->bigInteger('qty')->unsigned()->change()] as $definition) {
+            try {
+                $db->getSchemaBuilder()->table('products', $definition);
+                $this->fail('Unsupported type change was accepted.');
+            } catch (LogicException $error) {
+                $this->assertNotSame('', $error->getMessage());
+            }
+        }
+        $this->expectException(LogicException::class);
+        $db->getSchemaBuilder()->create('products', fn ($table) => $table->bigInteger('qty')->change());
+    }
 }

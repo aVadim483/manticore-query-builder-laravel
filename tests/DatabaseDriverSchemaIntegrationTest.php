@@ -102,6 +102,49 @@ class DatabaseDriverSchemaIntegrationTest extends DatabaseTestCase
         $this->assertCount(2, $db->getQueryLog());
     }
 
+    public function testChangeWidensIntPreservingValuesAndRefreshingCachedTypes(): void
+    {
+        $schema = Schema::connection('manticore');
+        $schema->create($this->schemaTable, fn ($table) => $table->integer('qty'));
+        $query = DB::connection('manticore')->table($this->schemaTable);
+        $query->insert(['id' => 1, 'qty' => 4294967295]);
+        $this->assertSame('uint', $schema->getColumnType($this->schemaTable, 'qty'));
+        $schema->table($this->schemaTable, fn ($table) => $table->bigInteger('qty')->change());
+        $this->assertSame('bigint', $schema->getColumnType($this->schemaTable, 'qty'));
+        $this->assertSame(4294967295, (clone $query)->find(1)->qty);
+        $query->insert(['id' => 2, 'qty' => 9007199254740993]);
+        $this->assertSame(9007199254740993, (clone $query)->find(2)->qty);
+        $schema->table($this->schemaTable, function ($table) {
+            $table->integer('added');
+            $table->bigInteger('added')->change();
+        });
+        $this->assertSame('bigint', $schema->getColumnType($this->schemaTable, 'added'));
+    }
+
+    public function testInvalidChangeSourcePreventsAllEarlierDdl(): void
+    {
+        $this->createTable();
+        $schema = Schema::connection('manticore');
+        $db = DB::connection('manticore');
+        foreach (['missing', 'active', 'published_at', 'title', 'price'] as $column) {
+            $db->enableQueryLog();
+            $db->flushQueryLog();
+            try {
+                $schema->table($this->schemaTable, function ($table) use ($column) {
+                    $table->integer('not_applied');
+                    $table->setting('min_word_len', 2);
+                    $table->bigInteger($column)->change();
+                });
+                $this->fail('Unsupported source type was accepted.');
+            } catch (\LogicException $error) {
+                $this->assertStringContainsString($column, $error->getMessage());
+            }
+            $this->assertCount(1, $db->getQueryLog());
+            $this->assertStringStartsWith('DESCRIBE ', $db->getQueryLog()[0]['query']);
+            $this->assertFalse($schema->hasColumn($this->schemaTable, 'not_applied'));
+        }
+    }
+
     public function testStructuredAttributesRoundTripThroughAllReadPaths(): void
     {
         $this->createTable();
