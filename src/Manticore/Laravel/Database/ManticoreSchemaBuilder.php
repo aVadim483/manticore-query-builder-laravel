@@ -26,6 +26,39 @@ class ManticoreSchemaBuilder extends Builder
         return $row->{'Create Table'};
     }
 
+    public function replacement(string $active, string $staged, string $backup): IndexReplacement
+    {
+        return new IndexReplacement($this, $active, $staged, $backup);
+    }
+
+    /** Empty, server-side schema clone on the same connection; never copies documents. */
+    public function createLike(string $table, string $source): void
+    {
+        foreach ([$table, $source] as $name) {
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name)) {
+                throw new InvalidArgumentException('CREATE LIKE requires logical table names.');
+            }
+        }
+        if ($this->connection->getConfig('read') || $this->connection->getConfig('write') || $this->connection->forgetCapabilities()->capabilities()->hasClusters) {
+            throw new UnsupportedFeatureException('create_like', 'Schema cloning supports a single non-clustered local connection.');
+        }
+        $physical = $this->connection->getTablePrefix().$source;
+        $found = false;
+        foreach ($this->getTables() as $candidate) {
+            if (strcasecmp($candidate['name'], $physical) === 0) {
+                $found = true;
+                if ($candidate['engine'] !== 'rt') {
+                    throw new UnsupportedFeatureException('create_like', 'Only local RT schemas can be cloned.');
+                }
+            }
+        }
+        if (!$found) {
+            // Preserve the native SQL error for a missing source.
+            $this->getCreateStatement($source);
+        }
+        $this->connection->statement('CREATE TABLE '.$this->grammar->wrapTable($table).' LIKE '.$this->grammar->wrapTable($source));
+    }
+
     /** HNSW metadata from the server's canonical CREATE, never inferred from module presence. */
     public function getVectorDefinition(string $table, string $column): array
     {
