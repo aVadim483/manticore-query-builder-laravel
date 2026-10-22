@@ -21,6 +21,12 @@ $schema = $db->getSchemaBuilder();
 try {
     $schema->create($table, fn ($blueprint) => $blueprint->text('title'));
     $db->table($table)->insert(['id' => 1, 'title' => 'preserved']);
+    foreach (['autocomplete', 'fuzzy'] as $feature) {
+        $evidence = $db->probeCapability($feature, $table);
+        if ($evidence->supported || !$evidence->cause instanceof \avadim\Manticore\Laravel\Database\UnsupportedFeatureException) {
+            throw new RuntimeException('Missing Buddy was not identified for '.$feature);
+        }
+    }
     try {
         $schema->rename($table, $table.'_renamed');
         throw new RuntimeException('RENAME unexpectedly succeeded without Buddy.');

@@ -27,6 +27,16 @@ final readonly class HybridResult
     /** The exact full-union total cannot be inferred from two truncated candidate lists. */
     public function totalFound(): ?int { return null; }
 
+    public function totals(): array
+    {
+        return [
+            'window' => ['value' => $this->windowTotal(), 'accuracy' => 'exact'],
+            'global' => ['value' => null, 'accuracy' => 'unavailable'],
+            'text' => ['value' => $this->textMeta?->totalFound(), 'accuracy' => $this->textMeta === null ? 'unavailable' : 'unknown'],
+            'vector' => ['value' => $this->vectorMeta?->totalFound(), 'accuracy' => $this->vectorMeta === null ? 'unavailable' : 'unknown'],
+        ];
+    }
+
     public function paginateWindow(int $perPage = 15, int $page = 1, array $options = []): LengthAwarePaginator
     {
         if ($perPage < 1 || $page < 1 || $perPage > intdiv(PHP_INT_MAX, $page)) {

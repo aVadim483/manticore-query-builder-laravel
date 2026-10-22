@@ -58,7 +58,7 @@ final class HybridSearch
             || ($base->columns !== null && $base->columns !== ['*']) || $base->orders || $base->limit !== null
             || $base->offset !== null || $base->groups || $base->havings || $base->joins || $base->unions
             || $base->distinct || $base->lock || $base->aggregate || $base->getFacets() || $base->getSearchExpressions()
-            || $base->hasQueryCallbacks()) {
+            || $base->hasQueryCallbacks() || array_intersect(array_keys($base->manticoreOptions), ['fusion_method', 'fusion_weights', 'rank_constant', 'window_size'])) {
             throw new LogicException('Hybrid requires a plain common attribute query without projection, ordering, callbacks or result windows.');
         }
         $query = clone $base;
@@ -116,6 +116,9 @@ final class HybridSearch
         $vector = $options['vector_weight'] > 0 ? $vector : null;
         $hits = [];
         foreach (['text' => $text, 'vector' => $vector] as $branch => $result) {
+            if ($result !== null && $result->rows()->count() > $options[$branch.'_candidates']) {
+                throw new InvalidArgumentException('A fusion branch exceeds its declared candidate window.');
+            }
             $seen = [];
             foreach ($result?->rows()->values() ?? [] as $rank => $document) {
                 if (!isset($document->id) || !preg_match('/^[0-9]+$/D', (string)$document->id)) {

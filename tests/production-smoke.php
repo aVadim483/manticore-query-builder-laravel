@@ -54,10 +54,11 @@ if (in_array('--live', $argv, true)) {
             $blueprint->multi('tags');
             $blueprint->float('price');
             $blueprint->integer('qty');
+            $blueprint->floatVector('embedding', 3, 'l2');
         });
         $id = $db->table($table)->insertGetId([
             'id' => 42, 'title' => 'galaxy phone', 'details' => ['brand' => 'acme'],
-            'tags' => [1, 2], 'price' => 12.5,
+            'tags' => [1, 2], 'price' => 12.5, 'embedding' => [1, 0, 0],
         ]);
         $result = $db->table($table)->match('galaxy')->search();
         $row = $result->rows()->sole();
@@ -67,7 +68,7 @@ if (in_array('--live', $argv, true)) {
         }
         $db->transaction(fn () => $db->table($table)->replace([
             'id' => 42, 'title' => 'galaxy phone', 'details' => ['brand' => 'acme'],
-            'tags' => [1, 2], 'price' => 25.5,
+            'tags' => [1, 2], 'price' => 25.5, 'embedding' => [1, 0, 0],
         ]));
         if ((float)$db->table($table)->find(42)->price !== 25.5) {
             throw new RuntimeException('Production transaction failed.');
@@ -83,9 +84,26 @@ if (in_array('--live', $argv, true)) {
             throw new RuntimeException('Production ALTER or RENAME failed.');
         }
         $schema->rename($table.'_renamed', $table);
+        $hybrid = $db->table($table)->hybrid('galaxy', 'embedding', [1, 0, 0])->search();
+        if ($hybrid->windowTotal() !== 1 || $hybrid->totalFound() !== null
+            || $hybrid->hits()[0]->textRank !== 1 || $hybrid->hits()[0]->vectorRank !== 1
+            || !$db->probeCapability('knn', $table, ['vector' => [1, 0, 0]])->supported) {
+            throw new RuntimeException('Production hybrid or capability probe failed.');
+        }
+        $schema->createLike($table.'_staged', $table);
+        $db->table($table.'_staged')->insert(['id' => 42, 'title' => 'staged', 'embedding' => [1, 0, 0]]);
+        $replacement = $schema->replacement($table, $table.'_staged', $table.'_backup');
+        $replacement->switch(true); // These random, isolated tables have no application traffic.
+        if ($db->table($table)->find(42)->title !== 'staged'
+            || $db->table($table.'_backup')->find(42)->title !== 'galaxy phone') {
+            throw new RuntimeException('Production index replacement failed.');
+        }
+        $replacement->rollback(true);
     } finally {
         $schema->dropIfExists($table);
         $schema->dropIfExists($table.'_renamed');
+        $schema->dropIfExists($table.'_staged');
+        $schema->dropIfExists($table.'_backup');
     }
 }
 

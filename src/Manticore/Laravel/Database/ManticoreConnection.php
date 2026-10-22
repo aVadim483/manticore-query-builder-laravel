@@ -60,6 +60,10 @@ class ManticoreConnection extends Connection
         if (isset($this->capabilityEvidence[$key])) {
             return $this->capabilityEvidence[$key];
         }
+        if (in_array($feature, ['autocomplete', 'fuzzy'], true) && !$this->capabilities()->advertises('buddy')) {
+            return $this->rememberCapability($key, new CapabilityEvidence($feature, $table, false,
+                new UnsupportedFeatureException($feature, 'The operation requires Buddy, which this server does not advertise.')));
+        }
         try {
             if ($feature === 'knn') {
                 $column = $parameters['column'] ?? 'embedding';
@@ -73,16 +77,24 @@ class ManticoreConnection extends Connection
                 $this->$feature($parameters['text'] ?? 'probe', $table);
             }
         } catch (UnsupportedFeatureException $error) {
-            return $this->capabilityEvidence[$key] = new CapabilityEvidence($feature, $table, false, $error);
+            return $this->rememberCapability($key, new CapabilityEvidence($feature, $table, false, $error));
         } catch (QueryException $error) {
             // Restrict classification to explicit dependency failures; syntax, table and network
             // errors retain their original QueryException and must not be cached as unsupported.
             if (!preg_match('/(?:knn library (?:not loaded|is not loaded)|buddy (?:is )?(?:not available|not running|not enabled|disabled)|requires? (?:manticore )?buddy)/i', $error->getPrevious()?->getMessage() ?? '')) {
                 throw $error;
             }
-            return $this->capabilityEvidence[$key] = new CapabilityEvidence($feature, $table, false, $error);
+            return $this->rememberCapability($key, new CapabilityEvidence($feature, $table, false, $error));
         }
-        return $this->capabilityEvidence[$key] = new CapabilityEvidence($feature, $table, true);
+        return $this->rememberCapability($key, new CapabilityEvidence($feature, $table, true));
+    }
+
+    private function rememberCapability(string $key, CapabilityEvidence $evidence): CapabilityEvidence
+    {
+        if (count($this->capabilityEvidence) >= 128) {
+            array_shift($this->capabilityEvidence);
+        }
+        return $this->capabilityEvidence[$key] = $evidence;
     }
 
     public function getTableSchema(string $table): array

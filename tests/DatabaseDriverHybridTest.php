@@ -31,6 +31,9 @@ class DatabaseDriverHybridTest extends DatabaseTestCase
         $this->assertSame($text->meta(), $result->textMeta);
         $this->assertNull($result->totalFound());
         $this->assertSame(3, $result->windowTotal());
+        $this->assertSame(['window' => ['value' => 3, 'accuracy' => 'exact'],
+            'global' => ['value' => null, 'accuracy' => 'unavailable'],
+            'text' => ['value' => 1000, 'accuracy' => 'unknown'], 'vector' => ['value' => 2, 'accuracy' => 'unknown']], $result->totals());
         $this->assertSame(['9007199254740993'], $result->paginateWindow(2, 2)->getCollection()->pluck('id')->all());
         $this->assertSame(3, $result->paginateWindow(2)->total());
         $this->assertSame('9007199254740993', HybridSearch::fuse($text, $vector, ['text_weight' => 100])->hits()[0]->id);

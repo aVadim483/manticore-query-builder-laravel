@@ -122,4 +122,23 @@ class DatabaseDriverCapabilitiesTest extends DatabaseTestCase
         }
         $this->assertSame(3, $db->calls);
     }
+
+    public function testProbeCacheIsBoundedAndDisconnectInvalidatesIt(): void
+    {
+        $db = new class(fn () => throw new \LogicException('No PDO')) extends ManticoreConnection {
+            public int $calls = 0;
+            public function keywords(string $text, string $table, array $options = []): \Illuminate\Support\Collection
+            {
+                $this->calls++;
+                return new \Illuminate\Support\Collection();
+            }
+        };
+        $first = $db->probeCapability('keywords', 'docs', ['text' => '0']);
+        for ($i = 1; $i <= 128; $i++) { $db->probeCapability('keywords', 'docs', ['text' => (string)$i]); }
+        $this->assertNotSame($first, $db->probeCapability('keywords', 'docs', ['text' => '0']));
+        $this->assertSame(130, $db->calls);
+        $last = $db->probeCapability('keywords', 'docs', ['text' => '0']);
+        $db->disconnect();
+        $this->assertNotSame($last, $db->probeCapability('keywords', 'docs', ['text' => '0']));
+    }
 }
