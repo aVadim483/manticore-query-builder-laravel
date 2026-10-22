@@ -163,4 +163,38 @@ class DatabaseDriverSchemaTest extends DatabaseTestCase
         $this->expectException(LogicException::class);
         $db->getSchemaBuilder()->create('products', fn ($table) => $table->bigInteger('qty')->change());
     }
+
+    public function testRenameAppliesPrefixesAndEscapesBothNames(): void
+    {
+        $db = $this->connection();
+        $log = $db->pretend(fn () => $db->getSchemaBuilder()->rename('old`products', 'new`products'));
+        $this->assertSame('alter table `app_old``products` rename `app_new``products`', $log[0]['query']);
+        foreach (['', 'products', 'Products', 'db.products', 'new as alias', '*'] as $target) {
+            try {
+                $db->getSchemaBuilder()->rename('products', $target);
+                $this->fail('Invalid rename target was accepted.');
+            } catch (\InvalidArgumentException $error) {
+                $this->assertStringContainsString('RENAME', $error->getMessage());
+            }
+        }
+    }
+
+    public function testRenameCannotBeMixedWithOtherOperations(): void
+    {
+        foreach ([fn ($table) => $table->integer('qty'), fn ($table) => $table->setting('min_word_len', 2),
+            fn ($table) => $table->dropColumn('qty'), fn ($table) => $table->rename('second')] as $operation) {
+            $db = $this->connection();
+            $db->enableQueryLog();
+            try {
+                $db->getSchemaBuilder()->table('products', function ($table) use ($operation) {
+                    $operation($table);
+                    $table->rename('new_products');
+                });
+                $this->fail('Mixed rename blueprint was accepted.');
+            } catch (LogicException $error) {
+                $this->assertStringContainsString('RENAME', $error->getMessage());
+            }
+            $this->assertSame([], $db->getQueryLog());
+        }
+    }
 }

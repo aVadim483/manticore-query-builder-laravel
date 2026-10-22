@@ -21,7 +21,7 @@ class ManticoreSchemaGrammar extends Grammar
             if ($command instanceof ColumnDefinition) {
                 continue;
             }
-            if (!in_array($command->name, ['create', 'drop', 'dropIfExists', 'dropColumn'], true)) {
+            if (!in_array($command->name, ['create', 'drop', 'dropIfExists', 'dropColumn', 'rename'], true)) {
                 throw new LogicException('Unsupported Manticore schema command: '.$command->name);
             }
             $commands[] = $command;
@@ -70,7 +70,16 @@ class ManticoreSchemaGrammar extends Grammar
                 }
                 continue;
             }
-            if ($command->name === 'drop' || $command->name === 'dropIfExists') {
+            if ($command->name === 'rename') {
+                if ($definitions || $blueprint->manticoreSettings || count($commands) !== 1) {
+                    throw new LogicException('A Manticore RENAME blueprint cannot mix schema commands.');
+                }
+                if (!is_string($command->to) || $command->to === '' || preg_match('/[.\s*]/', $command->to)
+                    || strcasecmp($blueprint->getTable(), $command->to) === 0) {
+                    throw new InvalidArgumentException('Manticore RENAME requires a different, unqualified table name.');
+                }
+                $sql[] = 'alter table '.$table.' rename '.$this->wrapTable($command->to);
+            } elseif ($command->name === 'drop' || $command->name === 'dropIfExists') {
                 if ($definitions || $blueprint->manticoreSettings || count($commands) !== 1) {
                     throw new LogicException('A Manticore DROP blueprint cannot mix schema commands.');
                 }

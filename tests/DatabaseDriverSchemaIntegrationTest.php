@@ -145,6 +145,54 @@ class DatabaseDriverSchemaIntegrationTest extends DatabaseTestCase
         }
     }
 
+    public function testRenamePreservesDataAndUsesTheConnectionPrefix(): void
+    {
+        config(['database.connections.prefixed_search' => config('database.connections.manticore') + ['prefix' => 'app_']]);
+        $schema = Schema::connection('prefixed_search');
+        $db = DB::connection('prefixed_search');
+        $renamed = $this->schemaTable.'_renamed';
+        try {
+            $schema->create($this->schemaTable, fn ($table) => $table->json('info'));
+            $db->table($this->schemaTable)->insert(['id' => 1, 'info' => ['kept' => true]]);
+            $schema->getColumns($this->schemaTable);
+            $schema->rename($this->schemaTable, $renamed);
+            $this->assertFalse($schema->hasTable($this->schemaTable));
+            $this->assertTrue($schema->hasTable($renamed));
+            $this->assertSame(['kept' => true], $db->table($renamed)->find(1)->info);
+            $schema->create($this->schemaTable, fn ($table) => $table->integer('qty'));
+            $this->assertFalse($schema->hasColumn($this->schemaTable, 'info'));
+            $schema->rename($renamed, $renamed.'_again');
+            $schema->rename($renamed.'_again', $renamed);
+        } finally {
+            $schema->dropIfExists($this->schemaTable);
+            $schema->dropIfExists($renamed);
+            $schema->dropIfExists($renamed.'_again');
+        }
+    }
+
+    public function testRenameConflictLeavesBothTablesUnchanged(): void
+    {
+        $this->createTable();
+        $schema = Schema::connection('manticore');
+        $db = DB::connection('manticore');
+        $target = $this->schemaTable.'_occupied';
+        try {
+            $schema->create($target, fn ($table) => $table->integer('qty'));
+            $db->table($this->schemaTable)->insert(['id' => 1, 'title' => 'preserved']);
+            $db->table($target)->insert(['id' => 2, 'qty' => 17]);
+            try {
+                $schema->rename($this->schemaTable, $target);
+                $this->fail('Rename to an existing table was accepted.');
+            } catch (\Illuminate\Database\QueryException $error) {
+                $this->assertStringContainsString('rename', $error->getSql());
+            }
+            $this->assertSame('preserved', $db->table($this->schemaTable)->find(1)->title);
+            $this->assertSame(17, $db->table($target)->find(2)->qty);
+        } finally {
+            $schema->dropIfExists($target);
+        }
+    }
+
     public function testStructuredAttributesRoundTripThroughAllReadPaths(): void
     {
         $this->createTable();
