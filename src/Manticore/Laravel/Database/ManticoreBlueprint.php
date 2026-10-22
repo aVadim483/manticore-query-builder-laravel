@@ -7,11 +7,11 @@ namespace avadim\Manticore\Laravel\Database;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\Grammar;
-use ReflectionMethod;
-use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Support\Fluent;
 use LogicException;
+use ReflectionMethod;
 
 class ManticoreBlueprint extends Blueprint
 {

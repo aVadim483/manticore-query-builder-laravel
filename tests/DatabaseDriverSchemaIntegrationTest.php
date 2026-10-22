@@ -180,16 +180,91 @@ class DatabaseDriverSchemaIntegrationTest extends DatabaseTestCase
             $schema->create($target, fn ($table) => $table->integer('qty'));
             $db->table($this->schemaTable)->insert(['id' => 1, 'title' => 'preserved']);
             $db->table($target)->insert(['id' => 2, 'qty' => 17]);
+            $db->enableQueryLog();
             try {
                 $schema->rename($this->schemaTable, $target);
                 $this->fail('Rename to an existing table was accepted.');
             } catch (\Illuminate\Database\QueryException $error) {
                 $this->assertStringContainsString('rename', $error->getSql());
             }
+            $db->flushQueryLog();
             $this->assertSame('preserved', $db->table($this->schemaTable)->find(1)->title);
             $this->assertSame(17, $db->table($target)->find(2)->qty);
+            $this->assertCount(2, array_filter($db->getQueryLog(), fn ($entry) => str_starts_with($entry['query'], 'DESCRIBE ')));
         } finally {
             $schema->dropIfExists($target);
+        }
+    }
+
+    public function testPartialAlterInvalidatesTypesAndPreservesAppliedSettings(): void
+    {
+        $schema = Schema::connection('manticore');
+        $db = DB::connection('manticore');
+        $schema->create($this->schemaTable, fn ($table) => $table->integer('qty'));
+        $db->table($this->schemaTable)->insert(['id' => 1, 'qty' => 4294967295]);
+        $this->assertSame('uint', $schema->getColumnType($this->schemaTable, 'qty'));
+        try {
+            $schema->table($this->schemaTable, function ($table) {
+                $table->bigInteger('qty')->change();
+                $table->setting('rt_mem_limit', '32M');
+                $table->dropColumn('missing_column');
+                $table->setting('min_word_len', 3);
+            });
+            $this->fail('The third statement must fail.');
+        } catch (\Illuminate\Database\QueryException $error) {
+            $this->assertStringContainsString('missing_column', $error->getSql());
+            $this->assertInstanceOf(\PDOException::class, $error->getPrevious());
+        }
+        $db->enableQueryLog();
+        $db->flushQueryLog();
+        $this->assertSame('bigint', $schema->getColumnType($this->schemaTable, 'qty'));
+        $this->assertStringStartsWith('DESCRIBE ', $db->getQueryLog()[0]['query']);
+        $this->assertSame(4294967295, $db->table($this->schemaTable)->find(1)->qty);
+        $settings = $schema->getSettings($this->schemaTable);
+        $this->assertSame('33554432', $settings['rt_mem_limit']);
+        $this->assertArrayNotHasKey('min_word_len', $settings);
+    }
+
+    public function testChangeChecksFreshSchemaAfterExternalDdl(): void
+    {
+        $schema = Schema::connection('manticore');
+        $schema->create($this->schemaTable, fn ($table) => $table->integer('qty'));
+        $this->assertSame('uint', $schema->getColumnType($this->schemaTable, 'qty'));
+        config(['database.connections.external_search' => config('database.connections.manticore')]);
+        DB::connection('external_search')->statement('ALTER TABLE `'.$this->schemaTable.'` MODIFY COLUMN qty bigint');
+        try {
+            $schema->table($this->schemaTable, function ($table) {
+                $table->integer('not_applied');
+                $table->bigInteger('qty')->change();
+            });
+            $this->fail('Already widened attributes must be rejected before DDL.');
+        } catch (\LogicException $error) {
+            $this->assertStringContainsString('qty', $error->getMessage());
+        }
+        $this->assertSame('bigint', $schema->getColumnType($this->schemaTable, 'qty'));
+        $this->assertFalse($schema->hasColumn($this->schemaTable, 'not_applied'));
+    }
+
+    public function testChangeRejectsColumnarAndDroppedSourcesBeforeAnyDdl(): void
+    {
+        $db = DB::connection('manticore');
+        $schema = $db->getSchemaBuilder();
+        $db->statement('CREATE TABLE `'.$this->schemaTable."` (qty int, columnar_qty int engine='columnar')");
+        foreach (['columnar_qty', 'qty'] as $column) {
+            try {
+                $schema->table($this->schemaTable, function ($table) use ($column) {
+                    $table->integer('not_applied');
+                    if ($column === 'qty') {
+                        $table->dropColumn('qty');
+                    }
+                    $table->bigInteger($column)->change();
+                });
+                $this->fail('An unsupported source was accepted.');
+            } catch (\LogicException $error) {
+                $this->assertStringContainsString($column, $error->getMessage());
+            }
+            $this->assertFalse($schema->hasColumn($this->schemaTable, 'not_applied'));
+            $this->assertTrue($schema->hasColumn($this->schemaTable, 'qty'));
         }
     }
 

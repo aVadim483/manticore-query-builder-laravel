@@ -197,4 +197,26 @@ class DatabaseDriverSchemaTest extends DatabaseTestCase
             $this->assertSame([], $db->getQueryLog());
         }
     }
+
+    public function testSettingsParserPreservesValuesAndRejectsAmbiguousOutput(): void
+    {
+        $db = new class(fn () => throw new LogicException('Unexpected PDO')) extends ManticoreConnection {
+            public string $settings = '';
+            public function selectFromWriteConnection($query, $bindings = [])
+            {
+                return [(object)['Variable_name' => 'settings', 'Value' => $this->settings]];
+            }
+        };
+        $db->settings = "morphology = stem_en\ncharset_table = U+0041->a, a..z\nstopwords = path=with=equals\n";
+        $this->assertSame(['morphology' => 'stem_en', 'charset_table' => 'U+0041->a, a..z', 'stopwords' => 'path=with=equals'], $db->getSchemaBuilder()->getSettings('products'));
+        foreach (["morphology = stem_en\nmorphology = stem_ru", 'unexpected output'] as $output) {
+            $db->settings = $output;
+            try {
+                $db->getSchemaBuilder()->getSettings('products');
+                $this->fail('Ambiguous settings output was accepted.');
+            } catch (\UnexpectedValueException $error) {
+                $this->assertStringContainsString('settings', $error->getMessage());
+            }
+        }
+    }
 }
