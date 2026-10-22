@@ -310,6 +310,16 @@ class ManticoreQueryBuilder extends Builder
         return $this->connection->getMeta();
     }
 
+    public function hybrid(string $text, string $column, array $vector, array $options = []): HybridSearch
+    {
+        return new HybridSearch($this, $text, $column, $vector, $options);
+    }
+
+    public function hasQueryCallbacks(): bool
+    {
+        return (bool)($this->beforeQueryCallbacks || $this->afterQueryCallbacks);
+    }
+
     public function withScore(string $alias = '_score'): static
     {
         return $this->addSearchExpression($alias, 'WEIGHT()', true);
