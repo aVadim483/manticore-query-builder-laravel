@@ -45,20 +45,21 @@ class ManticoreSchemaGrammar extends Grammar
                 throw new LogicException('A Manticore CREATE blueprint cannot mix schema commands.');
             }
             $sql = 'create table '.$table.' ('.implode(', ', $definitions).')';
-            foreach ($blueprint->manticoreSettings as $name => $value) {
-                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $name) || (is_float($value) && !is_finite($value))) {
-                    throw new InvalidArgumentException('Invalid Manticore table setting.');
-                }
-                $sql .= ' '.$name.'='.$this->escape((string)$value);
-            }
+            $sql .= $this->compileSettings($blueprint->manticoreSettings, false);
 
             return [$sql];
         }
-        if ($blueprint->manticoreSettings) {
-            throw new LogicException('Table settings are currently supported only on CREATE.');
-        }
         $sql = [];
+        $settings = [];
         foreach ($blueprint->getDriverOperations() as $command) {
+            if (!($command instanceof ColumnDefinition) && $command->name === 'setting') {
+                $settings[$command->setting] = $command->value;
+                continue;
+            }
+            if ($settings) {
+                $sql[] = 'alter table '.$table.$this->compileSettings($settings, true);
+                $settings = [];
+            }
             if ($command instanceof ColumnDefinition) {
                 $definition = $columnDefinitions[spl_object_id($command)];
                 if ($definition !== null) {
@@ -67,7 +68,7 @@ class ManticoreSchemaGrammar extends Grammar
                 continue;
             }
             if ($command->name === 'drop' || $command->name === 'dropIfExists') {
-                if ($definitions || count($commands) !== 1) {
+                if ($definitions || $blueprint->manticoreSettings || count($commands) !== 1) {
                     throw new LogicException('A Manticore DROP blueprint cannot mix schema commands.');
                 }
                 $sql[] = 'drop table '.($command->name === 'dropIfExists' ? 'if exists ' : '').$table;
@@ -80,7 +81,41 @@ class ManticoreSchemaGrammar extends Grammar
                 }
             }
         }
+        if ($settings) {
+            $sql[] = 'alter table '.$table.$this->compileSettings($settings, true);
+        }
         return $sql;
+    }
+
+    private function compileSettings(array $settings, bool $alter): string
+    {
+        $sql = '';
+        foreach ($settings as $name => $value) {
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', (string)$name)
+                || (is_float($value) && !is_finite($value)) || strpbrk((string)$value, "\r\n\0") !== false) {
+                throw new InvalidArgumentException('Invalid Manticore table setting.');
+            }
+            if ($alter) {
+                $this->validateAlterSetting((string)$name, $value);
+            }
+            $sql .= ' '.$name.'='.$this->escape((string)$value);
+        }
+        return $sql;
+    }
+
+    private function validateAlterSetting(string $name, int|float|string $value): void
+    {
+        $valid = match ($name) {
+            'min_prefix_len', 'min_infix_len', 'min_word_len' => preg_match('/^[0-9]+$/D', (string)$value) === 1,
+            'expand_keywords', 'index_exact_words', 'html_strip' => in_array((string)$value, ['0', '1'], true),
+            'dict' => in_array($value, ['keywords', 'crc'], true),
+            'rt_mem_limit' => preg_match('/^[1-9][0-9]*[KMG]?$/Di', (string)$value) === 1,
+            'morphology', 'charset_table', 'stopwords', 'prefix_fields' => is_string($value),
+            default => throw new LogicException('Unsupported Manticore ALTER setting: '.$name),
+        };
+        if (!$valid) {
+            throw new InvalidArgumentException('Invalid value for Manticore ALTER setting: '.$name);
+        }
     }
 
     protected function columnDefinition(ColumnDefinition $column): ?string

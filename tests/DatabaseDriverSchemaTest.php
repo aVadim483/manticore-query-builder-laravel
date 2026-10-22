@@ -92,4 +92,57 @@ class DatabaseDriverSchemaTest extends DatabaseTestCase
         $blueprint->setting('morphology', "stem_en' injected");
         $this->assertSame(["create table `app_products` (`title` text indexed) morphology='stem_en\\' injected'"], $blueprint->toSql());
     }
+
+    public function testAlterSettingsKeepDeclarationOrderAndGroupAdjacentSettings(): void
+    {
+        $db = $this->connection();
+        $log = $db->pretend(fn () => $db->getSchemaBuilder()->table('products', function ($table) {
+            $table->setting('min_infix_len', 3)->setting('morphology', 'stem_en');
+            $table->integer('qty');
+            $table->setting('rt_mem_limit', '32M');
+            $table->dropColumn('old_qty');
+            $table->setting('charset_table', "a..z, 'quoted'");
+        }));
+        $this->assertSame([
+            "alter table `app_products` min_infix_len='3' morphology='stem_en'",
+            'alter table `app_products` add column `qty` int',
+            "alter table `app_products` rt_mem_limit='32M'",
+            'alter table `app_products` drop column `old_qty`',
+            "alter table `app_products` charset_table='a..z, \\'quoted\\''",
+        ], array_column($log, 'query'));
+    }
+
+    public function testInvalidAlterSettingsAreRejectedBeforeEarlierDdl(): void
+    {
+        foreach ([['type', 'distributed'], ['min_word_len', -1], ['html_strip', 2],
+            ['rt_mem_limit', '0M'], ['morphology', "stem_en\ninvalid"], ['min_infix_len', INF],
+            ['invalid setting', 'x'], ['dict', 'unknown']] as [$name, $value]) {
+            $db = $this->connection();
+            $db->enableQueryLog();
+            try {
+                $db->getSchemaBuilder()->table('products', function ($table) use ($name, $value) {
+                    $table->integer('qty');
+                    $table->setting($name, $value);
+                });
+                $this->fail('Invalid ALTER setting was accepted.');
+            } catch (\LogicException|\InvalidArgumentException $error) {
+                $this->assertStringContainsString('setting', $error->getMessage());
+            }
+            $this->assertSame([], $db->getQueryLog());
+        }
+    }
+
+    public function testDropCannotBeMixedWithSettingsAndSettingsReadsSupportPretend(): void
+    {
+        $db = $this->connection();
+        $log = $db->pretend(function () use ($db) {
+            $this->assertSame([], $db->getSchemaBuilder()->getSettings('products'));
+        });
+        $this->assertSame('SHOW TABLE `app_products` SETTINGS', $log[0]['query']);
+        $this->expectException(LogicException::class);
+        $db->getSchemaBuilder()->table('products', function ($table) {
+            $table->setting('min_word_len', 2);
+            $table->drop();
+        });
+    }
 }

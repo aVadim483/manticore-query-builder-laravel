@@ -72,6 +72,36 @@ class DatabaseDriverSchemaIntegrationTest extends DatabaseTestCase
         $schema->dropIfExists($this->schemaTable);
     }
 
+    public function testAlterSettingsAreReadableAndApplyToNewDocuments(): void
+    {
+        $schema = Schema::connection('manticore');
+        $schema->create($this->schemaTable, function ($table) {
+            $table->text('title');
+            $table->setting('min_infix_len', 2);
+        });
+        $db = DB::connection('manticore');
+        $query = $db->table($this->schemaTable);
+        $query->insert(['id' => 1, 'title' => 'running']);
+        $this->assertSame('2', $schema->getSettings($this->schemaTable)['min_infix_len']);
+        $schema->table($this->schemaTable, function ($table) {
+            $table->setting('min_infix_len', 3)->setting('morphology', 'stem_en');
+            $table->integer('qty');
+            $table->setting('rt_mem_limit', '32M');
+        });
+        $settings = $schema->getSettings($this->schemaTable);
+        $this->assertSame('3', $settings['min_infix_len']);
+        $this->assertSame('stem_en', $settings['morphology']);
+        $this->assertSame('33554432', $settings['rt_mem_limit']);
+        $this->assertTrue($schema->hasColumn($this->schemaTable, 'qty'));
+        $query->insert(['id' => 2, 'title' => 'running', 'qty' => 7]);
+        $this->assertSame([1, 2], (clone $query)->orderBy('id')->pluck('id')->all());
+        $this->assertSame([2], (clone $query)->match('run')->pluck('id')->all());
+        $db->enableQueryLog();
+        $schema->getSettings($this->schemaTable);
+        $schema->getSettings($this->schemaTable);
+        $this->assertCount(2, $db->getQueryLog());
+    }
+
     public function testStructuredAttributesRoundTripThroughAllReadPaths(): void
     {
         $this->createTable();

@@ -7,6 +7,7 @@ namespace avadim\Manticore\Laravel\Database;
 use Closure;
 use Illuminate\Database\Schema\Builder;
 use LogicException;
+use UnexpectedValueException;
 
 class ManticoreSchemaBuilder extends Builder
 {
@@ -61,6 +62,30 @@ class ManticoreSchemaBuilder extends Builder
         }
 
         return $columns;
+    }
+
+    /** @return array<string, string> Reported settings only; defaults are not inferred. */
+    public function getSettings(string $table): array
+    {
+        $rows = $this->connection->selectFromWriteConnection('SHOW TABLE '.$this->grammar->wrapTable($table).' SETTINGS');
+        $settings = [];
+        foreach ($rows as $row) {
+            $row = array_change_key_case((array)$row, CASE_LOWER);
+            if (($row['variable_name'] ?? null) !== 'settings') {
+                continue;
+            }
+            foreach (preg_split('/\r?\n/', $row['value']) as $line) {
+                if (trim($line) === '') {
+                    continue;
+                }
+                if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.*)$/D', $line, $matches)
+                    || array_key_exists($matches[1], $settings)) {
+                    throw new UnexpectedValueException('Unrecognized Manticore table settings output.');
+                }
+                $settings[$matches[1]] = $matches[2];
+            }
+        }
+        return $settings;
     }
 
     public function createDatabase($name)

@@ -9,6 +9,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use ReflectionMethod;
+use Illuminate\Support\Fluent;
 
 class ManticoreBlueprint extends Blueprint
 {
@@ -52,6 +53,7 @@ class ManticoreBlueprint extends Blueprint
     public function setting(string $name, int|float|string $value): static
     {
         $this->manticoreSettings[$name] = $value;
+        $this->driverOperations[] = new Fluent(['name' => 'setting', 'setting' => $name, 'value' => $value]);
 
         return $this;
     }
