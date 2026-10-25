@@ -73,6 +73,16 @@ if (in_array('--live', $argv, true)) {
         if ((float)$db->table($table)->find(42)->price !== 25.5) {
             throw new RuntimeException('Production transaction failed.');
         }
+        $db->table($table)->updateOrInsert(['id' => 42], ['price' => 26.5]);
+        $processed = $db->table($table)->upsert(['id' => 42, 'price' => 25.5], 'id', ['price']);
+        $db->table($table)->replaceOrInsert(['id' => 43], ['title' => 'temporary', 'embedding' => [0, 1, 0]]);
+        $db->table($table)->replaceOrInsert(['id' => 43], ['title' => 'temporary replacement', 'embedding' => [0, 1, 0]]);
+        if ($processed !== 1 || $db->table($table)->find(42)->title !== 'galaxy phone'
+            || (float)$db->table($table)->find(42)->price !== 25.5
+            || $db->table($table)->find(43)->title !== 'temporary replacement') {
+            throw new RuntimeException('Production conditional writes or transactional upsert failed.');
+        }
+        $db->table($table)->where('id', 43)->delete();
         $schema->table($table, static function (ManticoreBlueprint $blueprint) {
             $blueprint->bigInteger('qty')->change();
             $blueprint->setting('min_word_len', 2);

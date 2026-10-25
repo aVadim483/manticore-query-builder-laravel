@@ -25,7 +25,9 @@ after ranking the same candidate windows. Get/First expose no scores or metadata
 immediately; the former `hybrid(...)->search()` API from alpha.2 is removed in alpha.3.
 See the [standalone hybrid guide](hybrid-search.md) for progressive examples and migration notes.
 
-Initial scope excludes pre-existing search expressions, MATCH/KNN, raw predicates, custom
+JSON arrow paths and `whereJson*()` AND filters are shared by both branches, including
+their generated hidden expressions and bound values; see [JSON semantics](laravel-driver.md#json-filters).
+Other pre-existing search expressions, MATCH/KNN, raw predicates, custom
 ordering, projections, facets, grouping, callbacks, offsets and limits on the common query.
 These are rejected rather than silently changed. Text is escaped as literal MATCH input
 unless explicitly opted into extended MATCH syntax. KNN candidates are bounded after

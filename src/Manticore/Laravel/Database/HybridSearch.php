@@ -61,15 +61,20 @@ final class HybridSearch
         if (!is_string($base->from) || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $base->from)
             || ($base->columns !== null && $base->columns !== ['*']) || $base->orders || $base->limit !== null
             || $base->offset !== null || $base->groups || $base->havings || $base->joins || $base->unions
-            || $base->distinct || $base->lock || $base->aggregate || $base->getFacets() || $base->getSearchExpressions()
+            || $base->distinct || $base->lock || $base->aggregate || $base->getFacets()
             || $base->hasQueryCallbacks() || array_intersect(array_keys($base->manticoreOptions), ['fusion_method', 'fusion_weights', 'rank_constant', 'window_size'])) {
             throw new LogicException('Hybrid requires a plain common attribute query without projection, ordering, callbacks or result windows.');
+        }
+        foreach ($base->getSearchExpressions() as $alias => $expression) {
+            if (!str_starts_with($alias, '__manticore_json_') || $expression['visible']) {
+                throw new LogicException('Hybrid common expressions are limited to generated JSON filters.');
+            }
         }
         $query = clone $base;
         foreach ($query->wheres ?? [] as $index => $where) {
             if (strtolower($where['boolean']) !== 'and'
                 || !in_array($where['type'], ['Basic', 'Column', 'In', 'NotIn', 'IntegerInRaw', 'IntegerNotInRaw',
-                    'between', 'Between', 'NotBetween', 'Null', 'NotNull', 'Mva', 'Nested'], true)) {
+                    'between', 'Between', 'NotBetween', 'Null', 'NotNull', 'Mva', 'Nested', 'JsonBoolean'], true)) {
                 throw new LogicException('Hybrid common predicates must be AND attribute conditions, not MATCH/KNN/raw expressions.');
             }
             if ($where['type'] === 'Nested') {

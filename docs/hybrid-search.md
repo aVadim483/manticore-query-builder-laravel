@@ -236,7 +236,8 @@ documents from the other. Branch failures propagate; there is no successful empt
 or implicit search-mode change. See [capability diagnostics](hybrid-and-index-replacement.md).
 
 The common query accepts a simple logical table name and AND attribute predicates, including
-nested AND/MVA. Projection, raw predicates/expressions, MATCH/KNN, facets, custom ordering,
+nested AND/MVA and [JSON filters](laravel-driver.md#json-filters). Generated JSON filter
+expressions are copied to both branches. Projection, raw predicates/expressions, MATCH/KNN, facets, custom ordering,
 limit/offset, joins, grouping, callbacks and native fusion controls are rejected. The source
 builder is not mutated. `__hybrid_text_score` and `__hybrid_distance` are reserved column names;
 application fields are not overwritten with scores.

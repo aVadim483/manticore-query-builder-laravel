@@ -215,8 +215,11 @@ to batch documents, or insert individual rows with `insertGetId()` when IDs must
 do not infer a contiguous ID range from one returned ID.
 
 REPLACE overwrites the entire document by ID and resets omitted attributes to server defaults.
-Use it for full-text changes. Arbitrary atomic `upsert()` is unsupported; Laravel's
-`updateOrInsert()` is a multi-query operation, not atomic REPLACE or upsert.
+Use it for full-text changes. `updateOrInsert()` searches and then UPDATEs/INSERTs;
+`replaceOrInsert()` searches and fully REPLACEs/INSERTs. Emulated `upsert()` searches all
+input keys, preserves non-updated fields, and writes INSERT/REPLACE in one transaction.
+These lookups have no isolation or database-enforced uniqueness for arbitrary attributes.
+See [write-helper semantics and transaction limits](laravel-driver.md#update-or-insert-replace-or-insert-and-upsert).
 
 ## 6. Lazy reads, pagination and transactions
 
@@ -364,7 +367,7 @@ AUTOCOMPLETE still needs Buddy and table infixes; KNN needs its server library a
 For old CALL helpers without a typed replacement, generic `call()` supports scalar arguments and
 flat lists only; more complex structures need explicitly constructed, bound SQL. Old date/JSON
 convenience methods, plugins and schema settings must be checked individually. Joins, unions,
-DISTINCT, locks, arbitrary upsert, some ALTER operations and general Eloquent compatibility are
+DISTINCT, locks, native isolated upsert, some ALTER operations and general Eloquent compatibility are
 not completed by changing the connection name. An installed Scout adapter may still use the old
 classes: migrate/test it separately before removing the old API or changing its version constraints.
 

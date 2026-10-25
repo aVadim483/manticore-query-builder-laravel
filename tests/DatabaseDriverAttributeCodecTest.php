@@ -48,11 +48,11 @@ class DatabaseDriverAttributeCodecTest extends TestCase
         }
     }
 
-    public function testNonEmptyUpsertIsExplicitlyUnsupported(): void
+    public function testEmptyUpsertAndInvalidLookupKeysDoNotConnect(): void
     {
         $db = new ManticoreConnection(fn () => throw new LogicException('Unexpected connection'));
         $this->assertSame(0, $db->table('products')->upsert([], ['id']));
-        $this->expectException(LogicException::class);
-        $db->table('products')->upsert([['id' => 1, 'title' => 'test']], ['id']);
+        $this->expectException(InvalidArgumentException::class);
+        $db->table('products')->upsert([['id' => 1, 'title' => 'test']], []);
     }
 }

@@ -109,6 +109,27 @@ Query Builder `select()` returns the builder and configures columns. Connection
 Rows use object properties. To get arrays, use
 `$rows->map(static fn ($row) => (array)$row)->all()`.
 
+Use `whereFullText()` for text input and an explicit field scope. It returns the builder;
+`get()`, `first()` or `search()` executes the query. Search operators are escaped by default.
+
+```php
+$rows = $db->table('products')->whereFullText('title', 'galaxy phone')->get();
+$rows = $db->table('products')->whereFullText(['title', 'body'], 'galaxy')
+    ->where('stock', '>', 0)->get();
+```
+
+Repeated calls produce one MATCH. Text OR groups use `orWhereFullText()`; OR between text
+and attributes is unsupported. See [full-text examples and options](docs/laravel-driver.md#full-text-conditions).
+
+JSON filters use Laravel's familiar syntax:
+
+```php
+$rows = $db->table('products')->where('details->color', 'red')
+    ->whereJsonContains('details->tags', 'sale')->whereJsonLength('details->tags', '>=', 2)->get();
+```
+
+See [JSON methods and Manticore-specific semantics](docs/laravel-driver.md#json-filters).
+
 `cursor()` returns a LazyCollection from one SELECT. `lazy()` reads offset pages; `lazyById()`
 walks an ID boundary. `cursorPaginate()` supports selected integer/bool/timestamp keys with ID
 as the final tie-breaker. Floats, computed keys, KNN and grouped/faceted cursor pagination are rejected.
@@ -192,13 +213,13 @@ selected database; see [Laravel's reference](https://laravel.com/docs/13.x/queri
 | Operation | Standard Laravel Query Builder | This Manticore driver |
 | --- | --- | --- |
 | Substring matching | `whereLike()` or `where('name', 'like', '%text%')` use SQL LIKE | LIKE in WHERE is unsupported. Use `match()` with full-text index rules for TEXT, or `REGEX()` through a SELECT alias for STRING. Their search semantics differ |
-| Full-text search | `whereFullText()` on supported databases | Use `match()`. `whereFullText()` is not automatically translated into MATCH |
-| JSON predicates | `details->color` syntax and `whereJson*()` helpers on supported databases | Laravel's JSON syntax is not automatically translated. For example: `whereRaw('details.color = ?', ['red'])` |
+| Full-text search | `whereFullText()` with database-specific options | `whereFullText()` / `orWhereFullText()` compile to one MATCH, escape operators by default and accept only the `escape` option. Text/attribute OR is unsupported; `match()` accepts native expressions |
+| JSON predicates | `details->color` syntax and `whereJson*()` helpers on supported databases | Arrow paths and `whereJson*()` are supported. Contains/overlaps test array elements; key checks treat JSON null as absent. See [JSON semantics](docs/laravel-driver.md#json-filters) |
 | Reading JSON | Query Builder returns PDO values without automatically decoding JSON into PHP arrays | By default, the builder reads DESCRIBE and converts JSON to arrays; `cast_attributes => false` disables conversion |
 | `get()` / `cursor()` without `limit()` | No row-count limit is added to the SQL | Manticore defaults to 20 returned rows. Set `limit()` or use `lazy()` / `chunk()` for batched traversal |
 | JOIN, UNION, DISTINCT, WHERE EXISTS, locks | Methods expose SQL constructs supported by the selected database | The current driver rejects these constructs |
 | Updating text with `update()` | Updates the specified text columns | Full-text fields require `replace()`, which replaces the whole document and resets omitted fields |
-| `upsert()` | Insert/update by unique keys under the SQL driver's rules | Arbitrary atomic upsert is unsupported. `replace()` uses document IDs and has different replacement rules |
+| `upsert()` | Native insert/update by unique keys under the SQL driver's rules | Emulated lookup + INSERT/REPLACE; non-updated fields are preserved. Writes share one transaction, but lookups have no isolation and arbitrary lookup attributes have no uniqueness constraint |
 | Writes inside a transaction | INSERT, UPDATE and DELETE can be rolled back on transactional SQL tables | Manticore transactions cover INSERT/REPLACE/DELETE; UPDATE is not rolled back. Driver nesting, savepoints and retries are rejected |
 | `cursorPaginate()` | Builds cursor boundaries from selected ordering columns under Laravel's constraints | Only selected integer/bool/timestamp keys ending in ID are supported; KNN, groups, facets and float/string/JSON/MVA/computed keys are rejected |
 

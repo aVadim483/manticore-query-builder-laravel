@@ -10,6 +10,15 @@ use LogicException;
 
 class ManticoreGrammar extends Grammar
 {
+    public function compileWheres(Builder $query)
+    {
+        if ($query instanceof ManticoreQueryBuilder) {
+            $query = FullTextConditions::normalize($query) ?? $query;
+        }
+
+        return parent::compileWheres($query);
+    }
+
     public function compileSelect(Builder $query)
     {
         if (count($query->havings ?? []) > 1) {
@@ -63,6 +72,19 @@ class ManticoreGrammar extends Grammar
     protected function wrapValue($value)
     {
         return $value === '*' ? $value : '`'.str_replace('`', '``', $value).'`';
+    }
+
+    protected function wrapJsonSelector($value)
+    {
+        return JsonPath::compile($value, $this);
+    }
+
+    protected function whereJsonBoolean(Builder $query, $where)
+    {
+        $column = $this->wrap($where['column']);
+        $value = $this->getValue($where['value']) === 'true' ? '1' : '0';
+
+        return '('.$column.' IS NOT NULL and '.$column.' '.$where['operator'].' '.$value.')';
     }
 
     protected function whereMatch(Builder $query, $where)

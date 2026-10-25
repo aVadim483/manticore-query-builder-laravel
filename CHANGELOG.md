@@ -6,6 +6,19 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+* `updateOrInsert()` and `replaceOrInsert()` with unambiguous lookup and existence callbacks.
+  Emulated `upsert()` preserves non-updated fields through REPLACE and stages its complete
+  INSERT/REPLACE batch in one transaction. It joins caller transactions without savepoints;
+  execution failures abort the whole transaction. Lookups remain non-isolated.
+* Laravel JSON arrow paths and all `whereJson*()` filters, including negative and OR
+  variants, with bound membership values and hidden expression aliases. Document native
+  Manticore null/key semantics, array candidate restrictions and write limitations.
+* Laravel-compatible `whereFullText()` / `orWhereFullText()` with field scoping, literal
+  escaping by default, nested text groups and one combined MATCH expression. Unsupported
+  options, mixed text/attribute OR conditions and mixing with `match()` fail explicitly.
+
 ### Fixed
 
 * Hybrid option validation lists all unknown keys in InvalidArgumentException messages.

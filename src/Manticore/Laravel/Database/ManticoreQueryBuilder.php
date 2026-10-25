@@ -17,7 +17,7 @@ class ManticoreQueryBuilder extends Builder
     /** @var array<string, int|float|string|array|Ranker> */
     public array $manticoreOptions = [];
 
-    /** @var array<string, array{sql: string, visible: bool}> */
+    /** @var array<string, array{sql: string, visible: bool, bindings?: array}> */
     protected array $searchExpressions = [];
     protected array $readCasts = [];
     protected array $searchFacets = [];
@@ -220,6 +220,10 @@ class ManticoreQueryBuilder extends Builder
 
     public function update(array $values)
     {
+        $this->applyBeforeQueryCallbacks();
+        if ($normalized = FullTextConditions::normalize($this)) {
+            return $normalized->update($values);
+        }
         $this->grammar->compileUpdate($this, $values);
         $values = $this->encodeWriteRows($values);
         $schema = $this->plainTable() === null || $this->connection->pretending() || $this->connection->getConfig('cast_attributes') === false
@@ -238,7 +242,17 @@ class ManticoreQueryBuilder extends Builder
         if (!$values) {
             return 0;
         }
-        throw new LogicException('Manticore has no native atomic upsert for arbitrary unique keys. Use replace() with document IDs.');
+        return (new DocumentWrites($this))->upsert($values, $uniqueBy, $update);
+    }
+
+    public function updateOrInsert(array $attributes, array|callable $values = [])
+    {
+        return (new DocumentWrites($this))->updateOrInsert($attributes, $values, false);
+    }
+
+    public function replaceOrInsert(array $attributes, array|callable $values = []): bool
+    {
+        return (new DocumentWrites($this))->updateOrInsert($attributes, $values, true);
     }
 
     public function replace(array $values): bool
@@ -648,6 +662,147 @@ class ManticoreQueryBuilder extends Builder
         }
 
         return parent::applyAfterQueryCallbacks($result);
+    }
+
+    public function delete($id = null)
+    {
+        if ($id !== null) {
+            $this->where($this->from.'.id', '=', $id);
+        }
+        $this->applyBeforeQueryCallbacks();
+        if ($normalized = FullTextConditions::normalize($this)) {
+            return $normalized->delete();
+        }
+
+        return parent::delete();
+    }
+
+    public function getBindings()
+    {
+        $normalized = FullTextConditions::normalize($this);
+
+        if ($normalized) {
+            return $normalized->getBindings();
+        }
+        $bindings = $this->bindings;
+        foreach ($this->getSearchExpressions() as $expression) {
+            array_push($bindings['select'], ...($expression['bindings'] ?? []));
+        }
+
+        return Arr::flatten($bindings);
+    }
+
+    public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
+    {
+        return $this->whereJsonMembership($column, $value, $boolean, $not, false);
+    }
+
+    public function whereJsonOverlaps($column, $value, $boolean = 'and', $not = false)
+    {
+        return $this->whereJsonMembership($column, $value, $boolean, $not, true);
+    }
+
+    private function whereJsonMembership($column, $value, $boolean, $not, bool $overlap): static
+    {
+        $path = JsonPath::compile($column, $this->grammar);
+        $this->assertJsonBoolean($boolean, $not);
+        $values = is_array($value) ? $value : [$value];
+        if (!array_is_list($values) || (!$values && !$overlap)) {
+            throw new InvalidArgumentException('JSON contains requires a scalar or a non-empty list; JSON objects and nested candidates are not supported.');
+        }
+        foreach ($values as $item) {
+            if ((!is_string($item) && !is_bool($item) && !is_int($item) && !is_float($item))
+                || (is_float($item) && !is_finite($item))) {
+                throw new InvalidArgumentException('JSON contains/overlaps candidates must be strings, booleans or finite numbers; null, objects and nested arrays are not supported.');
+            }
+        }
+        $terms = array_fill(0, count($values), 'ANY(__json_value = ? FOR __json_value IN '.$path.')');
+        $sql = $terms ? '('.implode($overlap ? ' OR ' : ' AND ', $terms).')' : '0';
+        $alias = $this->jsonExpressionAlias($sql, $values);
+
+        return $this->where($alias, '=', $not ? 0 : 1, $boolean);
+    }
+
+    public function whereJsonContainsKey($column, $boolean = 'and', $not = false)
+    {
+        JsonPath::compile($column, $this->grammar);
+        $this->assertJsonBoolean($boolean, $not);
+
+        return $this->whereNull($column, $boolean, !$not);
+    }
+
+    public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
+    {
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+        $path = JsonPath::compile($column, $this->grammar);
+        $this->assertJsonBoolean($boolean, false);
+        if (!in_array($operator, ['=', '!=', '<>', '<', '<=', '>', '>='], true)
+            || !is_int($value) || $value < 0) {
+            throw new InvalidArgumentException('whereJsonLength() requires a comparison operator and a non-negative integer length.');
+        }
+        $alias = $this->jsonExpressionAlias('LENGTH('.$path.')');
+
+        return $this->whereNested(function ($query) use ($column, $alias, $operator, $value) {
+            $query->whereNotNull($column)->where($alias, $operator, $value);
+        }, $boolean);
+    }
+
+    private function jsonExpressionAlias(string $sql, array $bindings = []): string
+    {
+        $alias = '__manticore_json_'.substr(hash('sha256', $sql.serialize($bindings)), 0, 16);
+        $this->searchExpressions[$alias] = ['sql' => $sql, 'visible' => false, 'bindings' => $bindings];
+
+        return $alias;
+    }
+
+    private function assertJsonBoolean(mixed $boolean, mixed $not): void
+    {
+        if (!is_string($boolean) || !in_array(strtolower($boolean), ['and', 'or'], true) || !is_bool($not)) {
+            throw new InvalidArgumentException('JSON filters require an AND/OR boolean and a boolean negation flag.');
+        }
+    }
+
+    /** @return $this */
+    public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
+    {
+        if (!is_string($columns) && !is_array($columns)) {
+            throw new InvalidArgumentException('whereFullText() requires a field name or a list of field names.');
+        }
+        $columns = (array) $columns;
+        if (!$columns || !array_is_list($columns)) {
+            throw new InvalidArgumentException('whereFullText() requires a field name or a non-empty list of field names.');
+        }
+        foreach ($columns as $column) {
+            if (!is_string($column) || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $column)) {
+                throw new InvalidArgumentException('Invalid whereFullText() field name.');
+            }
+        }
+        if (!is_string($value) || trim($value) === '') {
+            throw new InvalidArgumentException('whereFullText() requires non-empty search text.');
+        }
+        $unknown = array_diff(array_keys($options), ['escape']);
+        if ($unknown) {
+            throw new InvalidArgumentException('Unsupported whereFullText() option(s): '.implode(', ', $unknown).'.');
+        }
+        if (array_key_exists('escape', $options) && !is_bool($options['escape'])) {
+            throw new InvalidArgumentException('whereFullText() option escape must be boolean.');
+        }
+        if (!is_string($boolean) || !in_array(strtolower($boolean), ['and', 'or'], true)) {
+            throw new InvalidArgumentException('whereFullText() boolean must be and or or.');
+        }
+        $fields = count($columns) === 1 ? $columns[0] : '('.implode(',', $columns).')';
+        $text = ($options['escape'] ?? true) ? self::escapeMatch($value) : $value;
+        // The combined MATCH binding is generated at compilation, so nested builders
+        // contribute only their attribute bindings to Laravel's raw where bindings.
+        $this->wheres[] = [
+            'type' => 'Fulltext', 'expression' => '@'.$fields.' ('.$text.')',
+            'boolean' => strtolower($boolean),
+        ];
+
+        return $this;
     }
 
     public function match(string $text): static

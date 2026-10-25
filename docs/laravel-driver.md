@@ -55,7 +55,8 @@ $rows = $connection->select('SELECT id FROM products WHERE price > ?', [100]); /
 Laravel bindings, for example `whereRaw('price > ?', [100])` and
 `selectRaw('price * ? as adjusted', [2])`. `toSql()`, `getBindings()` and `toRawSql()` are available.
 `match()` binds a Manticore full-text expression; it does not escape search operators as literal text.
-For literal visitor text, pass it through `ManticoreQueryBuilder::escapeMatch()` first.
+For literal visitor text, use `whereFullText()` with field names, or pass it through
+`ManticoreQueryBuilder::escapeMatch()` before calling `match()`.
 
 The connector requires PDO emulated prepares. Native prepared UPDATE statements on the tested
 Manticore 28.6.6 server round fractional values, so disabling emulation is rejected. Finite PHP
@@ -87,6 +88,120 @@ establish that the server failed to execute a write.
 `lazy()`, `lazyById()` and `cursor()` return `LazyCollection`. `cursor()` performs one SELECT,
 while `lazy()` fetches pages. PDO buffering is controlled by the connection's PDO options;
 a lazy collection alone does not guarantee an unbuffered server result.
+
+## JSON filters
+
+Use Laravel arrow paths with ordinary predicates. Nested keys and zero-based indexes are
+supported: `details->dimensions->width`, `details->tags[0]` and `details->tags->0`.
+Quote a literal key containing a dot as `details->"odd.key"`. Paths are validated and keys
+are SQL-escaped; values remain bound parameters. Wildcards and negative indexes are rejected.
+
+```php
+$rows = $connection->table('products')->where('details->color', 'red')
+    ->where('details->dimensions->width', '>', 100)
+    ->whereIn('details->tags[0]', ['sale', 'new'])->get();
+```
+
+The following methods return the builder. Each also has an `orWhereJson...` variant.
+
+| Method | Meaning in this driver |
+| --- | --- |
+| `whereJsonContains($column, $value)` | The JSON array contains every candidate value |
+| `whereJsonDoesntContain($column, $value)` | Negation of contains: at least one candidate is absent |
+| `whereJsonOverlaps($column, $value)` | The JSON array contains at least one candidate value |
+| `whereJsonDoesntOverlap($column, $value)` | None of the candidates occur in the JSON array |
+| `whereJsonContainsKey($column)` | The path resolves to a non-null value |
+| `whereJsonDoesntContainKey($column)` | The path is missing or its value is JSON null |
+| `whereJsonLength($column, $operator, $value)` | Compare native LENGTH for a non-null path; two arguments mean equality |
+
+```php
+$rows = $connection->table('products')->whereJsonContains('details->tags', 'sale')->get();
+$rows = $connection->table('products')->whereJsonContains('details->tags', ['sale', 'new'])->get();
+$rows = $connection->table('products')->where(function ($query) {
+    $query->whereJsonOverlaps('details->tags', ['sale', 'new'])
+        ->orWhereJsonLength('details->tags', 0);
+})->whereJsonContainsKey('details->dimensions->width')->get();
+```
+
+Contains/overlaps accept a scalar or a list of strings, booleans and finite numbers.
+Contains with an empty candidate list, null candidates, objects and nested candidate arrays
+raise InvalidArgumentException. An empty overlaps list never matches; its negation always
+matches. Membership targets JSON arrays, not object containment or recursive nested search.
+Comparisons follow Manticore's native type coercion, including numeric/boolean conversions;
+use homogeneous arrays when strict type distinctions matter. A missing/non-array target has
+no matching elements and therefore matches the negative membership predicates.
+
+**Key/null semantics differ from Laravel's MySQL/PostgreSQL drivers.** Manticore treats
+missing paths and JSON null alike. Consequently, `whereJsonContainsKey()` excludes
+`{"key": null}`, while zero, false, empty strings, empty arrays and empty objects count as
+present. `whereNull('details->key')` matches both missing paths and JSON null. Store a separate
+presence attribute if the application needs to distinguish those two states.
+
+Length comparisons require a non-negative integer and one of `=`, `!=`, `<>`, `<`, `<=`, `>`,
+`>=`. Missing paths and JSON null are excluded, including from length-zero queries. Native
+LENGTH counts array elements and object members; scalar results follow Manticore (numbers
+have length 1, JSON strings/booleans length 0), rather than a portable JSON-length contract.
+
+Contains/overlaps and length predicates use generated SELECT expressions with parameter
+bindings. Their aliases are hidden from returned rows, including search and cursor results.
+They work with counts, pagination, full-text filters, KNN and hybrid search; KNN/hybrid common
+conditions still require AND. UPDATE/DELETE reject these computed filters with LogicException.
+Ordinary JSON-path predicates and key checks can filter writes. This does not add support
+for Laravel's JSON-path assignment syntax in update values.
+See [Manticore array functions](https://manual.manticoresearch.com/Functions/Arrays_and_conditions_functions).
+
+## Full-text conditions
+
+`whereFullText($columns, $value, array $options = [], $boolean = 'and')` has Laravel's
+signature and returns the same builder. It scopes text to one TEXT field or a non-empty
+list of TEXT fields. Names must be simple identifiers; SQL expressions and `*` are rejected.
+Fields must exist in the full-text index. All examples below require TEXT `title` and `body`.
+
+Start with a single field. Words follow Manticore's tokenizer, morphology and index settings;
+this is word matching, not SQL LIKE or substring matching.
+
+```php
+$rows = $connection->table('products')->whereFullText('title', 'galaxy phone')->get();
+$first = $connection->table('products')->whereFullText(['title', 'body'], 'galaxy')->first();
+```
+
+Repeated calls use AND and compile to one parameterized MATCH. Attribute filters can be
+added before or after them. `search()` returns the usual SearchResult, including metadata.
+
+```php
+$result = $connection->table('products')->where('stock', '>', 0)
+    ->whereFullText('title', 'galaxy')->whereFullText('body', 'phone')
+    ->withScore()->orderByDesc('_score')->limit(20)->search();
+```
+
+Use `orWhereFullText()` inside a group for alternative text conditions. AND binds more tightly
+than OR, as in Laravel; explicit nested groups preserve their meaning in the MATCH expression.
+
+```php
+$rows = $connection->table('products')->where('stock', '>', 0)
+    ->where(function ($query) {
+        $query->whereFullText('title', 'phone')->orWhereFullText('body', 'tablet');
+    })->get();
+```
+
+The only option is `escape` (boolean, default `true`). Search operators in visitor text are
+escaped by default; this does not disable tokenization. With `escape => false`, the value is
+a trusted Manticore expression inside the selected field scope. Values remain SQL-bound in
+both modes. This field scope is a search convenience, not an access-control boundary.
+
+```php
+$rows = $connection->table('products')
+    ->whereFullText('title', 'phone | tablet', ['escape' => false])->get();
+```
+
+Unknown options (including Laravel's `mode`, `language` and `expanded`) raise
+InvalidArgumentException naming the keys. Empty text and invalid fields are also rejected.
+Manticore cannot OR MATCH with attribute filters: `whereFullText(...)->orWhere('stock', 1)`
+raises LogicException, as do mixed nested OR groups and negated text groups. A query cannot
+mix `match()` with `whereFullText()`; use `match()` for a complete native expression instead.
+Do not add either method before `hybridSearch()` / `hybridGet()` / `hybridFirst()`; these
+terminal methods take their own text argument. KNN combinations require AND conditions.
+Full-text conditions also work with pagination, cursor reads, attribute UPDATE and DELETE.
 
 ## Search metadata
 
@@ -246,8 +361,7 @@ Server result limits still apply to a SELECT without an explicit `limit()`.
 `insert()` accepts one document or a batch. `insertGetId()` and `replaceGetId()` capture the
 server ID before query listeners can issue another write. `replace()` returns a boolean and
 replaces whole documents by ID: omitted fields reset to server defaults, including empty MVA,
-JSON null and numeric zero. Use REPLACE to change full-text fields. Non-empty `upsert()` calls
-throw `LogicException`: arbitrary unique keys and partial atomic upserts are not implemented.
+JSON null and numeric zero. Use REPLACE to change full-text fields.
 
 ```php
 $connection->table('products')->replace([
@@ -257,6 +371,78 @@ $connection->transaction(function () use ($connection) {
     $connection->table('products')->replace(['id' => 42, 'title' => 'Galaxy', 'price' => 189.5]);
 });
 ```
+
+### Update or insert, replace or insert, and upsert
+
+`updateOrInsert($attributes, $values = [])` returns bool. It finds at most one document
+matching the lookup attributes and existing builder WHERE conditions. If absent, it inserts
+the merged attributes and values; if present, it updates only the supplied attributes by ID.
+Other fields remain unchanged. An existing document with no update values returns true.
+The update branch retains native UPDATE restrictions; use `replaceOrInsert()` for text changes.
+
+```php
+$connection->table('products')->updateOrInsert(['id' => 42], ['price' => 199.5]);
+$connection->table('products')->updateOrInsert(['sku' => 'phone-42'], fn ($exists) => $exists
+    ? ['price' => 189.5]
+    : ['id' => 42, 'title' => 'Galaxy', 'price' => 199.5]);
+```
+
+`replaceOrInsert($attributes, $values = [])` also returns bool and accepts the same callback
+receiving `$exists`. It inserts when absent and replaces the whole document when present,
+retaining the matched ID. Its replacement payload is the merged attributes and values, not
+a merge with the old document: omitted fields reset, just as with `replace()`.
+
+```php
+$connection->table('products')->replaceOrInsert(['id' => 42], [
+    'title' => 'Galaxy phone', 'price' => 189.5, 'stock' => 10,
+    // Include every other field that must survive the replacement.
+]);
+```
+
+`upsert($rows, $uniqueBy, $update = null)` returns the number of successfully processed input
+rows (one per row, rather than database-specific affected-row counts). Pass a single row or
+a list of rows with identical column sets. `uniqueBy` is a column name or a non-empty list of
+lookup columns; each must be present in every row. This is an emulated multi-query operation.
+
+```php
+$count = $connection->table('products')->upsert([
+    ['id' => 42, 'title' => 'Galaxy phone', 'price' => 189.5],
+    ['id' => 43, 'title' => 'Galaxy tablet', 'price' => 249.5],
+], ['id'], ['title', 'price']);
+```
+
+New documents are inserted using all supplied values. For an existing document, the driver
+reads its stored fields, overlays only the columns in `$update`, and REPLACEs the complete
+document under the existing ID. This supports full-text, JSON, MVA, vector and columnar
+changes while preserving other fields. JSON objects/arrays and 64-bit integers retain their
+representation, even with read casts disabled. `null` for `$update` updates all supplied
+columns; an empty list performs INSERT only and duplicate IDs fail instead of replacing.
+An empty rows array returns 0. Update columns must be a list of names present in every row;
+SQL expression values and associative update maps are rejected.
+
+All upsert lookups and complete replacement payloads are prepared before the first write.
+INSERT/REPLACE statements run in one transaction, with rollback on errors before COMMIT.
+If a caller transaction is active, upsert joins it and leaves a successful commit to the caller.
+An execution error aborts that entire transaction, including earlier pending caller writes;
+there are no savepoints. COMMIT failures retain the existing uncertain-outcome behavior and
+are never retried. Manticore cannot read its own pending writes: avoid splitting dependent
+upserts across calls inside an outer transaction; submit them in one batch.
+
+Transactions provide rollback of these writes, **not isolated lookup/update semantics**.
+Concurrent inserts can conflict and concurrent replacements can lose intervening changes.
+There are no database-enforced unique constraints on arbitrary lookup attributes; applications
+must enforce their uniqueness. Prefer `id`. Duplicate lookup tuples in a batch, multiple rows
+resolving to the same ID, or a lookup matching multiple documents raise exceptions. Unstored
+TEXT fields cannot be recovered: existing documents require them in both the input and update
+column lists, otherwise upsert fails rather than silently clearing them.
+
+Lookup attributes must be non-null scalar physical columns; JSON paths, TEXT, JSON, MVA and
+vector lookup keys are unsupported. IDs accept integer strings without float conversion;
+0 cannot be a lookup ID because it requests auto-generation. Existing IDs cannot be changed.
+All three helpers clone the source builder, read through the write connection and reject
+projections, ordering, windows, grouping, facets, KNN, search options and after-query callbacks.
+`updateOrInsert()` / `replaceOrInsert()` can use existing WHERE filters for lookup;
+`upsert()` rejects WHERE conditions and takes lookup keys exclusively from `uniqueBy`.
 
 Transactions support one level and Laravel's after-commit callbacks. Nested transactions,
 DDL inside transactions and retry counts other than one are rejected. Failed BEGIN, COMMIT
@@ -434,7 +620,8 @@ servers are incompatible. See [server compatibility](testing.md#server-compatibi
   WHERE EXISTS subqueries and aggregates with HAVING are also rejected.
 - UPDATE and DELETE reject ordering, limits, offsets, joins, search options and computed search expressions, rather than
   silently discarding them. Updating full-text fields requires separate Manticore handling.
-- Native atomic `upsert()` remains unsupported. Advanced facet controls are
+- Native isolated/atomic conflict resolution for `upsert()` remains unsupported; the emulated
+  implementation wraps its writes in a transaction. Advanced facet controls are
   not yet exposed by dedicated helpers.
 - Read/write splitting and Eloquent compatibility have not been established.
 
