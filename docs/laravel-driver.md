@@ -312,8 +312,8 @@ ALTER leaves earlier statements applied, so `down()` and recovery must account f
 
 ## Attribute conversion and schema cache
 
-For independent hybrid fusion, capability evidence and maintenance index replacement, see
-[the additional API reference](hybrid-and-index-replacement.md). These APIs were added after alpha.1.
+For independent hybrid fusion, see the [progressive hybrid search guide](hybrid-search.md).
+[Capability evidence and maintenance index replacement](hybrid-and-index-replacement.md) are documented separately.
 
 The Query Builder loads DESCRIBE once per table and connection before its first read or write.
 JSON arrays/objects are serialized on writes and decoded to associative arrays on reads;

@@ -68,7 +68,7 @@ final class HybridSearch
         foreach ($query->wheres ?? [] as $index => $where) {
             if (strtolower($where['boolean']) !== 'and'
                 || !in_array($where['type'], ['Basic', 'Column', 'In', 'NotIn', 'IntegerInRaw', 'IntegerNotInRaw',
-                    'Between', 'NotBetween', 'Null', 'NotNull', 'Mva', 'Nested'], true)) {
+                    'between', 'Between', 'NotBetween', 'Null', 'NotNull', 'Mva', 'Nested'], true)) {
                 throw new LogicException('Hybrid common predicates must be AND attribute conditions, not MATCH/KNN/raw expressions.');
             }
             if ($where['type'] === 'Nested') {

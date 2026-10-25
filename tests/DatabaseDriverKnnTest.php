@@ -38,6 +38,14 @@ class DatabaseDriverKnnTest extends DatabaseTestCase
         }
     }
 
+    public function testKnnOversamplingAlwaysUsesAFloatToken(): void
+    {
+        foreach ([[2, '2.0'], [2.0, '2.0'], [2.5, '2.5']] as [$value, $sqlValue]) {
+            $sql = $this->knnQuery()->knn('embedding', [1, 0, 0], 10, ['oversampling' => $value])->toSql();
+            $this->assertStringContainsString('{oversampling='.$sqlValue.'}', $sql);
+        }
+    }
+
     public function testNestedOrAndDuplicateKnnAreRejected(): void
     {
         foreach ([fn () => $this->knnQuery()->knn('x', [1])->knn('x', [2]),

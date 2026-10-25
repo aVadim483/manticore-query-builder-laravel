@@ -8,8 +8,8 @@
 A native Laravel Database driver for ManticoreSearch. Use Laravel's database manager, Query Builder,
 collections, pagination, query events and Schema Builder over PDO's MySQL protocol.
 
-Version `4.0.0-alpha.2` is an early-testing prerelease; it is not a stable release.
-See the [alpha release notes](docs/releases/4.0.0-alpha.2.md) for scope and unverified integrations.
+Version `4.0.0-alpha.3` is an early-testing prerelease; it is not a stable release.
+See the [alpha release notes](docs/releases/4.0.0-alpha.3.md) for scope and unverified integrations.
 The 3.x wrapper API and its dependency on `avadim/manticore-query-builder-php` have been removed.
 Existing applications should follow the [3.x migration guide](docs/upgrading-3.x-to-4.x.md).
 
@@ -41,7 +41,7 @@ Support for older servers, Lumen and general Eloquent compatibility is not estab
 To install the published alpha:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.2
+composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.3
 ```
 
 To test subsequent development changes:
@@ -177,10 +177,10 @@ DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.
 
 ## Differences from Laravel Query Builder
 
-Alpha.2 also provides [independent weighted RRF search, explicit capability probes and
-maintenance-only RT replacement](docs/hybrid-and-index-replacement.md), without requiring Scout.
+See the [hybrid search guide](docs/hybrid-search.md) for examples from a minimal call to advanced
+options, and [capability probes / RT replacement](docs/hybrid-and-index-replacement.md). Scout is not required.
 `knn()->match()` keeps its intersection semantics; replacement does not promise zero downtime.
-On `dev-4.x` after alpha.2, hybrid search executes through `hybridSearch()`, `hybridGet()`
+Since alpha.3, hybrid search executes through `hybridSearch()`, `hybridGet()`
 or `hybridFirst()`, returning `HybridResult`, `Collection<stdClass>` or `stdClass|null`
 respectively; the former `hybrid(...)->search()` is removed.
 

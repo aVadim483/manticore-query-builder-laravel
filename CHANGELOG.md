@@ -6,6 +6,21 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.0-alpha.3] - 2026-10-25
+
+### Added
+
+* Dedicated English and Russian hybrid search guides with examples progressing from a minimal
+  call through first/document results, shared filters, branch weights, metadata, window pagination,
+  advanced text/KNN options and extended MATCH syntax. Guide examples run against live servers in CI.
+
+### Fixed
+
+* Hybrid common-query validation accepts Laravel's lowercase `between` predicate, including
+  nested attribute ranges used by the advanced guide example.
+* Serialize KNN oversampling as a SQL float token (for example `2.0`), including whole-number
+  values accepted by the PHP API, so Manticore can parse advanced KNN options correctly.
+
 ### Changed
 
 * Replace the separate `hybrid()` builder method with terminal `hybridSearch()` (HybridResult),

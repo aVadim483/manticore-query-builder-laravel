@@ -8,8 +8,8 @@
 Нативный драйвер Laravel Database для ManticoreSearch. Используйте менеджер соединений Laravel,
 Query Builder, коллекции, пагинацию, события запросов и Schema Builder через MySQL-протокол PDO.
 
-Версия `4.0.0-alpha.2` предназначена для раннего тестирования; это не стабильный релиз.
-Возможности и непроверенные интеграции перечислены в [заметках к alpha](docs/ru/releases/4.0.0-alpha.2.md).
+Версия `4.0.0-alpha.3` предназначена для раннего тестирования; это не стабильный релиз.
+Возможности и непроверенные интеграции перечислены в [заметках к alpha](docs/ru/releases/4.0.0-alpha.3.md).
 Старый API обёртки 3.x и зависимость от `avadim/manticore-query-builder-php` удалены.
 Для существующих приложений подготовлено [руководство перехода с 3.x](docs/ru/upgrading-3.x-to-4.x.md).
 
@@ -41,7 +41,7 @@ Query Builder, коллекции, пагинацию, события запро
 Для установки опубликованной alpha:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.2
+composer require avadim/manticore-query-builder-laravel:4.0.0-alpha.3
 ```
 
 Для проверки последующих изменений в разработке:
@@ -179,10 +179,11 @@ DDL не транзакционен. См. [пример миграции](docs/
 
 ## Отличия от Laravel Query Builder
 
-Alpha.2 добавляет [независимый поиск weighted RRF, явные проверки возможностей и
-замену RT-индекса в режиме обслуживания](docs/ru/hybrid-and-index-replacement.md) без Scout.
+В [руководстве по гибридному поиску](docs/ru/hybrid-search.md) примеры идут от минимального вызова
+к расширенным настройкам. [Проверки возможностей и замена RT-индекса](docs/ru/hybrid-and-index-replacement.md)
+описаны отдельно. Scout не требуется.
 `knn()->match()` сохраняет пересечение; замена индекса не обещает zero downtime.
-В `dev-4.x` после alpha.2 поиск выполняют `hybridSearch()`, `hybridGet()` и `hybridFirst()`;
+Начиная с alpha.3 поиск выполняют `hybridSearch()`, `hybridGet()` и `hybridFirst()`;
 они возвращают соответственно `HybridResult`, `Collection<stdClass>` и `stdClass|null`.
 Прежний вызов `hybrid(...)->search()` удалён.
 

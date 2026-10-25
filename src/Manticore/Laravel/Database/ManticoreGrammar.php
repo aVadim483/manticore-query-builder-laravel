@@ -128,7 +128,9 @@ class ManticoreGrammar extends Grammar
         $vector = implode(', ', array_map(fn ($value) => json_encode($value, JSON_THROW_ON_ERROR), $where['vector']));
         $options = [];
         foreach ($where['options'] as $name => $value) {
-            $options[] = $name.'='.json_encode($value, JSON_THROW_ON_ERROR);
+            // Manticore's KNN parser requires oversampling to be a float token, even for 2.0.
+            $options[] = $name.'='.json_encode($name === 'oversampling' ? (float)$value : $value,
+                JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
         }
         return 'KNN('.$this->wrap($where['column']).', '.$where['k'].', ('.$vector.')'
             .($options ? ', {'.implode(', ', $options).'}' : '').')';

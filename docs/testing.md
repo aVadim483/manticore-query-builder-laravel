@@ -117,3 +117,13 @@ checks on every supported runtime and minimum/latest server before the alpha.2 p
 The final local code passed on 2026-10-22 with PHP 8.4.19: minimum on Laravel 11/12/13,
 latest 29.9.0 on Laravel 13, each with 160 tests / 870 assertions and no skips. Production
 consumers passed on both servers. Other PHP versions are verified by the release CI matrix.
+
+## Executable hybrid guide examples (alpha.3)
+
+`HybridGuideIntegrationTest` extracts the labelled PHP examples directly from the
+[English](hybrid-search.md) and [Russian](ru/hybrid-search.md) guides. It creates an isolated,
+randomly prefixed tutorial table, loads text-only/shared/semantic candidates, flushes to a
+disk HNSW chunk and runs the examples in order. Assertions check result types, semantic-only
+documents, shared filters, metadata and pagination. The table is dropped afterward.
+These examples run in the existing minimum/latest CI matrix, including the advanced KNN
+options and nested range predicates, rather than being syntax-checked only.
