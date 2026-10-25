@@ -51,7 +51,7 @@ class DatabaseDriverHybridTest extends DatabaseTestCase
             fn ($q) => $q->limit(1), fn ($q) => $q->select('id'), fn ($q) => $q->afterQuery(fn ($r) => $r),
             fn ($q) => $q->where(fn ($nested) => $nested->where('stock', 1)->orWhere('stock', 2))] as $configure) {
             try {
-                $configure($db->table('products'))->hybrid('phone', 'embedding', [1, 0, 0]);
+                $configure($db->table('products'))->hybridSearch('phone', 'embedding', [1, 0, 0]);
                 $this->fail('Unsupported common query accepted.');
             } catch (\LogicException $error) {
                 $this->assertStringNotContainsString('Unexpected network', $error->getMessage());
@@ -60,11 +60,20 @@ class DatabaseDriverHybridTest extends DatabaseTestCase
         foreach ([['text_weight' => -1], ['vector_weight' => NAN], ['rank_constant' => -1],
             ['text_candidates' => 10001], ['text_weight' => 0, 'vector_weight' => 0], ['typo' => 1]] as $options) {
             try {
-                $db->table('products')->hybrid('phone', 'embedding', [1, 0, 0], $options);
+                $db->table('products')->hybridSearch('phone', 'embedding', [1, 0, 0], $options);
                 $this->fail('Invalid fusion options accepted.');
             } catch (\InvalidArgumentException $error) {
                 $this->assertNotSame('', $error->getMessage());
             }
         }
+    }
+
+    public function testRemovedHybridMethodFailsInsteadOfStartingAnImplicitMode(): void
+    {
+        $db = new ManticoreConnection(fn () => throw new \LogicException('Unexpected network'));
+        $query = $db->table('products');
+        $this->assertFalse(method_exists($query, 'hybrid'));
+        $this->expectException(\BadMethodCallException::class);
+        $query->hybrid('phone', 'embedding', [1, 0, 0]);
     }
 }

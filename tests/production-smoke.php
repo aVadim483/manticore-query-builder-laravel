@@ -84,11 +84,19 @@ if (in_array('--live', $argv, true)) {
             throw new RuntimeException('Production ALTER or RENAME failed.');
         }
         $schema->rename($table.'_renamed', $table);
-        $hybrid = $db->table($table)->hybrid('galaxy', 'embedding', [1, 0, 0])->search();
+        $hybrid = $db->table($table)->hybridSearch('galaxy', 'embedding', [1, 0, 0]);
         if ($hybrid->windowTotal() !== 1 || $hybrid->totalFound() !== null
             || $hybrid->hits()[0]->textRank !== 1 || $hybrid->hits()[0]->vectorRank !== 1
             || !$db->probeCapability('knn', $table, ['vector' => [1, 0, 0]])->supported) {
             throw new RuntimeException('Production hybrid or capability probe failed.');
+        }
+        $hybridRows = $db->table($table)->hybridGet('galaxy', 'embedding', [1, 0, 0]);
+        $hybridFirst = $db->table($table)->hybridFirst('galaxy', 'embedding', [1, 0, 0]);
+        if (!$hybridRows instanceof \Illuminate\Support\Collection || $hybridRows->count() !== 1
+            || !$hybridRows->first() instanceof \stdClass || !$hybridFirst instanceof \stdClass
+            || (array)$hybridRows->first() !== (array)$hybridFirst
+            || $db->table($table)->where('id', 0)->hybridFirst('galaxy', 'embedding', [1, 0, 0]) !== null) {
+            throw new RuntimeException('Production hybrid document return types failed.');
         }
         $schema->createLike($table.'_staged', $table);
         $db->table($table.'_staged')->insert(['id' => 42, 'title' => 'staged', 'embedding' => [1, 0, 0]]);

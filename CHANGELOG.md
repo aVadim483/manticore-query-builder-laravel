@@ -6,6 +6,14 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+* Replace the separate `hybrid()` builder method with terminal `hybridSearch()` (HybridResult),
+  `hybridGet()` (Collection of document objects) and `hybridFirst()` (document object or null).
+  First ranks the same candidate windows before selecting the best document. Scores and branch
+  metadata remain available through hybridSearch().
+  Migrate alpha.2 calls from `hybrid(...)->search()` to `hybridSearch(...)`.
+
 ## [4.0.0-alpha.2] - 2026-10-22
 
 ### Added

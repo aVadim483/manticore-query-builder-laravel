@@ -4,6 +4,8 @@
 
 Добавлено после alpha.1 для **4.0.0-alpha.2**. Scout устанавливать не требуется.
 См. [контракты](../parent-search-contracts.md) и [расширенный Schema Builder](schema-alter.md).
+Семейство выполняющих методов `hybridSearch()`/`hybridGet()`/`hybridFirst()` ниже — ещё не
+выпущенное изменение `dev-4.x` после alpha.2; в alpha.2 используется `hybrid(...)->search()`.
 
 ## Независимые текстовая и векторная ветви
 
@@ -12,11 +14,11 @@ use Illuminate\Support\Facades\DB;
 
 $db = DB::connection('manticore');
 $result = $db->table('products')->where('stock', '>', 0)
-    ->hybrid('phone', 'embedding', [1, 0, 0], [
+    ->hybridSearch('phone', 'embedding', [1, 0, 0], [
         'text_weight' => 1, 'vector_weight' => 2, 'rank_constant' => 60,
         'text_candidates' => 100, 'vector_candidates' => 100,
         'knn_options' => ['ef' => 100],
-    ])->search();
+    ]);
 
 foreach ($result->hits() as $hit) {
     $id = $hit->id;
@@ -28,6 +30,21 @@ $documents = $result->rows();
 $page = $result->paginateWindow(perPage: 20, page: 2);
 $totals = $result->totals();
 ```
+
+Все три метода сразу выполняют поиск. Условия задаются на
+обычном билдере до их вызова. Они не возвращают билдер и не требуют дополнительного `search()`.
+
+| Метод | Возвращаемое значение |
+| --- | --- |
+| `hybridSearch($text, $column, $vector, $options)` | `HybridResult`: полное окно, оценки и метаданные |
+| `hybridGet($text, $column, $vector, $options)` | `Collection<stdClass>`: документы в порядке итогового ранжирования |
+| `hybridFirst($text, $column, $vector, $options)` | `stdClass|null`: лучший документ либо null при пустой выдаче |
+
+`hybridGet()` возвращает те же документы, что `hybridSearch(...)->rows()`; при отсутствии
+совпадений — пустую коллекцию. `hybridFirst()` ранжирует те же окна кандидатов и только затем
+выбирает первый документ, не уменьшая лимиты ветвей до 1. Get/First используют типы
+Collection/документ обычных Laravel-методов, без оценок, рангов и метаданных.
+Для этих сведений и пагинации окна используйте `hybridSearch()`.
 
 Обе ветви используют один write PDO и одинаковые атрибутные фильтры. Текстовая сортируется
 по WEIGHT убывающе и ID возрастающе, векторная — по расстоянию и ID возрастающе.
@@ -147,8 +164,17 @@ CREATE LIKE сохраняет серверную схему, объявлени
 
 ## Переход с alpha.1 и контракт для Scout
 
-Контракты существующих методов сохранены. Новое объединение возвращает `HybridResult`, а не
+Контракты обычных `search()`, `get()` и `first()` сохранены. Объединение возвращает `HybridResult`, а не
 `SearchResult`; потребитель должен явно преобразовывать hits/documents и пагинацию окна.
 Импорт Eloquent-моделей, генерация embeddings, UUID mapping, согласование очередей и Scout engine
 в пакет не входят. Scout должен использовать точную проверенную alpha родителя и отдельно
 проверить интеграцию после публикации.
+
+## Переход с alpha.2 в dev-4.x
+
+Замените `->hybrid($text, $column, $vector, $options)->search()` на
+`->hybridSearch($text, $column, $vector, $options)`, чтобы сохранить полный результат с метаданными.
+Если нужны только документы, используйте `hybridGet()` либо `hybridFirst()`.
+Отдельный метод билдера `hybrid()` удалён без совместимого alias.
+`HybridSearch` остаётся внутренним исполнителем; обычные `search()`, `get()` и `first()`
+сохраняют прежние типы результата и не переключают режим выполнения.

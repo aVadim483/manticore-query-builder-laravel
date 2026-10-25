@@ -8,7 +8,10 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use LogicException;
 
-/** Independent bounded branches; this is not MATCH-filtered KNN or SQL UNION. */
+/**
+ * Independent bounded branches; this is not MATCH-filtered KNN or SQL UNION.
+ * @internal Execution helper for ManticoreQueryBuilder's terminal hybrid methods.
+ */
 final class HybridSearch
 {
     private ManticoreQueryBuilder $base;

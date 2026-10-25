@@ -182,6 +182,9 @@ DDL не транзакционен. См. [пример миграции](docs/
 Alpha.2 добавляет [независимый поиск weighted RRF, явные проверки возможностей и
 замену RT-индекса в режиме обслуживания](docs/ru/hybrid-and-index-replacement.md) без Scout.
 `knn()->match()` сохраняет пересечение; замена индекса не обещает zero downtime.
+В `dev-4.x` после alpha.2 поиск выполняют `hybridSearch()`, `hybridGet()` и `hybridFirst()`;
+они возвращают соответственно `HybridResult`, `Collection<stdClass>` и `stdClass|null`.
+Прежний вызов `hybrid(...)->search()` удалён.
 
 | Область | Поведение |
 | --- | --- |

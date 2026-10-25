@@ -310,9 +310,21 @@ class ManticoreQueryBuilder extends Builder
         return $this->connection->getMeta();
     }
 
-    public function hybrid(string $text, string $column, array $vector, array $options = []): HybridSearch
+    public function hybridSearch(string $text, string $column, array $vector, array $options = []): HybridResult
     {
-        return new HybridSearch($this, $text, $column, $vector, $options);
+        return (new HybridSearch($this, $text, $column, $vector, $options))->search();
+    }
+
+    /** @return Collection<int, \stdClass> Documents in fused ranking order. */
+    public function hybridGet(string $text, string $column, array $vector, array $options = []): Collection
+    {
+        return $this->hybridSearch($text, $column, $vector, $options)->rows();
+    }
+
+    /** Rank complete candidate windows, then return the best document or null. */
+    public function hybridFirst(string $text, string $column, array $vector, array $options = []): ?\stdClass
+    {
+        return $this->hybridGet($text, $column, $vector, $options)->first();
     }
 
     public function hasQueryCallbacks(): bool

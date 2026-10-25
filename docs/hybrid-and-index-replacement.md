@@ -4,6 +4,8 @@
 
 Added after alpha.1 for **4.0.0-alpha.2**. No Scout installation is required.
 See [design contracts](parent-search-contracts.md) and [extended Schema](schema-alter.md).
+The terminal `hybridSearch()`/`hybridGet()`/`hybridFirst()` family below is an unreleased
+change on `dev-4.x` after alpha.2; alpha.2 still uses `hybrid(...)->search()`.
 
 ## Independent text and vector search
 
@@ -12,11 +14,11 @@ use Illuminate\Support\Facades\DB;
 
 $db = DB::connection('manticore');
 $result = $db->table('products')->where('stock', '>', 0)
-    ->hybrid('phone', 'embedding', [1, 0, 0], [
+    ->hybridSearch('phone', 'embedding', [1, 0, 0], [
         'text_weight' => 1, 'vector_weight' => 2, 'rank_constant' => 60,
         'text_candidates' => 100, 'vector_candidates' => 100,
         'knn_options' => ['ef' => 100],
-    ])->search();
+    ]);
 
 foreach ($result->hits() as $hit) {
     $id = $hit->id;
@@ -28,6 +30,21 @@ $documents = $result->rows();
 $page = $result->paginateWindow(perPage: 20, page: 2);
 $totals = $result->totals();
 ```
+
+All three methods execute immediately. Set conditions on the
+normal query builder before calling them; none returns a builder or requires `search()`.
+
+| Method | Return value |
+| --- | --- |
+| `hybridSearch($text, $column, $vector, $options)` | `HybridResult`: complete bounded fused window, scores and metadata |
+| `hybridGet($text, $column, $vector, $options)` | `Collection<stdClass>`: documents in fused ranking order |
+| `hybridFirst($text, $column, $vector, $options)` | `stdClass|null`: best fused document, or null when empty |
+
+`hybridGet()` returns the same documents as `hybridSearch(...)->rows()`; an empty result is
+an empty collection. `hybridFirst()` ranks the same candidate windows before selecting the
+first document, without lowering either candidate limit to 1. Get/First follow Laravel's
+Collection/document return types and do not include scores, ranks or metadata. Use
+`hybridSearch()` when those details or window pagination are needed.
 
 Both searches use the same write PDO and common attribute filters. The text branch uses
 WEIGHT descending/ID ascending; the vector branch uses distance ascending/ID ascending.
@@ -145,7 +162,16 @@ guarantee in this release, so it is not exposed as a safe switch primitive.
 
 ## Notes for alpha.1 and Scout consumers
 
-Existing methods retain their contracts. New fusion returns `HybridResult`, not `SearchResult`;
+Ordinary `search()`, `get()` and `first()` retain their contracts. Fusion returns `HybridResult`, not `SearchResult`;
 consumers must map hits/documents and window pagination explicitly. No Eloquent model import,
 embedding generation, UUID mapping, queue coordination or Scout engine is included. Scout must
 depend on the exact tested parent alpha and separately test its integration after publication.
+
+## Migrating from alpha.2 on dev-4.x
+
+Replace `->hybrid($text, $column, $vector, $options)->search()` with
+`->hybridSearch($text, $column, $vector, $options)` to retain the full result and metadata.
+Use `hybridGet()` or `hybridFirst()` when only documents are needed.
+The separate builder method `hybrid()` is removed, without a compatibility alias.
+`HybridSearch` remains an internal executor; ordinary `search()`, `get()` and `first()`
+retain their original return types and do not change execution mode.

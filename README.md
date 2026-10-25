@@ -180,6 +180,9 @@ DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.
 Alpha.2 also provides [independent weighted RRF search, explicit capability probes and
 maintenance-only RT replacement](docs/hybrid-and-index-replacement.md), without requiring Scout.
 `knn()->match()` keeps its intersection semantics; replacement does not promise zero downtime.
+On `dev-4.x` after alpha.2, hybrid search executes through `hybridSearch()`, `hybridGet()`
+or `hybridFirst()`, returning `HybridResult`, `Collection<stdClass>` or `stdClass|null`
+respectively; the former `hybrid(...)->search()` is removed.
 
 | Area | Behavior |
 | --- | --- |

@@ -4,7 +4,7 @@ Introduced in 4.0.0-alpha.2 after alpha.1; implemented in the parent driver with
 
 ## B1: bounded weighted reciprocal rank fusion
 
-`$query->hybrid($text, $column, $vector, $options)->search()` clones a common attribute
+On `dev-4.x` after alpha.2, `$query->hybridSearch($text, $column, $vector, $options)` clones a common attribute
 query and executes independent text and KNN searches. Existing `knn()->match()` remains
 intersection. Default candidate limits are 100 per branch, with weights 1/1 and RRF
 constant 60. Bounds, weights and vectors are validated before either search.
@@ -18,6 +18,11 @@ metadata, not proof of an exact corpus-wide count. `paginateWindow()` pages the 
 window, never reruns SQL. A fresh search may change pages if data changes. No unlimited
 cursor/deep-page claim is made. Both enabled branches execute or an exception propagates;
 no partial success is returned on failure. Attribute filters are cloned into both branches.
+
+`hybridSearch()` returns the complete `HybridResult`. `hybridGet()` returns its document
+`Collection<stdClass>`, and `hybridFirst()` returns the best document as `stdClass|null`
+after ranking the same candidate windows. Get/First expose no scores or metadata. All three execute
+immediately; the former `hybrid(...)->search()` API from alpha.2 is removed in development.
 
 Initial scope excludes pre-existing search expressions, MATCH/KNN, raw predicates, custom
 ordering, projections, facets, grouping, callbacks, offsets and limits on the common query.
