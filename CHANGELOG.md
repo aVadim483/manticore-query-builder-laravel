@@ -6,6 +6,10 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+* Hybrid option validation lists all unknown keys in InvalidArgumentException messages.
+
 ## [4.0.0-alpha.3] - 2026-10-25
 
 ### Added

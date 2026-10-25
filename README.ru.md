@@ -153,6 +153,13 @@ $brands = $result->facet('brands');
 `keywords()`, `suggest()`, `qsuggest()`, `snippets()`, `autocomplete()`, общий `call()`.
 Сигнатуры и требования к серверу приведены в [справочнике](docs/ru/laravel-driver.md).
 
+В [руководстве по гибридному поиску](docs/ru/hybrid-search.md) примеры идут от минимального вызова
+к расширенным настройкам. `hybridSearch()` возвращает `HybridResult`, `hybridGet()` —
+`Collection<stdClass>`, `hybridFirst()` — `stdClass|null`. Эти методы выполняются сразу;
+старый вызов `hybrid(...)->search()` из alpha.2 удалён. `knn()->match()` сохраняет пересечение.
+[Проверки возможностей и замена RT-индекса](docs/ru/hybrid-and-index-replacement.md) описаны отдельно;
+замена требует режима обслуживания и не обещает zero downtime. Scout не требуется.
+
 ## Схема и миграции
 
 ```php
@@ -179,24 +186,29 @@ DDL не транзакционен. См. [пример миграции](docs/
 
 ## Отличия от Laravel Query Builder
 
-В [руководстве по гибридному поиску](docs/ru/hybrid-search.md) примеры идут от минимального вызова
-к расширенным настройкам. [Проверки возможностей и замена RT-индекса](docs/ru/hybrid-and-index-replacement.md)
-описаны отдельно. Scout не требуется.
-`knn()->match()` сохраняет пересечение; замена индекса не обещает zero downtime.
-Начиная с alpha.3 поиск выполняют `hybridSearch()`, `hybridGet()` и `hybridFirst()`;
-они возвращают соответственно `HybridResult`, `Collection<stdClass>` и `stdClass|null`.
-Прежний вызов `hybrid(...)->search()` удалён.
+Контракты `select()`, `get()`, `first()` и `lazy()` сохранены: билдер, коллекция, объект/null
+и ленивая коллекция соответственно. Ниже — различия при переносе запросов со стандартных
+SQL-драйверов Laravel на этот драйвер. Возможности обычного Laravel Query Builder тоже
+зависят от выбранной СУБД; сравнение опирается на [его документацию](https://laravel.com/docs/13.x/queries).
 
-| Область | Поведение |
-| --- | --- |
-| Билдер и результаты | Контракты Laravel Builder, Collection, stdClass и LazyCollection |
-| Диалект SQL | Manticore SQL через собственную Grammar; joins, unions, DISTINCT, блокировки и WHERE EXISTS отклоняются |
-| Поиск | MATCH, ранжирование, фасеты, подсветка, векторы и метаданные расширяют API Laravel |
-| Типы | Билдер преобразует JSON, MVA, векторы и числовые атрибуты по кэшированному DESCRIBE; сырые чтения сохраняют значения PDO |
-| Запись | Полнотекстовые изменения требуют REPLACE; произвольный атомарный upsert не поддержан |
-| Транзакции | Одно соединение, без вложенности, savepoints, повторных попыток и транзакционного DDL |
-| Пагинация | Есть ограничения окна результатов и типов ключей; см. справочник |
-| Eloquent | Связи, сохранение моделей и общая совместимость ORM не обещаются |
+| Операция | Стандартный Laravel Query Builder | Этот драйвер Manticore |
+| --- | --- | --- |
+| Поиск подстроки | `whereLike()` или `where('name', 'like', '%text%')` используют SQL LIKE | LIKE в WHERE не поддерживается. Для TEXT используйте `match()` с правилами полнотекстового индекса; для STRING — `REGEX()` через алиас в SELECT. Это разные семантики поиска |
+| Полнотекстовый поиск | `whereFullText()` для поддерживаемых СУБД | Используйте `match()`. Автоматического перевода `whereFullText()` в MATCH нет |
+| JSON-фильтры | Синтаксис `details->color` и методы `whereJson*()` для поддерживаемых СУБД | Laravel JSON-синтаксис автоматически не переводится. Например: `whereRaw('details.color = ?', ['red'])` |
+| Чтение JSON | Query Builder возвращает значения PDO, без автоматического декодирования JSON в PHP-массивы | По умолчанию билдер читает схему через DESCRIBE и преобразует JSON в массивы; `cast_attributes => false` отключает преобразование |
+| `get()` / `cursor()` без `limit()` | В SQL-запросе нет ограничения количества строк | Manticore по умолчанию возвращает 20 строк. Задайте `limit()` либо используйте `lazy()` / `chunk()` для обхода порциями |
+| JOIN, UNION, DISTINCT, WHERE EXISTS, блокировки | Есть методы для SQL-конструкций, поддерживаемых выбранной СУБД | Эти конструкции в текущем драйвере отклоняются |
+| Изменение текста через `update()` | Обновляет указанные текстовые колонки | Полнотекстовые поля требуют `replace()`: он заменяет документ целиком и сбрасывает пропущенные поля |
+| `upsert()` | Вставка/обновление по уникальным ключам согласно правилам SQL-драйвера | Произвольный атомарный upsert не поддержан. `replace()` работает по ID документа, с другими правилами замены |
+| Запись внутри транзакции | На транзакционных SQL-таблицах INSERT, UPDATE и DELETE участвуют в откате | В Manticore транзакционны INSERT/REPLACE/DELETE; UPDATE не откатывается. Вложенность, savepoints и повторные попытки в драйвере запрещены |
+| `cursorPaginate()` | Курсор строится по выбранным колонкам сортировки с учётом ограничений Laravel | Поддерживаются только выбранные целочисленные/bool/timestamp ключи с ID в конце порядка; KNN, группы, фасеты и float/string/JSON/MVA/вычисляемые ключи отклоняются |
+
+Замены для LIKE опираются на [типы полей Manticore](https://manual.manticoresearch.com/Creating_a_table/Data_types)
+и [REGEX](https://manual.manticoresearch.com/Functions/String_functions). Подробнее о
+[лимите выдачи](https://manual.manticoresearch.com/Searching/Pagination),
+[транзакциях](https://manual.manticoresearch.com/Data_creation_and_modification/Transactions)
+и [ограничениях драйвера](docs/ru/laravel-driver.md).
 
 Используйте параметры в `whereRaw()` / `selectRaw()`; `DB::raw()` предназначен для доверенного SQL.
 Буквальный текст MATCH экранируется через

@@ -31,8 +31,9 @@ final class HybridSearch
     {
         $defaults = ['text_weight' => 1, 'vector_weight' => 1, 'rank_constant' => 60,
             'text_candidates' => 100, 'vector_candidates' => 100, 'escape' => true, 'knn_options' => []];
-        if (array_diff(array_keys($options), array_keys($defaults))) {
-            throw new InvalidArgumentException('Unknown hybrid option.');
+        $unknown = array_diff(array_keys($options), array_keys($defaults));
+        if ($unknown) {
+            throw new InvalidArgumentException('Unknown hybrid options: '.implode(', ', $unknown));
         }
         $options += $defaults;
         foreach (['text_weight', 'vector_weight'] as $key) {

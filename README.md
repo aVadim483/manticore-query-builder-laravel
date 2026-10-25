@@ -152,6 +152,13 @@ Other extensions include `option()`, `knn()`, MVA ANY/ALL, geo distance, and con
 `keywords()`, `suggest()`, `qsuggest()`, `snippets()`, `autocomplete()` and generic `call()`.
 See the [reference](docs/laravel-driver.md) for signatures and server requirements.
 
+The [hybrid search guide](docs/hybrid-search.md) progresses from a minimal call to advanced
+options. `hybridSearch()` returns `HybridResult`, `hybridGet()` returns `Collection<stdClass>`,
+and `hybridFirst()` returns `stdClass|null`. These execute immediately; the alpha.2
+`hybrid(...)->search()` call is removed. `knn()->match()` retains intersection semantics.
+[Capability probes and RT replacement](docs/hybrid-and-index-replacement.md) are documented separately;
+replacement requires maintenance and does not promise zero downtime. Scout is not required.
+
 ## Schema and migrations
 
 ```php
@@ -177,23 +184,29 @@ DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.
 
 ## Differences from Laravel Query Builder
 
-See the [hybrid search guide](docs/hybrid-search.md) for examples from a minimal call to advanced
-options, and [capability probes / RT replacement](docs/hybrid-and-index-replacement.md). Scout is not required.
-`knn()->match()` keeps its intersection semantics; replacement does not promise zero downtime.
-Since alpha.3, hybrid search executes through `hybridSearch()`, `hybridGet()`
-or `hybridFirst()`, returning `HybridResult`, `Collection<stdClass>` or `stdClass|null`
-respectively; the former `hybrid(...)->search()` is removed.
+The `select()`, `get()`, `first()` and `lazy()` contracts are preserved: a builder, collection,
+object/null and lazy collection respectively. The differences below matter when porting queries
+from Laravel's standard SQL drivers. Standard Query Builder capabilities also depend on the
+selected database; see [Laravel's reference](https://laravel.com/docs/13.x/queries).
 
-| Area | Behavior |
-| --- | --- |
-| Builder/results | Laravel Builder, Collection, stdClass and LazyCollection contracts |
-| SQL dialect | Manticore SQL through custom Grammar; joins, unions, DISTINCT, locks and WHERE EXISTS are rejected |
-| Search | MATCH, ranking, facets, highlighting, vectors and metadata extend Laravel's API |
-| Types | Builder reads/writes cast JSON, MVA, vectors and numeric attributes using cached DESCRIBE; raw connection reads retain PDO values |
-| Writes | Full-text changes require REPLACE; arbitrary atomic upsert is unsupported |
-| Transactions | One connection, no nesting, savepoints, automatic retries or transactional DDL |
-| Pagination | Server result windows and supported key types impose limits; consult the reference |
-| Eloquent | Relationships, model persistence and general ORM compatibility are not promised |
+| Operation | Standard Laravel Query Builder | This Manticore driver |
+| --- | --- | --- |
+| Substring matching | `whereLike()` or `where('name', 'like', '%text%')` use SQL LIKE | LIKE in WHERE is unsupported. Use `match()` with full-text index rules for TEXT, or `REGEX()` through a SELECT alias for STRING. Their search semantics differ |
+| Full-text search | `whereFullText()` on supported databases | Use `match()`. `whereFullText()` is not automatically translated into MATCH |
+| JSON predicates | `details->color` syntax and `whereJson*()` helpers on supported databases | Laravel's JSON syntax is not automatically translated. For example: `whereRaw('details.color = ?', ['red'])` |
+| Reading JSON | Query Builder returns PDO values without automatically decoding JSON into PHP arrays | By default, the builder reads DESCRIBE and converts JSON to arrays; `cast_attributes => false` disables conversion |
+| `get()` / `cursor()` without `limit()` | No row-count limit is added to the SQL | Manticore defaults to 20 returned rows. Set `limit()` or use `lazy()` / `chunk()` for batched traversal |
+| JOIN, UNION, DISTINCT, WHERE EXISTS, locks | Methods expose SQL constructs supported by the selected database | The current driver rejects these constructs |
+| Updating text with `update()` | Updates the specified text columns | Full-text fields require `replace()`, which replaces the whole document and resets omitted fields |
+| `upsert()` | Insert/update by unique keys under the SQL driver's rules | Arbitrary atomic upsert is unsupported. `replace()` uses document IDs and has different replacement rules |
+| Writes inside a transaction | INSERT, UPDATE and DELETE can be rolled back on transactional SQL tables | Manticore transactions cover INSERT/REPLACE/DELETE; UPDATE is not rolled back. Driver nesting, savepoints and retries are rejected |
+| `cursorPaginate()` | Builds cursor boundaries from selected ordering columns under Laravel's constraints | Only selected integer/bool/timestamp keys ending in ID are supported; KNN, groups, facets and float/string/JSON/MVA/computed keys are rejected |
+
+LIKE alternatives follow [Manticore field types](https://manual.manticoresearch.com/Creating_a_table/Data_types)
+and [REGEX](https://manual.manticoresearch.com/Functions/String_functions). See also
+[result limits](https://manual.manticoresearch.com/Searching/Pagination),
+[transactions](https://manual.manticoresearch.com/Data_creation_and_modification/Transactions)
+and [driver restrictions](docs/laravel-driver.md).
 
 Use bound parameters with `whereRaw()` / `selectRaw()`; `DB::raw()` is for trusted SQL.
 Escape literal MATCH text with
