@@ -10,6 +10,7 @@ PHP CLI 8.3.6, PHP-FPM 8.4.27 and Manticore 29.9.0 were retained.
 | Published package | Git source reference | Application / native / current API / browser checks |
 | --- | --- | --- |
 | 4.0.0-beta.1 | `cbbf0e0fa2545914c3dec09e292767c991cff286` | 32 / 6 / 8 / 11, all passed |
+| 4.0.0-rc.1 | `08d9cbdb91624280c93cb6e38c4fec712a8b0e32` | 32 / 6 / 8 / 11, all passed |
 
 The beta also passed a second real 120-job worker run in one process, with zero retained or
 allocated memory growth after job 20. The [performance report](performance.md) describes its scope.

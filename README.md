@@ -8,8 +8,8 @@
 A native Laravel Database driver for ManticoreSearch. Use Laravel's database manager, Query Builder,
 collections, pagination, query events and Schema Builder over PDO's MySQL protocol.
 
-Version `4.0.0-rc.1` is the release candidate with the public 4.0 API frozen since beta.1.
-See the [release candidate notes](docs/releases/4.0.0-rc.1.md) for verification and limitations.
+Version `4.0.0` is the stable native driver, with the public API frozen since beta.1.
+See the [4.0 release notes](docs/releases/4.0.0.md) for verification and limitations.
 The 3.x wrapper API and its dependency on `avadim/manticore-query-builder-php` have been removed.
 Existing applications should follow the [3.x migration guide](docs/upgrading-3.x-to-4.x.md).
 
@@ -38,10 +38,10 @@ Support for older servers, Lumen and general Eloquent compatibility is not estab
 
 ## Installation
 
-To install the published release candidate:
+To install the stable 4.x driver:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-rc.1
+composer require "avadim/manticore-query-builder-laravel:^4.0"
 ```
 
 To test subsequent development changes:
@@ -50,7 +50,6 @@ To test subsequent development changes:
 composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 ```
 
-An explicit RC constraint avoids changing the whole application's `minimum-stability`.
 A live Laravel 12 demonstration application's migration has been [verified](docs/migration-app-verification.md).
 Migration of other applications remains unverified.
 
@@ -198,8 +197,8 @@ Schema::connection('manticore')->create('products', function (ManticoreBlueprint
 
 CREATE, DROP and ALTER ADD/DROP use Laravel Schema Builder, including `multi64()`,
 `floatVector()` and CREATE `setting()`. Unsupported schema operations fail explicitly.
-On `dev-4.x` after alpha.1, [extended ALTER](docs/schema-alter.md) adds settings changes/inspection,
-int-to-bigint `change()` and table `rename()` with Buddy; these additions are not in alpha.1.
+[Extended ALTER](docs/schema-alter.md) supports settings changes/inspection,
+int-to-bigint `change()` and table `rename()` with Buddy.
 Keep the migration repository in the primary SQL database; select Manticore inside individual migrations.
 DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.md).
 

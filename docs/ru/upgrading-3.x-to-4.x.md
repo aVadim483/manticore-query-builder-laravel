@@ -2,7 +2,7 @@
 
 # Переход с 3.x на нативный драйвер Laravel
 
-Руководство относится к драйверу в ветке `dev-4.x`; стабильная версия 4.0 ещё не выпущена.
+Руководство относится к стабильному нативному драйверу **4.0.0**.
 API 3.x и Composer-зависимость от `avadim/manticore-query-builder-php` удалены.
 Нативный драйвер работает напрямую через Laravel Database
 и PDO. Ниже описаны изменения приложения: автоматического перенаправления старых вызовов нет.
@@ -38,6 +38,12 @@ rg -n "app\(['\"]manticore|MANTICORE_|whereKnn|callAutocomplete|->highlight\(|->
 Соединение Laravel по умолчанию обычно указывает на основную SQL-базу приложения.
 
 ## 2. Перенос конфигурации соединения
+
+Подготовьте изменения приложения в отдельной копии развёртывания, затем установите стабильный драйвер:
+
+```sh
+composer require "avadim/manticore-query-builder-laravel:^4.0"
+```
 
 Добавьте запись в существующий массив `connections` файла `config/database.php`:
 
@@ -290,9 +296,8 @@ return new class extends Migration {
 `Schema::connection('manticore')->table('products', $callback)` и методы Blueprint.
 Типы Manticore задаются через `multi()`, `multi64()`, `floatVector()`, настройки CREATE — `setting()`.
 Старые массивы схемы и модификаторы автоматически не переводятся.
-В опубликованной alpha.1 для `modifyColumn()`, `rename()`, `alterSettings()` нужен проверенный SQL
-через `$db->statement()`. В `dev-4.x` после alpha.1 для расширения построчного int до bigint
-используйте `bigInteger($column)->change()`, для переименования — `$schema->rename($from, $to)`
+Для расширения построчного int до bigint используйте `bigInteger($column)->change()`,
+для переименования — `$schema->rename($from, $to)`
 с Buddy, для поддерживаемых настроек ALTER — `setting()` внутри `table()`.
 `$schema->getSettings($table)` читает настройки сервера без подстановки пропущенных значений по умолчанию.
 См. [расширенный Schema Builder](schema-alter.md). Произвольные старые модификаторы и изменения

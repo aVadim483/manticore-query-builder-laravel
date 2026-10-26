@@ -6,6 +6,15 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-26
+
+### Changed
+
+* Publish the stable native Laravel driver with the runtime code and API verified in beta.1
+  and rc.1. The published RC passed Composer installation, all 32 application, six native,
+  eight current-API and 11 browser checks while preserving the original 2,105 documents.
+* Update installation, reference, schema and 3.x migration documentation for stable 4.0.
+
 ## [4.0.0-rc.1] - 2026-10-26
 
 ### Changed

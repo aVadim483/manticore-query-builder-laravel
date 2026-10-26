@@ -8,8 +8,8 @@
 Нативный драйвер Laravel Database для ManticoreSearch. Используйте менеджер соединений Laravel,
 Query Builder, коллекции, пагинацию, события запросов и Schema Builder через MySQL-протокол PDO.
 
-Версия `4.0.0-rc.1` — кандидат в стабильный выпуск с API, зафиксированным в beta.1.
-Проверки и ограничения перечислены в [заметках к RC](docs/ru/releases/4.0.0-rc.1.md).
+Версия `4.0.0` — стабильный нативный драйвер с API, зафиксированным в beta.1.
+Проверки и ограничения перечислены в [заметках к 4.0](docs/ru/releases/4.0.0.md).
 Старый API обёртки 3.x и зависимость от `avadim/manticore-query-builder-php` удалены.
 Для существующих приложений подготовлено [руководство перехода с 3.x](docs/ru/upgrading-3.x-to-4.x.md).
 
@@ -38,10 +38,10 @@ Query Builder, коллекции, пагинацию, события запро
 
 ## Установка
 
-Для установки опубликованного кандидата в стабильный выпуск:
+Для установки стабильной версии 4.x:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-rc.1
+composer require "avadim/manticore-query-builder-laravel:^4.0"
 ```
 
 Для проверки последующих изменений в разработке:
@@ -50,7 +50,6 @@ composer require avadim/manticore-query-builder-laravel:4.0.0-rc.1
 composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 ```
 
-Явное ограничение RC не требует менять `minimum-stability` всего приложения.
 Миграция работающего демонстрационного Laravel-приложения [проверена](docs/ru/migration-app-verification.md).
 Миграция других приложений пока не проверена.
 
@@ -200,8 +199,8 @@ Schema::connection('manticore')->create('products', function (ManticoreBlueprint
 
 CREATE, DROP, ALTER ADD/DROP выполняются через Laravel Schema Builder. Доступны
 `multi64()`, `floatVector()`, настройки CREATE через `setting()`.
-В `dev-4.x` после alpha.1 [расширенный ALTER](docs/ru/schema-alter.md) добавляет изменение и чтение
-настроек, `change()` для int → bigint и `rename()` таблицы с Buddy; в alpha.1 этих дополнений нет.
+[Расширенный ALTER](docs/ru/schema-alter.md) поддерживает изменение и чтение
+настроек, `change()` для int → bigint и `rename()` таблицы с Buddy.
 Неподдерживаемые операции схемы явно отклоняются.
 Таблицу учёта миграций оставьте в основной SQL-базе, выбирая Manticore в отдельных миграциях.
 DDL не транзакционен. См. [пример миграции](docs/ru/upgrading-3.x-to-4.x.md).

@@ -1,6 +1,6 @@
 # Native Laravel Database driver
 
-The `dev-4.x` branch includes an experimental driver built on Laravel's own Query Builder.
+Version 4.0 provides a native driver built on Laravel's own Query Builder.
 It uses PDO directly; its implementation does not call the standalone PHP query builder.
 The 3.x wrapper API and its standalone builder dependency have been removed.
 
@@ -485,7 +485,7 @@ Other supported column types are `integer`, `bigInteger`, `boolean` and `timesta
 Laravel string lengths and float precision declarations do not impose SQL constraints;
 `float()` maps to Manticore's native float. TEXT supports `stored()` and `indexed()` flags.
 CREATE settings are escaped; ALTER supports adding and dropping columns in declaration order.
-On `dev-4.x` after alpha.1, ALTER also supports validated `setting()`, settings inspection through
+ALTER also supports validated `setting()`, settings inspection through
 `getSettings()`, row-wise int-to-bigint `change()` and table `rename()` with Buddy.
 See [extended Schema Builder](schema-alter.md) for examples, validation and rollback rules.
 Arbitrary type changes, column renaming, nullable/default constraints, foreign keys, ordinary

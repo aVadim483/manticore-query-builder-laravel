@@ -2,7 +2,7 @@
 
 [Русский](ru/schema-alter.md)
 
-Available on `dev-4.x` after **4.0.0-alpha.1**, not in that published archive.
+Available in **4.0.0**; these additions were introduced after alpha.1.
 These operations target real-time tables in RT mode. The supported minimum remains
 Manticore 28.6.6. See [verified server contracts](schema-alter-compatibility.md).
 

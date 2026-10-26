@@ -2,8 +2,7 @@
 
 # Upgrading from 3.x to the native Laravel driver
 
-This guide targets the native driver currently developed on `dev-4.x`. It is not an announcement
-of a stable 4.0 release. The 3.x API and its Composer dependency on
+This guide targets the stable native driver **4.0.0**. The 3.x API and its Composer dependency on
 `avadim/manticore-query-builder-php` have been removed. The native driver
 uses Laravel Database and PDO directly. This guide describes explicit application changes,
 not compatibility aliases that redirect old calls automatically.
@@ -39,6 +38,12 @@ failure handling differ. A service formerly injecting `Manager` can inject
 Injecting Laravel's default connection alone would normally select the application's primary SQL database.
 
 ## 2. Move the connection configuration
+
+Prepare the application changes in a deployment copy, then install the stable driver:
+
+```sh
+composer require "avadim/manticore-query-builder-laravel:^4.0"
+```
 
 Put the new connection in the existing `connections` array of `config/database.php`:
 
@@ -289,9 +294,8 @@ Replace old `create()` / `drop($table, true)` / `hasTable()` with the named Sche
 `create()` / `dropIfExists()` / `hasTable()`. For `addColumn()` / `dropColumn()`, use
 `Schema::connection('manticore')->table('products', $callback)` and Blueprint methods.
 Use `multi()`, `multi64()` and `floatVector()` for native types; CREATE settings use `setting()`.
-Old schema arrays and options are not automatically translated. In published alpha.1,
-`modifyColumn()`, `rename()` and `alterSettings()` require explicitly reviewed `$db->statement()` SQL.
-On `dev-4.x` after alpha.1, use `bigInteger($column)->change()` for row-wise int-to-bigint,
+Old schema arrays and options are not automatically translated.
+Use `bigInteger($column)->change()` for row-wise int-to-bigint,
 `$schema->rename($from, $to)` with Buddy and `setting()` inside `table()` for supported ALTER settings.
 Read reported settings with `$schema->getSettings($table)`; omitted defaults are not inferred.
 See [extended Schema Builder](schema-alter.md). Arbitrary old modifiers and type changes
