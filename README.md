@@ -251,3 +251,5 @@ Tests also require `pdo_sqlite` for the primary migration repository.
 See [verification instructions](docs/testing.md) for isolated production consumers and test matrices.
 
 [Benchmarks](benchmarks/README.md) compare the native driver with PDO and the official HTTP client.
+Current [upsert, bulk-read, hybrid and long-running worker measurements](docs/performance.md)
+include reproducible scenarios and their dataset limits.
