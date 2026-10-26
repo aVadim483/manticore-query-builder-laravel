@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use LogicException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
+use Illuminate\Database\Query\Expression;
 
 class ManticoreQueryBuilder extends Builder
 {
@@ -233,6 +234,33 @@ class ManticoreQueryBuilder extends Builder
         return $multiple ? $rows : $rows[0];
     }
 
+    private function encodeInsertRows(array $values): array
+    {
+        $values = $this->encodeWriteRows($values);
+        if (!$values) {
+            return [];
+        }
+        $multiple = array_is_list($values) && is_array($values[0]);
+        $rows = [];
+        foreach ($multiple ? $values : [$values] as $row) {
+            $encoded = [];
+            foreach ($row as $column => $value) {
+                if (is_float($value)) {
+                    if (!is_finite($value)) {
+                        throw new InvalidArgumentException('Manticore parameters must be finite numbers.');
+                    }
+                    // Laravel renders Expressions and removes them from bindings. Do this only
+                    // after schema encoding, so JSON numbers remain JSON-bound strings.
+                    $value = new Expression(json_encode($value, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION));
+                }
+                $encoded[$column] = $value;
+            }
+            $rows[] = $encoded;
+        }
+
+        return $multiple ? $rows : $rows[0];
+    }
+
     public function insert(array $values)
     {
         if (!$values) {
@@ -241,7 +269,7 @@ class ManticoreQueryBuilder extends Builder
         $this->applyBeforeQueryCallbacks();
         QueryCapabilities::write($this, true);
         QueryCapabilities::payload($values);
-        return parent::insert($this->encodeWriteRows($values));
+        return parent::insert($this->encodeInsertRows($values));
     }
 
     public function insertGetId(array $values, $sequence = null)
@@ -252,7 +280,7 @@ class ManticoreQueryBuilder extends Builder
         }
         $this->applyBeforeQueryCallbacks();
         QueryCapabilities::write($this, true);
-        return parent::insertGetId($this->encodeWriteRows($values), $sequence);
+        return parent::insertGetId($this->encodeInsertRows($values), $sequence);
     }
 
     public function update(array $values)
@@ -324,7 +352,7 @@ class ManticoreQueryBuilder extends Builder
         $this->applyBeforeQueryCallbacks();
         QueryCapabilities::write($this, true);
         QueryCapabilities::payload($values);
-        $values = $this->encodeWriteRows($values);
+        $values = $this->encodeInsertRows($values);
         if (!array_is_list($values)) {
             $values = [$values];
         }

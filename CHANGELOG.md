@@ -6,6 +6,14 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+* Compile finite scalar floats directly as numeric SQL literals for builder INSERT/REPLACE,
+  including the GetId variants and writes delegated through these methods. This avoids
+  scanning the generated SQL in NumericBindings while preserving JSON/MVA/vector encoding.
+  Query events and logs now contain those float literals in SQL rather than bindings;
+  UPDATE, WHERE and raw SQL retain the general numeric renderer.
+
 ## [4.0.0] - 2026-10-26
 
 ### Changed

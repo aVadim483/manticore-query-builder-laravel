@@ -2,6 +2,19 @@
 
 [Русский](ru/performance.md)
 
+A separate [3.0.0 vs 4.0.0 A/B report](../benchmarks/compare-versions/results-2026-10-26.md)
+covers the same 20,000 documents and dependencies across API, HTTP and queue scenarios.
+The measurements below concern 4.x alone.
+
+Builder INSERT/REPLACE now render finite scalar PHP floats during SQL compilation,
+after schema encoding. JSON numbers remain JSON-bound strings; strings and other
+scalar bindings still use PDO parameters. This also applies to `insertGetId()` and
+`replaceGetId()`, and writes delegated through these methods. Query events and query
+logs expose the float literal in SQL, without a corresponding float binding.
+UPDATE, WHERE and raw SQL continue to use `NumericBindings::prepare()`.
+See the [bulk-write optimization comparison](../benchmarks/profile-writes/optimized-results-2026-10-26.md)
+for released 3.0.0/4.0.0 and optimized source measurements.
+
 Measured on October 26, 2026 against current 4.x source, PHP CLI 8.3.6, Laravel 12.70.1,
 Manticore 29.9.0 with Columnar/KNN 14.2.1. One client used local TCP on the test server;
 these are measurements of this fixture, not throughput or latency guarantees.
