@@ -38,7 +38,7 @@ Support for older servers, Lumen and general Eloquent compatibility is not estab
 
 ## Installation
 
-To install the published alpha:
+To install the published beta:
 
 ```sh
 composer require avadim/manticore-query-builder-laravel:4.0.0-beta.1
