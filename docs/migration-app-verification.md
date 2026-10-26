@@ -2,6 +2,10 @@
 
 # Live Laravel application migration: 3.x → 4.x
 
+Subsequent installations of published packages through Composer are recorded in the
+[release verification report](release-verification.md). The source-snapshot and alpha.1
+checks below remain historical evidence of the 3.x migration.
+
 ## Current 4.x recheck — October 26, 2026
 
 The application at [manticore.avadim.ru](https://manticore.avadim.ru/) now runs **dev-4.x**:

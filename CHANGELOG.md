@@ -6,6 +6,15 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.0-rc.1] - 2026-10-26
+
+### Changed
+
+* Promote the frozen beta.1 API to release candidate without runtime changes. The published
+  beta package passed Composer installation in the live test application, 32 application,
+  six native, eight current-API and 11 browser checks. A real 120-job worker again retained
+  no additional memory after warm-up. Preserve release verification and source references.
+
 ## [4.0.0-beta.1] - 2026-10-26
 
 ### Added

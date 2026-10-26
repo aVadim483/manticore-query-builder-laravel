@@ -8,8 +8,8 @@
 A native Laravel Database driver for ManticoreSearch. Use Laravel's database manager, Query Builder,
 collections, pagination, query events and Schema Builder over PDO's MySQL protocol.
 
-Version `4.0.0-beta.1` freezes the public 4.0 API for prerelease verification.
-See the [beta release notes](docs/releases/4.0.0-beta.1.md) for scope and remaining limitations.
+Version `4.0.0-rc.1` is the release candidate with the public 4.0 API frozen since beta.1.
+See the [release candidate notes](docs/releases/4.0.0-rc.1.md) for verification and limitations.
 The 3.x wrapper API and its dependency on `avadim/manticore-query-builder-php` have been removed.
 Existing applications should follow the [3.x migration guide](docs/upgrading-3.x-to-4.x.md).
 
@@ -38,10 +38,10 @@ Support for older servers, Lumen and general Eloquent compatibility is not estab
 
 ## Installation
 
-To install the published beta:
+To install the published release candidate:
 
 ```sh
-composer require avadim/manticore-query-builder-laravel:4.0.0-beta.1
+composer require avadim/manticore-query-builder-laravel:4.0.0-rc.1
 ```
 
 To test subsequent development changes:
@@ -50,7 +50,7 @@ To test subsequent development changes:
 composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 ```
 
-An explicit beta constraint avoids changing the whole application's `minimum-stability`.
+An explicit RC constraint avoids changing the whole application's `minimum-stability`.
 A live Laravel 12 demonstration application's migration has been [verified](docs/migration-app-verification.md).
 Migration of other applications remains unverified.
 
