@@ -11,6 +11,12 @@ PHP CLI 8.3.6, PHP-FPM 8.4.27 and Manticore 29.9.0 were retained.
 | --- | --- | --- |
 | 4.0.0-beta.1 | `cbbf0e0fa2545914c3dec09e292767c991cff286` | 32 / 6 / 8 / 11, all passed |
 | 4.0.0-rc.1 | `08d9cbdb91624280c93cb6e38c4fec712a8b0e32` | 32 / 6 / 8 / 11, all passed |
+| 4.0.0 | `51b49e949ec0c11f7a236ac3a079dcc8ad7a3eb8` | 32 / 6 / 8 / 11, all passed |
+
+The public application now runs published stable **4.0.0**. Its Composer installation
+removed the release-candidate version without updating other dependencies. The GitHub release
+is stable (not draft/prerelease) and Latest. All eight CI jobs passed for the release commit;
+the exact release archive was separately installed in a clean production-only consumer.
 
 The beta also passed a second real 120-job worker run in one process, with zero retained or
 allocated memory growth after job 20. The [performance report](performance.md) describes its scope.
