@@ -2,8 +2,8 @@
 
 [Русский](ru/hybrid-and-index-replacement.md)
 
-Diagnostics and replacement APIs were added in alpha.2 and work without Scout.
-See also [Schema Builder](schema-alter.md) and [parent driver contracts](parent-search-contracts.md).
+Diagnostics and replacement APIs were added in alpha.2.
+See also [Schema Builder](schema-alter.md) and [API contracts](parent-search-contracts.md).
 
 ## Independent text and vector search
 

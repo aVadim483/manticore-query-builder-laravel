@@ -8,6 +8,9 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
+* Reviewed API catalog for 299 Laravel/driver methods and frozen parameter/result contracts
+  for 19 full-text, JSON and conditional-write methods. CI checks catalog drift and installs
+  minimum Illuminate 11.0.0/12.0.0/13.0.0 consumers without dev dependencies.
 * `updateOrInsert()` and `replaceOrInsert()` with unambiguous lookup and existence callbacks.
   Emulated `upsert()` preserves non-updated fields through REPLACE and stages its complete
   INSERT/REPLACE batch in one transaction. It joins caller transactions without savepoints;
@@ -21,6 +24,14 @@ All notable changes to this package are documented here. The format follows
 
 ### Fixed
 
+* Reject DML clauses that the base grammar could silently omit, including DISTINCT, grouping,
+  HAVING, hints and filtered TRUNCATE/INSERT/REPLACE. Validate matching bulk column sets.
+* Explicitly reject unsupported inherited filter/subquery/date/arithmetic/vector APIs;
+  unavailable known where-methods cannot fall through to unrelated dynamic column filters.
+* Include deferred MATCH/JSON parameters in getRawBindings() without duplicating nested
+  bindings. Reject manual merges of deferred search state and ignored terminal fetch modes.
+* Keep TEXT/columnar UPDATE validation enabled when casts are disabled. Backport JSON overlap
+  aliases and after-query callback behavior missing from the earliest Laravel 11 releases.
 * Hybrid option validation lists all unknown keys in InvalidArgumentException messages.
 
 ## [4.0.0-alpha.3] - 2026-10-25

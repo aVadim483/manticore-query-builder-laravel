@@ -42,6 +42,12 @@ $log = $db->pretend(fn () => $db->table('products')->select('id')->match('galaxy
 if (count($log) !== 1 || $log[0]['bindings'] !== ['galaxy']) {
     throw new RuntimeException('Native query compilation failed.');
 }
+try {
+    $db->table('products')->whereLike('title', '%phone%')->toSql();
+    throw new RuntimeException('An unsupported where-method fell through to a column filter.');
+} catch (LogicException $error) {
+    // Also protects older Laravel patches that do not declare whereLike().
+}
 
 if (in_array('--live', $argv, true)) {
     $table = 'phpunit_'.bin2hex(random_bytes(8)).'_production';
@@ -65,6 +71,19 @@ if (in_array('--live', $argv, true)) {
         if ((string)$id !== '42' || $row->details !== ['brand' => 'acme']
             || $row->tags !== [1, 2] || $result->meta()->totalFound() !== 1) {
             throw new RuntimeException('Production CRUD, casts or search metadata failed.');
+        }
+        if ($db->table($table)->whereJsonDoesntOverlap('details->missing', ['x'])->whereFullText('title', 'galaxy')->count() !== 1
+            || $db->table($table)->where('id', 0)->orWhereJsonDoesntOverlap('details->missing', ['x'])->count() !== 1
+            || $db->table($table)->where('id', 42)->orWhereJsonOverlaps('details->missing', ['x'])->count() !== 1) {
+            throw new RuntimeException('Production JSON/full-text aliases failed.');
+        }
+        $afterCalls = 0;
+        $withCallback = $db->table($table)->where('id', 42)->afterQuery(function ($rows) use (&$afterCalls) {
+            $afterCalls++;
+        });
+        if ($withCallback->get()->count() !== 1 || $afterCalls !== 1
+            || $withCallback->search()->rows()->count() !== 1 || $afterCalls !== 2) {
+            throw new RuntimeException('Production after-query callbacks did not execute exactly once.');
         }
         $db->transaction(fn () => $db->table($table)->replace([
             'id' => 42, 'title' => 'galaxy phone', 'details' => ['brand' => 'acme'],

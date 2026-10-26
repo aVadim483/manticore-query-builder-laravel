@@ -2,8 +2,8 @@
 
 [English](../hybrid-and-index-replacement.md)
 
-API диагностики и замены индекса добавлены в alpha.2 и доступны без Scout.
-См. также [Schema Builder](schema-alter.md) и [контракты родительского драйвера](../parent-search-contracts.md).
+API диагностики и замены индекса добавлены в alpha.2.
+См. также [Schema Builder](schema-alter.md) и [контракты API](../parent-search-contracts.md).
 
 ## Независимые текстовая и векторная ветви
 

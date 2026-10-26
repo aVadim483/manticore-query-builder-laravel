@@ -1,0 +1,338 @@
+{
+    "api_version": "4.0",
+    "notes": "Named parameters, defaults and result contracts are intentional; changing them requires an explicit API review.",
+    "methods": {
+        "whereFullText": {
+            "parameters": [
+                {
+                    "name": "columns",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                },
+                {
+                    "name": "options",
+                    "type": "array",
+                    "default": []
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereFullText": {
+            "parameters": [
+                {
+                    "name": "columns",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                },
+                {
+                    "name": "options",
+                    "type": "array",
+                    "default": []
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonContains": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                },
+                {
+                    "name": "not",
+                    "type": null,
+                    "default": false
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonContains": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonDoesntContain": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonDoesntContain": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonOverlaps": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                },
+                {
+                    "name": "not",
+                    "type": null,
+                    "default": false
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonOverlaps": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonDoesntOverlap": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonDoesntOverlap": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonContainsKey": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                },
+                {
+                    "name": "not",
+                    "type": null,
+                    "default": false
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonContainsKey": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonDoesntContainKey": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonDoesntContainKey": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "whereJsonLength": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "operator",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null,
+                    "default": null
+                },
+                {
+                    "name": "boolean",
+                    "type": null,
+                    "default": "and"
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "orWhereJsonLength": {
+            "parameters": [
+                {
+                    "name": "column",
+                    "type": null
+                },
+                {
+                    "name": "operator",
+                    "type": null
+                },
+                {
+                    "name": "value",
+                    "type": null,
+                    "default": null
+                }
+            ],
+            "declared_return": null,
+            "result": "same-builder"
+        },
+        "updateOrInsert": {
+            "parameters": [
+                {
+                    "name": "attributes",
+                    "type": "array"
+                },
+                {
+                    "name": "values",
+                    "type": "array|callable",
+                    "default": []
+                }
+            ],
+            "declared_return": null,
+            "result": "bool"
+        },
+        "replaceOrInsert": {
+            "parameters": [
+                {
+                    "name": "attributes",
+                    "type": "array"
+                },
+                {
+                    "name": "values",
+                    "type": "array|callable",
+                    "default": []
+                }
+            ],
+            "declared_return": "bool",
+            "result": "bool"
+        },
+        "upsert": {
+            "parameters": [
+                {
+                    "name": "values",
+                    "type": "array"
+                },
+                {
+                    "name": "uniqueBy",
+                    "type": null
+                },
+                {
+                    "name": "update",
+                    "type": null,
+                    "default": null
+                }
+            ],
+            "declared_return": null,
+            "result": "int"
+        }
+    }
+}

@@ -612,6 +612,12 @@ See [Laravel cursor pagination](https://laravel.com/docs/13.x/pagination#cursor-
 
 ## Current boundaries
 
+See the [API audit and frozen contracts](laravel-api-audit.md) for the complete method profile.
+Unsupported date/LIKE/column/subquery filters, index hints, random/CASE ordering and arithmetic
+UPDATE helpers fail explicitly. Writes reject clauses they cannot preserve; INSERT/REPLACE/
+TRUNCATE reject WHERE, and bulk INSERT/REPLACE require identical column sets. JSON-path
+assignments are unsupported. Compiled getRawBindings() includes deferred MATCH/JSON values.
+
 The minimum supported server is Manticore 28.6.6. CI tests its pinned official image and `latest`
 with their bundled Buddy/KNN libraries. This is a support policy, not a claim that all older
 servers are incompatible. See [server compatibility](testing.md#server-compatibility).

@@ -7,7 +7,7 @@ A document can enter through either branch. In this driver, Manticore runs two s
 queries; PHP merges their results by ID and orders them using weighted RRF.
 
 This guide describes **4.0.0-alpha.3**. Alpha.2 used `hybrid(...)->search()` instead of the
-terminal methods below; see the migration section at the end. Scout is not required.
+terminal methods below; see the migration section at the end.
 
 ## 1. The simplest search
 
@@ -243,8 +243,7 @@ builder is not mutated. `__hybrid_text_score` and `__hybrid_distance` are reserv
 application fields are not overwritten with scores.
 
 `knn()->match()` remains intersection: documents must satisfy both conditions. `hybrid*()`
-merges independent lists in the library without SQL UNION. Model imports, Scout engines,
-UUID mapping, queues and embedding generation are outside this package.
+merges independent lists in the library without SQL UNION.
 
 ## Migrating from alpha.2
 

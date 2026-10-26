@@ -62,7 +62,8 @@ final class HybridSearch
             || ($base->columns !== null && $base->columns !== ['*']) || $base->orders || $base->limit !== null
             || $base->offset !== null || $base->groups || $base->havings || $base->joins || $base->unions
             || $base->distinct || $base->lock || $base->aggregate || $base->getFacets()
-            || $base->hasQueryCallbacks() || array_intersect(array_keys($base->manticoreOptions), ['fusion_method', 'fusion_weights', 'rank_constant', 'window_size'])) {
+            || ($base->fetchUsing ?? []) || ($base->indexHint ?? null) !== null || ($base->timeout ?? null) !== null
+            || isset($base->groupLimit) || $base->hasQueryCallbacks() || array_intersect(array_keys($base->manticoreOptions), ['fusion_method', 'fusion_weights', 'rank_constant', 'window_size'])) {
             throw new LogicException('Hybrid requires a plain common attribute query without projection, ordering, callbacks or result windows.');
         }
         foreach ($base->getSearchExpressions() as $alias => $expression) {

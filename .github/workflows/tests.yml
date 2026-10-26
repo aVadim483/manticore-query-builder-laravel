@@ -104,10 +104,20 @@ jobs:
         run: php tests/check-server.php
 
       - name: Run the tests
-        run: vendor/bin/phpunit --fail-on-skipped
+        run: |
+          php tests/check-api-contracts.php
+          vendor/bin/phpunit --fail-on-skipped
 
       - name: Verify a production-only consumer
         run: |
           php tests/prepare-production.php ${{ matrix.runtime.laravel }}
           composer update --working-dir=build/production --no-dev --prefer-dist --no-progress --no-interaction
           php tests/production-smoke.php build/production/vendor/autoload.php --live
+
+      - name: Verify minimum Illuminate API without dev dependencies
+        if: matrix.server.expected == '28.6.6' && matrix.runtime.php != '8.5'
+        run: |
+          php tests/prepare-production.php ${{ matrix.runtime.laravel }} ${{ matrix.runtime.laravel }}.0.0
+          composer update --working-dir=build/production-floor-${{ matrix.runtime.laravel }} --no-dev --prefer-dist --no-progress --no-interaction
+          php tests/check-api-contracts.php build/production-floor-${{ matrix.runtime.laravel }}/vendor/autoload.php
+          php tests/production-smoke.php build/production-floor-${{ matrix.runtime.laravel }}/vendor/autoload.php --live

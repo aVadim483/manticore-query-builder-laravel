@@ -1,6 +1,6 @@
-# Parent driver contracts for Scout consumers
+# Search, capability and index replacement contracts
 
-Introduced in 4.0.0-alpha.2 after alpha.1; implemented in the parent driver without Scout.
+Introduced in 4.0.0-alpha.2 after alpha.1.
 
 ## B1: bounded weighted reciprocal rank fusion
 

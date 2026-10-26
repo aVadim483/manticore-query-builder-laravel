@@ -101,17 +101,17 @@ table and documents. Run this script separately with `MANTICORE_TEST_HOST` and
 It is not part of the ordinary Buddy-enabled PHPUnit run. All temporary compatibility
 services were stopped after verification; the persistent application test server was retained.
 
-## Parent API verification for Scout consumers
+## Search, capability and index replacement verification
 
-The parent-only [hybrid/replacement/capability contract](hybrid-and-index-replacement.md)
-has dedicated tests independent of Scout: weighted RRF relevance fixtures, independent
+The [hybrid/replacement/capability contract](hybrid-and-index-replacement.md)
+has dedicated tests: weighted RRF relevance fixtures, independent
 text-only and semantic-only hits, common filters, metadata listeners, branch failures,
 bounded window pagination, schema cloning, process-level readers during rename gaps,
 interruption recovery and a real second-rename SQL conflict. Module advertising is tested
 separately from read-only operation probes; disconnect/reconnect/purge and DDL clear evidence.
 The no-Buddy script additionally checks unavailable fuzzy/autocomplete evidence.
 Production smoke now exercises hybrid, HNSW probes and clone/switch/rollback without
-Testbench, Scout or the standalone PHP builder. The existing eight-job CI matrix runs these
+Testbench or the standalone PHP builder. The existing eight-job CI matrix runs these
 checks on every supported runtime and minimum/latest server before the alpha.2 publication.
 
 The final local code passed on 2026-10-22 with PHP 8.4.19: minimum on Laravel 11/12/13,

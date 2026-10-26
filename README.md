@@ -52,7 +52,7 @@ composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 
 An explicit alpha constraint avoids changing the whole application's `minimum-stability`.
 A live Laravel 12 demonstration application's migration has been [verified](docs/migration-app-verification.md).
-Scout adapter migration and other applications remain unverified.
+Migration of other applications remains unverified.
 
 Laravel discovers `avadim\Manticore\Laravel\ServiceProvider` automatically.
 If package discovery is disabled, register that provider in `bootstrap/providers.php`.
@@ -178,7 +178,7 @@ options. `hybridSearch()` returns `HybridResult`, `hybridGet()` returns `Collect
 and `hybridFirst()` returns `stdClass|null`. These execute immediately; the alpha.2
 `hybrid(...)->search()` call is removed. `knn()->match()` retains intersection semantics.
 [Capability probes and RT replacement](docs/hybrid-and-index-replacement.md) are documented separately;
-replacement requires maintenance and does not promise zero downtime. Scout is not required.
+replacement requires maintenance and does not promise zero downtime.
 
 ## Schema and migrations
 
@@ -204,6 +204,9 @@ Keep the migration repository in the primary SQL database; select Manticore insi
 DDL is not transactional. See the [migration example](docs/upgrading-3.x-to-4.x.md).
 
 ## Differences from Laravel Query Builder
+
+The [complete API profile and frozen contracts](docs/laravel-api-audit.md) cover every reviewed
+public method, explicit rejections, argument defaults, results and exceptions.
 
 The `select()`, `get()`, `first()` and `lazy()` contracts are preserved: a builder, collection,
 object/null and lazy collection respectively. The differences below matter when porting queries

@@ -14,6 +14,15 @@ use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 
 class ManticoreQueryBuilder extends Builder
 {
+    public function __call($method, $parameters)
+    {
+        if (!static::hasMacro($method) && QueryCapabilities::unsupportedDynamicMethod($method)) {
+            throw new LogicException('Unsupported Laravel method for Manticore: '.$method);
+        }
+
+        return parent::__call($method, $parameters);
+    }
+
     /** @var array<string, int|float|string|array|Ranker> */
     public array $manticoreOptions = [];
 
@@ -22,6 +31,20 @@ class ManticoreQueryBuilder extends Builder
     protected array $readCasts = [];
     protected array $searchFacets = [];
     protected array $facetCasts = [];
+    // Laravel 11.0 predates after-query callbacks; keep one consistent driver contract.
+    protected $afterQueryCallbacks = [];
+
+    public function afterQuery(\Closure $callback)
+    {
+        $this->afterQueryCallbacks[] = $callback;
+        return $this;
+    }
+
+    public function get($columns = ['*'])
+    {
+        $result = parent::get($columns);
+        return method_exists(Builder::class, 'afterQuery') ? $result : $this->applyAfterQueryCallbacks($result);
+    }
 
     protected function plainTable(): ?string
     {
@@ -66,6 +89,7 @@ class ManticoreQueryBuilder extends Builder
         if ($this->searchFacets) {
             throw new LogicException('Queries with facets must be executed through search().');
         }
+        $this->toSql(); // Validate before DESCRIBE can open a connection.
         $this->prepareReadCasts();
 
         return parent::runSelect();
@@ -81,6 +105,7 @@ class ManticoreQueryBuilder extends Builder
             if ($this->searchFacets) {
                 throw new LogicException('Queries with facets must be executed through search().');
             }
+            $this->toSql();
             $this->prepareReadCasts();
             foreach ($this->connection->cursor($this->toSql(), $this->getBindings(), !$this->useWritePdo, $this->fetchUsing ?? []) as $row) {
                 $row = $this->applyAfterQueryCallbacks(new Collection($this->processReadRows([$row])))->first();
@@ -210,27 +235,46 @@ class ManticoreQueryBuilder extends Builder
 
     public function insert(array $values)
     {
+        if (!$values) {
+            return true;
+        }
+        $this->applyBeforeQueryCallbacks();
+        QueryCapabilities::write($this, true);
+        QueryCapabilities::payload($values);
         return parent::insert($this->encodeWriteRows($values));
     }
 
     public function insertGetId(array $values, $sequence = null)
     {
+        QueryCapabilities::payload($values, true);
+        if ($sequence !== null && $sequence !== 'id') {
+            throw new InvalidArgumentException('Manticore only supports the document id.');
+        }
+        $this->applyBeforeQueryCallbacks();
+        QueryCapabilities::write($this, true);
         return parent::insertGetId($this->encodeWriteRows($values), $sequence);
     }
 
     public function update(array $values)
     {
+        QueryCapabilities::payload($values, true);
+        if (array_key_exists('id', $values)) {
+            throw new LogicException('Manticore document IDs cannot be updated.');
+        }
         $this->applyBeforeQueryCallbacks();
         if ($normalized = FullTextConditions::normalize($this)) {
             return $normalized->update($values);
         }
         $this->grammar->compileUpdate($this, $values);
         $values = $this->encodeWriteRows($values);
-        $schema = $this->plainTable() === null || $this->connection->pretending() || $this->connection->getConfig('cast_attributes') === false
+        $schema = $this->plainTable() === null || $this->connection->pretending()
             ? [] : $this->connection->getTableSchema($this->plainTable());
         foreach ($values as $column => $value) {
             if (($schema[$column]['type'] ?? null) === 'text') {
                 throw new LogicException('Full-text fields require REPLACE, not UPDATE.');
+            }
+            if (preg_match('/\bcolumnar\b/i', $schema[$column]['properties'] ?? '')) {
+                throw new LogicException('Columnar attributes require REPLACE, not UPDATE.');
             }
         }
 
@@ -277,6 +321,9 @@ class ManticoreQueryBuilder extends Builder
 
     protected function compileReplacement(array $values): array
     {
+        $this->applyBeforeQueryCallbacks();
+        QueryCapabilities::write($this, true);
+        QueryCapabilities::payload($values);
         $values = $this->encodeWriteRows($values);
         if (!array_is_list($values)) {
             $values = [$values];
@@ -292,10 +339,17 @@ class ManticoreQueryBuilder extends Builder
 
     public function search($columns = ['*']): SearchResult
     {
+        if ($this->fetchUsing ?? []) {
+            throw new LogicException('search() requires the default object fetch mode. Use get() or cursor() with fetchUsing().');
+        }
         $original = $this->columns;
         $this->columns ??= Arr::wrap($columns);
         try {
             $this->applyBeforeQueryCallbacks();
+            if ($this->fetchUsing ?? []) {
+                throw new LogicException('search() requires the default object fetch mode.');
+            }
+            $this->toSql();
             $this->prepareReadCasts();
             $result = $this->connection->search($this->toSql(), $this->getBindings(), !$this->useWritePdo, array_keys($this->searchFacets));
             $rows = $this->processor->processSelect($this, $result->rows()->all());
@@ -661,7 +715,10 @@ class ManticoreQueryBuilder extends Builder
             $result = new Collection($this->cleanSearchRows($result->all()));
         }
 
-        return parent::applyAfterQueryCallbacks($result);
+        foreach ($this->afterQueryCallbacks as $callback) {
+            $result = $callback($result) ?? $result;
+        }
+        return $result;
     }
 
     public function delete($id = null)
@@ -679,17 +736,134 @@ class ManticoreQueryBuilder extends Builder
 
     public function getBindings()
     {
+        return Arr::flatten($this->getRawBindings());
+    }
+
+    public function getRawBindings()
+    {
         $normalized = FullTextConditions::normalize($this);
 
         if ($normalized) {
-            return $normalized->getBindings();
+            return $normalized->getRawBindings();
         }
         $bindings = $this->bindings;
         foreach ($this->getSearchExpressions() as $expression) {
             array_push($bindings['select'], ...($expression['bindings'] ?? []));
         }
 
-        return Arr::flatten($bindings);
+        return $bindings;
+    }
+
+    public function addNestedWhereQuery($query, $boolean = 'and')
+    {
+        if ($query->wheres) {
+            $this->wheres[] = ['type' => 'Nested', 'query' => $query, 'boolean' => $boolean];
+            // Synthetic MATCH/JSON bindings belong to the final query, not the nested fragment.
+            $this->addBinding($query->bindings['where'], 'where');
+        }
+
+        return $this;
+    }
+
+    public function mergeBindings(Builder $query)
+    {
+        if ($query instanceof self && $query->getRawBindings() !== $query->bindings) {
+            throw new LogicException('Manual mergeBindings() of deferred search bindings is not supported. Use nested query conditions.');
+        }
+
+        return parent::mergeBindings($query);
+    }
+
+    public function mergeWheres($wheres, $bindings)
+    {
+        $check = function (array $conditions) use (&$check): void {
+            foreach ($conditions as $where) {
+                if ($where['type'] === 'Fulltext' || (isset($where['column']) && is_string($where['column'])
+                    && str_starts_with($where['column'], '__manticore_'))) {
+                    throw new LogicException('Manual mergeWheres() of search predicates is not supported. Use nested query conditions.');
+                }
+                if ($where['type'] === 'Nested') {
+                    $check($where['query']->wheres ?? []);
+                }
+            }
+        };
+        $check((array) $wheres);
+        return parent::mergeWheres($wheres, $bindings);
+    }
+
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        if (($this->isQueryable($column) && $operator !== null) || $this->isQueryable($operator) || $this->isQueryable($value)) {
+            throw new LogicException('Scalar subqueries are not supported by the Manticore driver.');
+        }
+
+        return parent::where(...func_get_args());
+    }
+
+    public function whereIn($column, $values, $boolean = 'and', $not = false)
+    {
+        if ($this->isQueryable($values)) {
+            throw new LogicException('IN subqueries are not supported by the Manticore driver.');
+        }
+
+        return parent::whereIn($column, $values, $boolean, $not);
+    }
+
+    public function selectSub($query, $as)
+    {
+        throw new LogicException('selectSub() is not supported by the Manticore driver.');
+    }
+
+    public function fromSub($query, $as)
+    {
+        throw new LogicException('fromSub() is not supported. Native sub-selects have a different syntax; use explicit SQL.');
+    }
+
+    public function inOrderOf($column, $values, $filter = true)
+    {
+        throw new LogicException('inOrderOf() is not supported. Order by a native SELECT expression alias.');
+    }
+
+    public function incrementEach(array $columns, array $extra = [])
+    {
+        throw new LogicException('Manticore UPDATE does not support increment/decrement expressions.');
+    }
+
+    public function decrementEach(array $columns, array $extra = [])
+    {
+        throw new LogicException('Manticore UPDATE does not support increment/decrement expressions.');
+    }
+
+    public function explain()
+    {
+        throw new LogicException('Laravel EXPLAIN SELECT is not supported. Use native Manticore profiling commands.');
+    }
+
+    public function timeout(?int $seconds): static
+    {
+        if ($seconds !== null) {
+            throw new LogicException('timeout() is not supported. Use option(\'max_query_time\', $milliseconds) for the server search limit.');
+        }
+        if (property_exists($this, 'timeout')) {
+            $this->timeout = null;
+        }
+        return $this;
+    }
+
+    protected function wherePastOrFuture($columns, $operator, $boolean)
+    {
+        throw new LogicException('Laravel relative-date filters are not supported. Compare explicit Unix timestamps.');
+    }
+
+    protected function ensureConnectionSupportsVectors()
+    {
+        throw new LogicException('Laravel vector-distance methods are not supported. Use knn() or hybridSearch().');
+    }
+
+    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
+    {
+        // Reject before Laravel can request an embedding for a string argument.
+        $this->ensureConnectionSupportsVectors();
     }
 
     public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
@@ -700,6 +874,21 @@ class ManticoreQueryBuilder extends Builder
     public function whereJsonOverlaps($column, $value, $boolean = 'and', $not = false)
     {
         return $this->whereJsonMembership($column, $value, $boolean, $not, true);
+    }
+
+    public function orWhereJsonOverlaps($column, $value)
+    {
+        return $this->whereJsonOverlaps($column, $value, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $value, $boolean = 'and')
+    {
+        return $this->whereJsonOverlaps($column, $value, $boolean, true);
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $value)
+    {
+        return $this->whereJsonDoesntOverlap($column, $value, 'or');
     }
 
     private function whereJsonMembership($column, $value, $boolean, $not, bool $overlap): static

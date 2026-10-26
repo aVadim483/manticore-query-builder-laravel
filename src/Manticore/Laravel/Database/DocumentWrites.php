@@ -22,11 +22,12 @@ final class DocumentWrites
         $this->query = clone $source;
         $this->query->applyBeforeQueryCallbacks();
         $query = $this->query;
+        QueryCapabilities::select($query);
         if (!is_string($query->from) || !preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/D', $query->from)
             || ($query->columns !== null && $query->columns !== ['*']) || $query->joins || $query->unions
             || $query->groups || $query->havings || $query->aggregate || $query->distinct || $query->lock !== null
             || $query->orders || $query->limit !== null || $query->offset !== null || $query->manticoreOptions
-            || $query->hasKnn() || $query->getFacets() || $query->hasQueryCallbacks()) {
+            || ($query->fetchUsing ?? []) || $query->hasKnn() || $query->getFacets() || $query->hasQueryCallbacks()) {
             throw new LogicException('Read-before-write helpers require one table without projection, ordering, windows, search options or after-query callbacks.');
         }
         foreach ($query->getSearchExpressions() as $expression) {

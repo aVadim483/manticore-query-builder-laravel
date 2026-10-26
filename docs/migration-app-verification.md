@@ -2,6 +2,53 @@
 
 # Live Laravel application migration: 3.x → 4.x
 
+## Current 4.x recheck — October 26, 2026
+
+The application at [manticore.avadim.ru](https://manticore.avadim.ru/) now runs **dev-4.x**:
+a snapshot of the current library working tree, including the uncommitted API audit changes.
+This verifies source changes, not a new published release.
+Runtime: Laravel 12.70.1, CLI PHP 8.3.6 and PHP-FPM 8.4.27.
+
+A separate application copy was restored from `baseline-v3` with libraries 3.0.0 and 2.6.0.
+Its checks were rerun before upgrading that same copy to current 4.x using the
+[migration guide](upgrading-3.x-to-4.x.md). Laravel, other dependencies and the original
+Manticore table were retained. The copy used separate SQLite, storage and caches. The catalogue
+was neither recreated nor reseeded. Public form writes were temporarily paused during comparisons.
+
+| Check | Repeated 3.0.0 run | Current 4.x |
+| --- | --- | --- |
+| Application scenarios | 32 / 32 | 32 / 32 |
+| Browser scenarios in the private copy over SSH | 11 / 11 | 11 / 11 |
+| Native checks | Not applicable | 6 / 6 |
+| New methods and write guards | Not applicable | 8 / 8 |
+| Matching comparable results | Original results confirmed | 31 / 31 |
+
+The public application was then upgraded to **the same snapshot**. It passed another
+32 application, 6 native, 8 new API checks and 11 browser scenarios through its actual PHP-FPM.
+The Row/Generator → stdClass/LazyCollection contract is checked separately from result comparisons.
+
+The eight new checks cover combined `whereFullText()`/JSON paths, nested MATCH/JSON bindings,
+the `hybridSearch/Get/First` family, `updateOrInsert()`/`replaceOrInsert()`, JSON membership/length,
+upsert field preservation and caller-transaction rollback, rejected write clauses preserving data,
+and after-query callbacks running once. The application's JSON filter now uses
+`where('details->color', 'red')` instead of raw SQL.
+
+Composer installed the snapshot through a path repository with package mirroring; vendor files
+were not patched manually. SHA-256 of the manifest containing `composer.json` and all `src` files:
+
+```text
+a124d80a8772719db21db3dee6c2d0f1d1df1317dc16a1859906fb264796f3f7
+```
+
+All **2105** original documents and their fingerprint were preserved:
+`77b7e55f17dff88e5ecca2e674bcce3bce746a2a18a6ba1ee9eac79ace463f17`.
+The original 3.x report is unchanged; the alpha.1 installation is retained for rollback.
+The site and forms are live, and the temporary rehearsal web server has been stopped.
+The [public JSON evidence](https://manticore.avadim.ru/?report=1) contains current results,
+the public browser run, extra checks (`current`) and exact source provenance (`source`).
+
+## First verification: 3.0.0 → 4.0.0-alpha.1
+
 The application at [manticore.avadim.ru](https://manticore.avadim.ru/) was first deployed with
 **3.0.0**, exercised in the browser and CLI, then upgraded in place to the published
 **4.0.0-alpha.1** using the [migration guide](upgrading-3.x-to-4.x.md). It now runs 4.x.

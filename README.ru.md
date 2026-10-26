@@ -52,7 +52,7 @@ composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 
 Явное ограничение alpha не требует менять `minimum-stability` всего приложения.
 Миграция работающего демонстрационного Laravel-приложения [проверена](docs/ru/migration-app-verification.md).
-Переход Scout-адаптера и других приложений пока не проверен.
+Миграция других приложений пока не проверена.
 
 Laravel автоматически обнаруживает `avadim\Manticore\Laravel\ServiceProvider`.
 Если обнаружение пакетов отключено, зарегистрируйте его в `bootstrap/providers.php`.
@@ -180,7 +180,7 @@ $brands = $result->facet('brands');
 `Collection<stdClass>`, `hybridFirst()` — `stdClass|null`. Эти методы выполняются сразу;
 старый вызов `hybrid(...)->search()` из alpha.2 удалён. `knn()->match()` сохраняет пересечение.
 [Проверки возможностей и замена RT-индекса](docs/ru/hybrid-and-index-replacement.md) описаны отдельно;
-замена требует режима обслуживания и не обещает zero downtime. Scout не требуется.
+замена требует режима обслуживания и не обещает zero downtime.
 
 ## Схема и миграции
 
@@ -207,6 +207,9 @@ CREATE, DROP, ALTER ADD/DROP выполняются через Laravel Schema Bu
 DDL не транзакционен. См. [пример миграции](docs/ru/upgrading-3.x-to-4.x.md).
 
 ## Отличия от Laravel Query Builder
+
+В [полном профиле API и контрактах](docs/ru/laravel-api-audit.md) перечислены проверенные
+публичные методы, явные запреты, аргументы по умолчанию, результаты и исключения.
 
 Контракты `select()`, `get()`, `first()` и `lazy()` сохранены: билдер, коллекция, объект/null
 и ленивая коллекция соответственно. Ниже — различия при переносе запросов со стандартных

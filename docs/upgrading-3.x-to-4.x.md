@@ -368,8 +368,7 @@ For old CALL helpers without a typed replacement, generic `call()` supports scal
 flat lists only; more complex structures need explicitly constructed, bound SQL. Old date/JSON
 convenience methods, plugins and schema settings must be checked individually. Joins, unions,
 DISTINCT, locks, native isolated upsert, some ALTER operations and general Eloquent compatibility are
-not completed by changing the connection name. An installed Scout adapter may still use the old
-classes: migrate/test it separately before removing the old API or changing its version constraints.
+not completed by changing the connection name.
 
 ## 10. Application rollout
 

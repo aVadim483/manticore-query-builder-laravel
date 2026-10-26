@@ -21,6 +21,7 @@ class ManticoreGrammar extends Grammar
 
     public function compileSelect(Builder $query)
     {
+        QueryCapabilities::select($query);
         if (count($query->havings ?? []) > 1) {
             throw new LogicException('Manticore supports a single HAVING condition per query.');
         }
@@ -221,10 +222,51 @@ class ManticoreGrammar extends Grammar
 
     protected function assertPlainWrite(Builder $query): void
     {
-        if ($query->joins || $query->orders || $query->limit !== null || $query->offset !== null
-            || ($query instanceof ManticoreQueryBuilder && ($query->manticoreOptions || $query->getSearchExpressions() || $query->hasKnn() || $query->getFacets()))) {
-            throw new LogicException('Manticore UPDATE and DELETE do not support joins, ordering, limits, offsets, search options or computed search expressions in this driver.');
-        }
+        QueryCapabilities::write($query);
+    }
+
+    public function compileInsert(Builder $query, array $values)
+    {
+        QueryCapabilities::write($query, true);
+
+        return parent::compileInsert($query, $values);
+    }
+
+    public function compileInsertOrIgnore(Builder $query, array $values)
+    {
+        throw new LogicException('insertOrIgnore() is not supported by the Manticore driver.');
+    }
+
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
+    {
+        throw new LogicException('insertOrIgnoreReturning() is not supported by the Manticore driver.');
+    }
+
+    public function compileInsertUsing(Builder $query, array $columns, string $sql)
+    {
+        throw new LogicException('insertUsing() is not supported by the Manticore driver.');
+    }
+
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
+    {
+        throw new LogicException('insertOrIgnoreUsing() is not supported by the Manticore driver.');
+    }
+
+    public function compileTruncate(Builder $query)
+    {
+        QueryCapabilities::write($query, true);
+
+        return parent::compileTruncate($query);
+    }
+
+    public function compileRandom($seed)
+    {
+        throw new LogicException('inRandomOrder() is not supported. Use orderByRaw(\'RAND()\') and option(\'rand_seed\', $seed).');
+    }
+
+    protected function dateBasedWhere($type, Builder $query, $where)
+    {
+        throw new LogicException('Laravel date filters are not supported. Compare Unix timestamps or use native SELECT expressions.');
     }
 
     public function supportsSavepoints()
