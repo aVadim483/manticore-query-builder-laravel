@@ -8,6 +8,9 @@ All notable changes to this package are documented here. The format follows
 
 ### Changed
 
+* Select attribute encoders once per column for multi-row INSERT/REPLACE on the stock
+  connection. Keep the plan local to each write, share validation with single-value
+  encoding, and preserve custom connection metadata behavior and builder hooks.
 * Prepare multi-row INSERT/REPLACE SQL and bindings together with the stock builder and
   Grammar, preserving schema encoding and numeric literal formatting. Builder/Grammar
   subclasses retain their existing hooks and compilation path, including changes made

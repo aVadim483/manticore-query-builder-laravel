@@ -121,6 +121,16 @@ class PipelineStatement extends PDOStatement
 
 class PipelinePDO extends PDO
 {
+    public function exec(string $statement): int|false
+    {
+        if (!PipelineTrace::$enabled) return parent::exec($statement);
+        $id=PipelineTrace::enter($statement,'exec'); $start=hrtime(true);
+        $result=parent::exec($statement);
+        PipelineTrace::$records[$id]['execute_ms']=(hrtime(true)-$start)/1e6;
+        PipelineTrace::$records[$id]['literal_sql']=$statement;
+        return $result;
+    }
+
     public function prepare(string $query, array $options = []): PDOStatement|false
     {
         if (!PipelineTrace::$enabled) return parent::prepare($query,$options);

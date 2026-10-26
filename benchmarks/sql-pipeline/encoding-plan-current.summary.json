@@ -1,0 +1,2363 @@
+{
+  "created_at": "2026-10-26T20:54:13Z",
+  "run_id": "3d6b8bc691bd",
+  "labels": [
+    "baseline",
+    "current"
+  ],
+  "samples": 60,
+  "profile_samples": 20,
+  "warmup": 5,
+  "manifests": {
+    "baseline": {
+      "composer.json": "42c75a44ee696d82d83bcfb4e82c44fc1b98dfa36fbf1d8c0ff978d1121cf9bc",
+      "src/Manticore/Laravel/Database/AttributeCodec.php": "9828fa825c3f1984a6241fcb673a74426069171d53ea15b1a0b348c39bd5c8b4",
+      "src/Manticore/Laravel/Database/CapabilityEvidence.php": "1bf92e3c0dabaea31832bcb5bfcff9678865da5117fb3c13aaba8349798c82a0",
+      "src/Manticore/Laravel/Database/CursorPagination.php": "dce09bfcfde0a52f54f8dfe9960e70fa9ce969163a53c16c2171a09f0c7a0c1a",
+      "src/Manticore/Laravel/Database/DocumentWrites.php": "8821721c3cf851ae6008e72cad80b5a8cfe917d6116f51ff30980be44af98198",
+      "src/Manticore/Laravel/Database/FullTextConditions.php": "00a4389c5e1d8433ebfcf7c85604761ff9b6cacbca1ffc9a3e23590ebd1bf194",
+      "src/Manticore/Laravel/Database/HybridHit.php": "41696ae14926345b9580b88404ed7a35aa9739614c8cde88c95f477146c7ce48",
+      "src/Manticore/Laravel/Database/HybridResult.php": "147082ef998cb372ed0cf45d73deb821dbe564d67ee358c66ccd0520c137d343",
+      "src/Manticore/Laravel/Database/HybridSearch.php": "884235c16b40e489a709c1409ec2cac3e07911e058a6e7f83306ecb88a2b442f",
+      "src/Manticore/Laravel/Database/IndexReplacement.php": "0253ecc001d9c25c1a96423e93a86cc85619b3c41965e68776b18e2fdd1ec7b0",
+      "src/Manticore/Laravel/Database/IndexReplacementState.php": "173d7a18a58d8f1f19c6f9305b32b62321a7db22afa8cdef598ebcd84ff4f2df",
+      "src/Manticore/Laravel/Database/JsonPath.php": "a76bec270b20fea4bf64cad04b3d9bb08c2dd35d4887ee56456d9a913544ce40",
+      "src/Manticore/Laravel/Database/ManticoreBlueprint.php": "c95732b1e4227818980d582bb0636ee34d3543e936e21b91ddc7ff1c79fe5bb1",
+      "src/Manticore/Laravel/Database/ManticoreConnection.php": "626d417238adf36c0a6329580cf3535ec2656accf443329545ca3e94b4f27193",
+      "src/Manticore/Laravel/Database/ManticoreConnector.php": "4d9ffb24ef24e7b1ed97e64ae1371c156d10ed7093368593181ccdc55b963f75",
+      "src/Manticore/Laravel/Database/ManticoreGrammar.php": "1d16d87e6d04bc71c2cb6f3f398bb4632aae713b36153d04c76c9a55cad098bd",
+      "src/Manticore/Laravel/Database/ManticoreProcessor.php": "2e5f5e0f258d6de23d9b196fd5017a16caea050a2a0434d649ecbf16980fc2bc",
+      "src/Manticore/Laravel/Database/ManticoreQueryBuilder.php": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "src/Manticore/Laravel/Database/ManticoreSchemaBuilder.php": "e6280d0145519d86f6de9fbcb59d970c032d0a56dafbfba6ad2c49d4b1a6933f",
+      "src/Manticore/Laravel/Database/ManticoreSchemaGrammar.php": "defc5bee425039dc389b84034810d0ab3d38386fcfbab4a1a83353c2351c070c",
+      "src/Manticore/Laravel/Database/Meta.php": "092ce66483800556041fb7629b52e2f4e05306d921b2c0292bda28e555238490",
+      "src/Manticore/Laravel/Database/NumericBindings.php": "699932a15d495b43f3ac6b4bf9649e3c136e2f73406349780291c7625e44692b",
+      "src/Manticore/Laravel/Database/ProcedureCall.php": "87d738553ac7f81b7f04ffe32e023f545516273df3f7368262cd6dcc0fb04cc3",
+      "src/Manticore/Laravel/Database/QueryCapabilities.php": "73b3db00f2814fe121c0a9c62ba32186365e3ff3c589abb291c16f1ec4923693",
+      "src/Manticore/Laravel/Database/Ranker.php": "6e86078f36d29e6779c25f7c1c7912c80b5a08ec991227a13360777fd3de2aa2",
+      "src/Manticore/Laravel/Database/SearchOptions.php": "9a363f0556d716b72d5b624f306992c2defb14f149f5e332f6caaba21814fd55",
+      "src/Manticore/Laravel/Database/SearchResult.php": "7b34fe2684cdc38c68881f6a112cf0c2170d436ad5c8b2671c6ec0fac79dc06b",
+      "src/Manticore/Laravel/Database/ServerCapabilities.php": "f6680b903a1c6106bb4d29656b17ce9a52c15f243fb62c341b899087a8f408a6",
+      "src/Manticore/Laravel/Database/TransactionRollbackException.php": "c732bc283e5cf12370186b45b6608bcd460c08e2f95a149d43372319f5d0013a",
+      "src/Manticore/Laravel/Database/UnsupportedFeatureException.php": "a763bc7bf1f23d60bfb0a3acb3247f1f17f741cb4c3b40b6d8bc6d1bb7e207b5",
+      "src/Manticore/Laravel/DatabaseServiceProvider.php": "adc266180ad177944f152ddc93b7c87b9a474510585c508fe268d1139f73c9b2",
+      "src/Manticore/Laravel/ServiceProvider.php": "274ca68bd0dcb4589644c468ae5aab68d4cb12aa74365b9bffaffc005f023e9f"
+    },
+    "baseline_timed": {
+      "composer.json": "42c75a44ee696d82d83bcfb4e82c44fc1b98dfa36fbf1d8c0ff978d1121cf9bc",
+      "src/Manticore/Laravel/Database/AttributeCodec.php": "9828fa825c3f1984a6241fcb673a74426069171d53ea15b1a0b348c39bd5c8b4",
+      "src/Manticore/Laravel/Database/CapabilityEvidence.php": "1bf92e3c0dabaea31832bcb5bfcff9678865da5117fb3c13aaba8349798c82a0",
+      "src/Manticore/Laravel/Database/CursorPagination.php": "dce09bfcfde0a52f54f8dfe9960e70fa9ce969163a53c16c2171a09f0c7a0c1a",
+      "src/Manticore/Laravel/Database/DocumentWrites.php": "8821721c3cf851ae6008e72cad80b5a8cfe917d6116f51ff30980be44af98198",
+      "src/Manticore/Laravel/Database/FullTextConditions.php": "00a4389c5e1d8433ebfcf7c85604761ff9b6cacbca1ffc9a3e23590ebd1bf194",
+      "src/Manticore/Laravel/Database/HybridHit.php": "41696ae14926345b9580b88404ed7a35aa9739614c8cde88c95f477146c7ce48",
+      "src/Manticore/Laravel/Database/HybridResult.php": "147082ef998cb372ed0cf45d73deb821dbe564d67ee358c66ccd0520c137d343",
+      "src/Manticore/Laravel/Database/HybridSearch.php": "884235c16b40e489a709c1409ec2cac3e07911e058a6e7f83306ecb88a2b442f",
+      "src/Manticore/Laravel/Database/IndexReplacement.php": "0253ecc001d9c25c1a96423e93a86cc85619b3c41965e68776b18e2fdd1ec7b0",
+      "src/Manticore/Laravel/Database/IndexReplacementState.php": "173d7a18a58d8f1f19c6f9305b32b62321a7db22afa8cdef598ebcd84ff4f2df",
+      "src/Manticore/Laravel/Database/JsonPath.php": "a76bec270b20fea4bf64cad04b3d9bb08c2dd35d4887ee56456d9a913544ce40",
+      "src/Manticore/Laravel/Database/ManticoreBlueprint.php": "c95732b1e4227818980d582bb0636ee34d3543e936e21b91ddc7ff1c79fe5bb1",
+      "src/Manticore/Laravel/Database/ManticoreConnection.php": "626d417238adf36c0a6329580cf3535ec2656accf443329545ca3e94b4f27193",
+      "src/Manticore/Laravel/Database/ManticoreConnector.php": "4d9ffb24ef24e7b1ed97e64ae1371c156d10ed7093368593181ccdc55b963f75",
+      "src/Manticore/Laravel/Database/ManticoreGrammar.php": "1d16d87e6d04bc71c2cb6f3f398bb4632aae713b36153d04c76c9a55cad098bd",
+      "src/Manticore/Laravel/Database/ManticoreProcessor.php": "2e5f5e0f258d6de23d9b196fd5017a16caea050a2a0434d649ecbf16980fc2bc",
+      "src/Manticore/Laravel/Database/ManticoreQueryBuilder.php": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "src/Manticore/Laravel/Database/ManticoreSchemaBuilder.php": "e6280d0145519d86f6de9fbcb59d970c032d0a56dafbfba6ad2c49d4b1a6933f",
+      "src/Manticore/Laravel/Database/ManticoreSchemaGrammar.php": "defc5bee425039dc389b84034810d0ab3d38386fcfbab4a1a83353c2351c070c",
+      "src/Manticore/Laravel/Database/Meta.php": "092ce66483800556041fb7629b52e2f4e05306d921b2c0292bda28e555238490",
+      "src/Manticore/Laravel/Database/NumericBindings.php": "699932a15d495b43f3ac6b4bf9649e3c136e2f73406349780291c7625e44692b",
+      "src/Manticore/Laravel/Database/ProcedureCall.php": "87d738553ac7f81b7f04ffe32e023f545516273df3f7368262cd6dcc0fb04cc3",
+      "src/Manticore/Laravel/Database/QueryCapabilities.php": "73b3db00f2814fe121c0a9c62ba32186365e3ff3c589abb291c16f1ec4923693",
+      "src/Manticore/Laravel/Database/Ranker.php": "6e86078f36d29e6779c25f7c1c7912c80b5a08ec991227a13360777fd3de2aa2",
+      "src/Manticore/Laravel/Database/SearchOptions.php": "9a363f0556d716b72d5b624f306992c2defb14f149f5e332f6caaba21814fd55",
+      "src/Manticore/Laravel/Database/SearchResult.php": "7b34fe2684cdc38c68881f6a112cf0c2170d436ad5c8b2671c6ec0fac79dc06b",
+      "src/Manticore/Laravel/Database/ServerCapabilities.php": "f6680b903a1c6106bb4d29656b17ce9a52c15f243fb62c341b899087a8f408a6",
+      "src/Manticore/Laravel/Database/TransactionRollbackException.php": "c732bc283e5cf12370186b45b6608bcd460c08e2f95a149d43372319f5d0013a",
+      "src/Manticore/Laravel/Database/UnsupportedFeatureException.php": "a763bc7bf1f23d60bfb0a3acb3247f1f17f741cb4c3b40b6d8bc6d1bb7e207b5",
+      "src/Manticore/Laravel/DatabaseServiceProvider.php": "adc266180ad177944f152ddc93b7c87b9a474510585c508fe268d1139f73c9b2",
+      "src/Manticore/Laravel/ServiceProvider.php": "274ca68bd0dcb4589644c468ae5aab68d4cb12aa74365b9bffaffc005f023e9f"
+    },
+    "current": {
+      "composer.json": "42c75a44ee696d82d83bcfb4e82c44fc1b98dfa36fbf1d8c0ff978d1121cf9bc",
+      "src/Manticore/Laravel/Database/AttributeCodec.php": "e4f7ef13fddbb42e5ad1de27d360c87e5b434ef8c6ad853dbfc28eebfa96a41a",
+      "src/Manticore/Laravel/Database/CapabilityEvidence.php": "1bf92e3c0dabaea31832bcb5bfcff9678865da5117fb3c13aaba8349798c82a0",
+      "src/Manticore/Laravel/Database/CursorPagination.php": "dce09bfcfde0a52f54f8dfe9960e70fa9ce969163a53c16c2171a09f0c7a0c1a",
+      "src/Manticore/Laravel/Database/DocumentWrites.php": "8821721c3cf851ae6008e72cad80b5a8cfe917d6116f51ff30980be44af98198",
+      "src/Manticore/Laravel/Database/FullTextConditions.php": "00a4389c5e1d8433ebfcf7c85604761ff9b6cacbca1ffc9a3e23590ebd1bf194",
+      "src/Manticore/Laravel/Database/HybridHit.php": "41696ae14926345b9580b88404ed7a35aa9739614c8cde88c95f477146c7ce48",
+      "src/Manticore/Laravel/Database/HybridResult.php": "147082ef998cb372ed0cf45d73deb821dbe564d67ee358c66ccd0520c137d343",
+      "src/Manticore/Laravel/Database/HybridSearch.php": "884235c16b40e489a709c1409ec2cac3e07911e058a6e7f83306ecb88a2b442f",
+      "src/Manticore/Laravel/Database/IndexReplacement.php": "0253ecc001d9c25c1a96423e93a86cc85619b3c41965e68776b18e2fdd1ec7b0",
+      "src/Manticore/Laravel/Database/IndexReplacementState.php": "173d7a18a58d8f1f19c6f9305b32b62321a7db22afa8cdef598ebcd84ff4f2df",
+      "src/Manticore/Laravel/Database/JsonPath.php": "a76bec270b20fea4bf64cad04b3d9bb08c2dd35d4887ee56456d9a913544ce40",
+      "src/Manticore/Laravel/Database/ManticoreBlueprint.php": "c95732b1e4227818980d582bb0636ee34d3543e936e21b91ddc7ff1c79fe5bb1",
+      "src/Manticore/Laravel/Database/ManticoreConnection.php": "626d417238adf36c0a6329580cf3535ec2656accf443329545ca3e94b4f27193",
+      "src/Manticore/Laravel/Database/ManticoreConnector.php": "4d9ffb24ef24e7b1ed97e64ae1371c156d10ed7093368593181ccdc55b963f75",
+      "src/Manticore/Laravel/Database/ManticoreGrammar.php": "1d16d87e6d04bc71c2cb6f3f398bb4632aae713b36153d04c76c9a55cad098bd",
+      "src/Manticore/Laravel/Database/ManticoreProcessor.php": "2e5f5e0f258d6de23d9b196fd5017a16caea050a2a0434d649ecbf16980fc2bc",
+      "src/Manticore/Laravel/Database/ManticoreQueryBuilder.php": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "src/Manticore/Laravel/Database/ManticoreSchemaBuilder.php": "e6280d0145519d86f6de9fbcb59d970c032d0a56dafbfba6ad2c49d4b1a6933f",
+      "src/Manticore/Laravel/Database/ManticoreSchemaGrammar.php": "defc5bee425039dc389b84034810d0ab3d38386fcfbab4a1a83353c2351c070c",
+      "src/Manticore/Laravel/Database/Meta.php": "092ce66483800556041fb7629b52e2f4e05306d921b2c0292bda28e555238490",
+      "src/Manticore/Laravel/Database/NumericBindings.php": "699932a15d495b43f3ac6b4bf9649e3c136e2f73406349780291c7625e44692b",
+      "src/Manticore/Laravel/Database/ProcedureCall.php": "87d738553ac7f81b7f04ffe32e023f545516273df3f7368262cd6dcc0fb04cc3",
+      "src/Manticore/Laravel/Database/QueryCapabilities.php": "73b3db00f2814fe121c0a9c62ba32186365e3ff3c589abb291c16f1ec4923693",
+      "src/Manticore/Laravel/Database/Ranker.php": "6e86078f36d29e6779c25f7c1c7912c80b5a08ec991227a13360777fd3de2aa2",
+      "src/Manticore/Laravel/Database/SearchOptions.php": "9a363f0556d716b72d5b624f306992c2defb14f149f5e332f6caaba21814fd55",
+      "src/Manticore/Laravel/Database/SearchResult.php": "7b34fe2684cdc38c68881f6a112cf0c2170d436ad5c8b2671c6ec0fac79dc06b",
+      "src/Manticore/Laravel/Database/ServerCapabilities.php": "f6680b903a1c6106bb4d29656b17ce9a52c15f243fb62c341b899087a8f408a6",
+      "src/Manticore/Laravel/Database/TransactionRollbackException.php": "c732bc283e5cf12370186b45b6608bcd460c08e2f95a149d43372319f5d0013a",
+      "src/Manticore/Laravel/Database/UnsupportedFeatureException.php": "a763bc7bf1f23d60bfb0a3acb3247f1f17f741cb4c3b40b6d8bc6d1bb7e207b5",
+      "src/Manticore/Laravel/DatabaseServiceProvider.php": "adc266180ad177944f152ddc93b7c87b9a474510585c508fe268d1139f73c9b2",
+      "src/Manticore/Laravel/ServiceProvider.php": "274ca68bd0dcb4589644c468ae5aab68d4cb12aa74365b9bffaffc005f023e9f"
+    },
+    "current_timed": {
+      "composer.json": "42c75a44ee696d82d83bcfb4e82c44fc1b98dfa36fbf1d8c0ff978d1121cf9bc",
+      "src/Manticore/Laravel/Database/AttributeCodec.php": "e4f7ef13fddbb42e5ad1de27d360c87e5b434ef8c6ad853dbfc28eebfa96a41a",
+      "src/Manticore/Laravel/Database/CapabilityEvidence.php": "1bf92e3c0dabaea31832bcb5bfcff9678865da5117fb3c13aaba8349798c82a0",
+      "src/Manticore/Laravel/Database/CursorPagination.php": "dce09bfcfde0a52f54f8dfe9960e70fa9ce969163a53c16c2171a09f0c7a0c1a",
+      "src/Manticore/Laravel/Database/DocumentWrites.php": "8821721c3cf851ae6008e72cad80b5a8cfe917d6116f51ff30980be44af98198",
+      "src/Manticore/Laravel/Database/FullTextConditions.php": "00a4389c5e1d8433ebfcf7c85604761ff9b6cacbca1ffc9a3e23590ebd1bf194",
+      "src/Manticore/Laravel/Database/HybridHit.php": "41696ae14926345b9580b88404ed7a35aa9739614c8cde88c95f477146c7ce48",
+      "src/Manticore/Laravel/Database/HybridResult.php": "147082ef998cb372ed0cf45d73deb821dbe564d67ee358c66ccd0520c137d343",
+      "src/Manticore/Laravel/Database/HybridSearch.php": "884235c16b40e489a709c1409ec2cac3e07911e058a6e7f83306ecb88a2b442f",
+      "src/Manticore/Laravel/Database/IndexReplacement.php": "0253ecc001d9c25c1a96423e93a86cc85619b3c41965e68776b18e2fdd1ec7b0",
+      "src/Manticore/Laravel/Database/IndexReplacementState.php": "173d7a18a58d8f1f19c6f9305b32b62321a7db22afa8cdef598ebcd84ff4f2df",
+      "src/Manticore/Laravel/Database/JsonPath.php": "a76bec270b20fea4bf64cad04b3d9bb08c2dd35d4887ee56456d9a913544ce40",
+      "src/Manticore/Laravel/Database/ManticoreBlueprint.php": "c95732b1e4227818980d582bb0636ee34d3543e936e21b91ddc7ff1c79fe5bb1",
+      "src/Manticore/Laravel/Database/ManticoreConnection.php": "626d417238adf36c0a6329580cf3535ec2656accf443329545ca3e94b4f27193",
+      "src/Manticore/Laravel/Database/ManticoreConnector.php": "4d9ffb24ef24e7b1ed97e64ae1371c156d10ed7093368593181ccdc55b963f75",
+      "src/Manticore/Laravel/Database/ManticoreGrammar.php": "1d16d87e6d04bc71c2cb6f3f398bb4632aae713b36153d04c76c9a55cad098bd",
+      "src/Manticore/Laravel/Database/ManticoreProcessor.php": "2e5f5e0f258d6de23d9b196fd5017a16caea050a2a0434d649ecbf16980fc2bc",
+      "src/Manticore/Laravel/Database/ManticoreQueryBuilder.php": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "src/Manticore/Laravel/Database/ManticoreSchemaBuilder.php": "e6280d0145519d86f6de9fbcb59d970c032d0a56dafbfba6ad2c49d4b1a6933f",
+      "src/Manticore/Laravel/Database/ManticoreSchemaGrammar.php": "defc5bee425039dc389b84034810d0ab3d38386fcfbab4a1a83353c2351c070c",
+      "src/Manticore/Laravel/Database/Meta.php": "092ce66483800556041fb7629b52e2f4e05306d921b2c0292bda28e555238490",
+      "src/Manticore/Laravel/Database/NumericBindings.php": "699932a15d495b43f3ac6b4bf9649e3c136e2f73406349780291c7625e44692b",
+      "src/Manticore/Laravel/Database/ProcedureCall.php": "87d738553ac7f81b7f04ffe32e023f545516273df3f7368262cd6dcc0fb04cc3",
+      "src/Manticore/Laravel/Database/QueryCapabilities.php": "73b3db00f2814fe121c0a9c62ba32186365e3ff3c589abb291c16f1ec4923693",
+      "src/Manticore/Laravel/Database/Ranker.php": "6e86078f36d29e6779c25f7c1c7912c80b5a08ec991227a13360777fd3de2aa2",
+      "src/Manticore/Laravel/Database/SearchOptions.php": "9a363f0556d716b72d5b624f306992c2defb14f149f5e332f6caaba21814fd55",
+      "src/Manticore/Laravel/Database/SearchResult.php": "7b34fe2684cdc38c68881f6a112cf0c2170d436ad5c8b2671c6ec0fac79dc06b",
+      "src/Manticore/Laravel/Database/ServerCapabilities.php": "f6680b903a1c6106bb4d29656b17ce9a52c15f243fb62c341b899087a8f408a6",
+      "src/Manticore/Laravel/Database/TransactionRollbackException.php": "c732bc283e5cf12370186b45b6608bcd460c08e2f95a149d43372319f5d0013a",
+      "src/Manticore/Laravel/Database/UnsupportedFeatureException.php": "a763bc7bf1f23d60bfb0a3acb3247f1f17f741cb4c3b40b6d8bc6d1bb7e207b5",
+      "src/Manticore/Laravel/DatabaseServiceProvider.php": "adc266180ad177944f152ddc93b7c87b9a474510585c508fe268d1139f73c9b2",
+      "src/Manticore/Laravel/ServiceProvider.php": "274ca68bd0dcb4589644c468ae5aab68d4cb12aa74365b9bffaffc005f023e9f"
+    }
+  },
+  "environment": {
+    "pipe_3d6b8bc691bd_baseline_structured_1_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_1_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_1_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_1_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_1_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_1_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_2_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_2_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_2_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_2_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_2_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_2_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_10_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_10_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_10_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_10_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_10_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_10_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_100_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_100_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_100_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_100_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_100_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_100_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_500_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_500_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_500_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_500_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_500_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_500_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_1000_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_1000_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_1000_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_1000_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_structured_1000_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_structured_1000_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_1_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_1_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_1_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_1_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_1_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_1_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_2_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_2_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_2_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_2_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_2_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_2_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_10_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_10_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_10_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_10_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_10_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_10_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_100_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_100_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_100_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_100_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_100_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_100_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_500_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_500_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_500_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_500_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_500_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_500_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_1000_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_1000_capture": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PipelinePDO",
+      "pdo_statement_class": "PipelineStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_1000_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "b41e292f68a16846e3e2df8956bc737d6e2feb04ba9ac502512d7a7b3e8e610a",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_1000_plain": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "8186440a8db614892a7ffdf199419cf472aee3d2a6e8d84bc43265261231f454",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_baseline_scalar_1000_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "ff757ad753f6edb42ea24a9cde89d00fe0efaefb60214e7eee0c2672b2acf236",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/baseline_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    },
+    "pipe_3d6b8bc691bd_current_scalar_1000_profile": {
+      "ready": true,
+      "php": "8.3.6",
+      "laravel": "12.70.1",
+      "client": "v4",
+      "package": "v4.0.0",
+      "native_builder": true,
+      "pdo_class": "PDO",
+      "pdo_statement_class": "PDOStatement",
+      "grammar_class": "avadim\\Manticore\\Laravel\\Database\\ManticoreGrammar",
+      "source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/ManticoreQueryBuilder.php",
+      "source_sha256": "731ebc59a32e56c3cbe19c788fd9c289dcba2adba3d3f059053df8390031b770",
+      "codec_source": "/var/www/avadim/data/apps/sql-pipeline-lab/encoding-current-variants/current_timed/src/Manticore/Laravel/Database/AttributeCodec.php",
+      "xdebug": false,
+      "emulated_prepares": 1,
+      "buffered": true
+    }
+  },
+  "ok": true,
+  "raw_sha256": "89d0fecc354fa2e5ff09994aea2a1cf87f465f766d5fddefd8c64010383f8693",
+  "cases": {
+    "structured_insert_1": {
+      "digest": "f861c0577a220b281174d80fd9c05a47d0c6d9ac4ebe114648ea49c3151561a8",
+      "sql_bindings_sha256": {
+        "baseline": "efb4f311a35221b91c185b1b8d7185cf7fee564923d529f701fdf383cc57f2f8",
+        "current": "efb4f311a35221b91c185b1b8d7185cf7fee564923d529f701fdf383cc57f2f8"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.034734,
+              "p95_ms": 1.086085
+            },
+            "current": {
+              "total_ms": 1.0128515,
+              "p95_ms": 1.066618
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.028867499999999935
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.996828,
+              "encode_ms": 0.038191,
+              "p95_ms": 1.041388
+            },
+            "current": {
+              "total_ms": 1.030156,
+              "encode_ms": 0.038082500000000005,
+              "p95_ms": 1.095381
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.03921800000000003
+          }
+        }
+      }
+    },
+    "structured_replace_1": {
+      "digest": "f861c0577a220b281174d80fd9c05a47d0c6d9ac4ebe114648ea49c3151561a8",
+      "sql_bindings_sha256": {
+        "baseline": "19fa4f78918baf412e0dbcbdece3bf4d00203ee9b45948050cef96cdeb9f3317",
+        "current": "19fa4f78918baf412e0dbcbdece3bf4d00203ee9b45948050cef96cdeb9f3317"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.9853369999999999,
+              "p95_ms": 1.055252
+            },
+            "current": {
+              "total_ms": 0.978645,
+              "p95_ms": 1.0081
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.00994649999999997
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.9960165000000001,
+              "encode_ms": 0.039341,
+              "p95_ms": 1.035786
+            },
+            "current": {
+              "total_ms": 1.0000909999999998,
+              "encode_ms": 0.0386675,
+              "p95_ms": 1.045346
+            }
+          },
+          "paired_difference_ms": {
+            "current": -4.8000000000048004e-05
+          }
+        }
+      }
+    },
+    "structured_insert_2": {
+      "digest": "aaac5ea77e564d0fdad6df22fc84dc2aa0b73f5528bde962c9b8e8bd8ec3fa92",
+      "sql_bindings_sha256": {
+        "baseline": "433675cb581e42ad9d45d7b1bb4ee3a81d7b2f294c5a312bfe4ff96f2081fb5d",
+        "current": "433675cb581e42ad9d45d7b1bb4ee3a81d7b2f294c5a312bfe4ff96f2081fb5d"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.1120375,
+              "p95_ms": 1.17095
+            },
+            "current": {
+              "total_ms": 1.078466,
+              "p95_ms": 1.15001
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.025824500000000028
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.1355605,
+              "encode_ms": 0.0488285,
+              "p95_ms": 1.180393
+            },
+            "current": {
+              "total_ms": 1.16542,
+              "encode_ms": 0.053957,
+              "p95_ms": 1.194746
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.020757000000000025
+          }
+        }
+      }
+    },
+    "structured_replace_2": {
+      "digest": "aaac5ea77e564d0fdad6df22fc84dc2aa0b73f5528bde962c9b8e8bd8ec3fa92",
+      "sql_bindings_sha256": {
+        "baseline": "5d9f58f7fd7ef19c6e350da0c024036d685bee0b6e8d5cf92de1fc4e510cc16a",
+        "current": "5d9f58f7fd7ef19c6e350da0c024036d685bee0b6e8d5cf92de1fc4e510cc16a"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.0575855,
+              "p95_ms": 1.092514
+            },
+            "current": {
+              "total_ms": 1.046532,
+              "p95_ms": 1.085258
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.007657499999999984
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.0306410000000001,
+              "encode_ms": 0.049701999999999996,
+              "p95_ms": 1.072302
+            },
+            "current": {
+              "total_ms": 1.0333975,
+              "encode_ms": 0.055102,
+              "p95_ms": 1.088178
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.0031050000000000244
+          }
+        }
+      }
+    },
+    "structured_insert_10": {
+      "digest": "560cdc59acef6a75248d37522b9dc2090ba224de974e8260065d8acd32a97ec6",
+      "sql_bindings_sha256": {
+        "baseline": "aa1f29c87d17dbf699f21664e83835e2b63ce3a3f8ed066110f54e41ce942eda",
+        "current": "aa1f29c87d17dbf699f21664e83835e2b63ce3a3f8ed066110f54e41ce942eda"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.7869975,
+              "p95_ms": 1.838323
+            },
+            "current": {
+              "total_ms": 1.7701125,
+              "p95_ms": 1.807486
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.020234500000000044
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.7779025,
+              "encode_ms": 0.113069,
+              "p95_ms": 1.841559
+            },
+            "current": {
+              "total_ms": 1.752249,
+              "encode_ms": 0.1003475,
+              "p95_ms": 1.777943
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.025066000000000144
+          }
+        }
+      }
+    },
+    "structured_replace_10": {
+      "digest": "560cdc59acef6a75248d37522b9dc2090ba224de974e8260065d8acd32a97ec6",
+      "sql_bindings_sha256": {
+        "baseline": "b94bdcf2cd00bc38814a38fac4ed646740976bddce0c5f99e042b9ac971b57bf",
+        "current": "b94bdcf2cd00bc38814a38fac4ed646740976bddce0c5f99e042b9ac971b57bf"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.70943,
+              "p95_ms": 1.79724
+            },
+            "current": {
+              "total_ms": 1.6986975,
+              "p95_ms": 1.778631
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.016728000000000076
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.72077,
+              "encode_ms": 0.11400450000000001,
+              "p95_ms": 1.786997
+            },
+            "current": {
+              "total_ms": 1.697394,
+              "encode_ms": 0.1015365,
+              "p95_ms": 1.776354
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.003706500000000057
+          }
+        }
+      }
+    },
+    "structured_insert_100": {
+      "digest": "91e88531f1ac98517bea5c9bb1b6e37d14c1ac14b0c16a49cefeff957ed0db27",
+      "sql_bindings_sha256": {
+        "baseline": "04a4ca98dd6f2a87038126d590ee8e5b60515f67d2e2143eb6f2c0d3c4d0cba3",
+        "current": "04a4ca98dd6f2a87038126d590ee8e5b60515f67d2e2143eb6f2c0d3c4d0cba3"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 8.452548,
+              "p95_ms": 8.56425
+            },
+            "current": {
+              "total_ms": 8.1463295,
+              "p95_ms": 8.293321
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.28869600000000073
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 8.469688,
+              "encode_ms": 0.856784,
+              "p95_ms": 8.585672
+            },
+            "current": {
+              "total_ms": 8.175226,
+              "encode_ms": 0.618764,
+              "p95_ms": 8.270375
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.29357099999999914
+          }
+        }
+      }
+    },
+    "structured_replace_100": {
+      "digest": "91e88531f1ac98517bea5c9bb1b6e37d14c1ac14b0c16a49cefeff957ed0db27",
+      "sql_bindings_sha256": {
+        "baseline": "6b44f0112472b33cd77088b27a0d28a31fc37951f9459bb998955ae307791520",
+        "current": "6b44f0112472b33cd77088b27a0d28a31fc37951f9459bb998955ae307791520"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 8.4144855,
+              "p95_ms": 8.490127
+            },
+            "current": {
+              "total_ms": 8.134396500000001,
+              "p95_ms": 8.234316
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.2844709999999999
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 8.4901745,
+              "encode_ms": 0.8777875,
+              "p95_ms": 8.619194
+            },
+            "current": {
+              "total_ms": 8.230901,
+              "encode_ms": 0.6362255,
+              "p95_ms": 8.283595
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.2881840000000002
+          }
+        }
+      }
+    },
+    "structured_insert_500": {
+      "digest": "574557e92b1f4c432ba477db3a40427d188d772f38e2ea231e326cdc5269cdc7",
+      "sql_bindings_sha256": {
+        "baseline": "475bb770110cb2a6b0fc9827765c1b7f4f6c764d39b8ca47781349f79eb5e7a7",
+        "current": "475bb770110cb2a6b0fc9827765c1b7f4f6c764d39b8ca47781349f79eb5e7a7"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 37.7473775,
+              "p95_ms": 38.175864
+            },
+            "current": {
+              "total_ms": 36.751549999999995,
+              "p95_ms": 37.097703
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.9212350000000029
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 37.8976495,
+              "encode_ms": 4.171705,
+              "p95_ms": 38.33364
+            },
+            "current": {
+              "total_ms": 36.6366635,
+              "encode_ms": 3.0817534999999996,
+              "p95_ms": 36.954999
+            }
+          },
+          "paired_difference_ms": {
+            "current": -1.3439545000000024
+          }
+        }
+      }
+    },
+    "structured_replace_500": {
+      "digest": "574557e92b1f4c432ba477db3a40427d188d772f38e2ea231e326cdc5269cdc7",
+      "sql_bindings_sha256": {
+        "baseline": "9162993613f863659fe24d2f5fad003e84fa0780342f34e5b70258815928a705",
+        "current": "9162993613f863659fe24d2f5fad003e84fa0780342f34e5b70258815928a705"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 37.659436,
+              "p95_ms": 38.029061
+            },
+            "current": {
+              "total_ms": 36.556095,
+              "p95_ms": 36.849478
+            }
+          },
+          "paired_difference_ms": {
+            "current": -1.1395149999999994
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 37.925167,
+              "encode_ms": 4.191787,
+              "p95_ms": 38.352834
+            },
+            "current": {
+              "total_ms": 34.974323,
+              "encode_ms": 3.087864,
+              "p95_ms": 37.156881
+            }
+          },
+          "paired_difference_ms": {
+            "current": -2.616642500000001
+          }
+        }
+      }
+    },
+    "structured_insert_1000": {
+      "digest": "7a4a02b58c76c4d42c19d6882ba54583fec52c554cfbbf149e24b2914dad9263",
+      "sql_bindings_sha256": {
+        "baseline": "83f22a3d560c0824e412500a8ea3a410f2f69f462093fd098f0e0e2bb4344f17",
+        "current": "83f22a3d560c0824e412500a8ea3a410f2f69f462093fd098f0e0e2bb4344f17"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 71.9138235,
+              "p95_ms": 73.354244
+            },
+            "current": {
+              "total_ms": 69.680148,
+              "p95_ms": 71.134013
+            }
+          },
+          "paired_difference_ms": {
+            "current": -2.532009000000002
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 71.854344,
+              "encode_ms": 8.370058,
+              "p95_ms": 73.371624
+            },
+            "current": {
+              "total_ms": 69.57528149999999,
+              "encode_ms": 6.0287975,
+              "p95_ms": 71.033275
+            }
+          },
+          "paired_difference_ms": {
+            "current": -2.303511999999998
+          }
+        }
+      }
+    },
+    "structured_replace_1000": {
+      "digest": "7a4a02b58c76c4d42c19d6882ba54583fec52c554cfbbf149e24b2914dad9263",
+      "sql_bindings_sha256": {
+        "baseline": "616db93a36dcaa85954eb75b2ef8b09395aa6c675b1d01f6708701de1acc47a7",
+        "current": "616db93a36dcaa85954eb75b2ef8b09395aa6c675b1d01f6708701de1acc47a7"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 67.992976,
+              "p95_ms": 73.353498
+            },
+            "current": {
+              "total_ms": 65.520989,
+              "p95_ms": 71.332536
+            }
+          },
+          "paired_difference_ms": {
+            "current": -2.0107809999999944
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 68.0042645,
+              "encode_ms": 8.4738725,
+              "p95_ms": 73.642162
+            },
+            "current": {
+              "total_ms": 65.4936745,
+              "encode_ms": 6.053438,
+              "p95_ms": 71.204034
+            }
+          },
+          "paired_difference_ms": {
+            "current": -2.365060000000007
+          }
+        }
+      }
+    },
+    "scalar_insert_1": {
+      "digest": "d6ffad60df055d84b358db887107af9b235c0776be63b82edba474f1cf7fb4ce",
+      "sql_bindings_sha256": {
+        "baseline": "86e9585bf28c905e79c5e5bd99b874fff1650fb66d227dcf1483f4ca8ed1a14a",
+        "current": "86e9585bf28c905e79c5e5bd99b874fff1650fb66d227dcf1483f4ca8ed1a14a"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.9747835,
+              "p95_ms": 1.040469
+            },
+            "current": {
+              "total_ms": 0.9809355,
+              "p95_ms": 1.033476
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.003051500000000096
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.9828935,
+              "encode_ms": 0.0254395,
+              "p95_ms": 1.039419
+            },
+            "current": {
+              "total_ms": 1.0125115,
+              "encode_ms": 0.024697999999999998,
+              "p95_ms": 1.037029
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.0038845000000000685
+          }
+        }
+      }
+    },
+    "scalar_replace_1": {
+      "digest": "d6ffad60df055d84b358db887107af9b235c0776be63b82edba474f1cf7fb4ce",
+      "sql_bindings_sha256": {
+        "baseline": "c658fdf43462b24e5edfc00faf33c912f23c58d655e260a2a7c2637a1d87de65",
+        "current": "c658fdf43462b24e5edfc00faf33c912f23c58d655e260a2a7c2637a1d87de65"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.795781,
+              "p95_ms": 0.866879
+            },
+            "current": {
+              "total_ms": 0.796082,
+              "p95_ms": 0.897532
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.003332000000000057
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.8604134999999999,
+              "encode_ms": 0.02249,
+              "p95_ms": 0.943954
+            },
+            "current": {
+              "total_ms": 0.83891,
+              "encode_ms": 0.02514,
+              "p95_ms": 0.947061
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.0028435000000000543
+          }
+        }
+      }
+    },
+    "scalar_insert_2": {
+      "digest": "9b3c4fb85e017d57785a5791b8b6f323a33a92ed4fad1e31a696cc325d7e3f7a",
+      "sql_bindings_sha256": {
+        "baseline": "6262f31a02b7a7c473d61bac0af2ac81f69548b3fc53bf3fffc1f4946882392f",
+        "current": "6262f31a02b7a7c473d61bac0af2ac81f69548b3fc53bf3fffc1f4946882392f"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.9661865000000001,
+              "p95_ms": 1.061235
+            },
+            "current": {
+              "total_ms": 0.9671635000000001,
+              "p95_ms": 1.079148
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.0007110000000000172
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.0458205,
+              "encode_ms": 0.029832499999999998,
+              "p95_ms": 1.120481
+            },
+            "current": {
+              "total_ms": 0.9827835,
+              "encode_ms": 0.0347825,
+              "p95_ms": 1.014802
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.06623850000000003
+          }
+        }
+      }
+    },
+    "scalar_replace_2": {
+      "digest": "9b3c4fb85e017d57785a5791b8b6f323a33a92ed4fad1e31a696cc325d7e3f7a",
+      "sql_bindings_sha256": {
+        "baseline": "b31c89534c5693b9ae1fb777350efc9b7d117a96bd096cedaa2474a4044260d1",
+        "current": "b31c89534c5693b9ae1fb777350efc9b7d117a96bd096cedaa2474a4044260d1"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.9641815,
+              "p95_ms": 1.002396
+            },
+            "current": {
+              "total_ms": 0.9752970000000001,
+              "p95_ms": 1.01179
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.016836499999999976
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 0.969052,
+              "encode_ms": 0.030473,
+              "p95_ms": 1.020959
+            },
+            "current": {
+              "total_ms": 0.927888,
+              "encode_ms": 0.035371,
+              "p95_ms": 0.961503
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.028932499999999972
+          }
+        }
+      }
+    },
+    "scalar_insert_10": {
+      "digest": "baaf4f5f88ea8a48b1c9f965ed7f56bed046d7d7dca310d9ae42084af6ca71d9",
+      "sql_bindings_sha256": {
+        "baseline": "4443044ee4e1310190826bbfe9501745db51fea2d03f703e708244c7b5bc5a01",
+        "current": "4443044ee4e1310190826bbfe9501745db51fea2d03f703e708244c7b5bc5a01"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.3924915,
+              "p95_ms": 1.453267
+            },
+            "current": {
+              "total_ms": 1.4071609999999999,
+              "p95_ms": 1.461873
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.004951499999999998
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.4470589999999999,
+              "encode_ms": 0.059467,
+              "p95_ms": 1.48169
+            },
+            "current": {
+              "total_ms": 1.4452025,
+              "encode_ms": 0.052887,
+              "p95_ms": 1.491396
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.01718850000000005
+          }
+        }
+      }
+    },
+    "scalar_replace_10": {
+      "digest": "baaf4f5f88ea8a48b1c9f965ed7f56bed046d7d7dca310d9ae42084af6ca71d9",
+      "sql_bindings_sha256": {
+        "baseline": "4aacdd7fa849f545fb03478229ef39892616ea7b408d7a0ac80372b43388b797",
+        "current": "4aacdd7fa849f545fb03478229ef39892616ea7b408d7a0ac80372b43388b797"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.2795075,
+              "p95_ms": 1.402571
+            },
+            "current": {
+              "total_ms": 1.32422,
+              "p95_ms": 1.418991
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.0030094999999999983
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 1.278977,
+              "encode_ms": 0.060867000000000004,
+              "p95_ms": 1.48106
+            },
+            "current": {
+              "total_ms": 1.3758305000000002,
+              "encode_ms": 0.0811315,
+              "p95_ms": 1.482787
+            }
+          },
+          "paired_difference_ms": {
+            "current": 0.05059250000000004
+          }
+        }
+      }
+    },
+    "scalar_insert_100": {
+      "digest": "22e7d91f5d905856b95f46d378b64ee5eec2b0def7fbbe25d29eab499d3cee50",
+      "sql_bindings_sha256": {
+        "baseline": "46d2fac498e3f4f13fcaca495921b625e022c2165a1c4eff9539689298ca5f93",
+        "current": "46d2fac498e3f4f13fcaca495921b625e022c2165a1c4eff9539689298ca5f93"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 4.9608125,
+              "p95_ms": 5.764342
+            },
+            "current": {
+              "total_ms": 4.9665495,
+              "p95_ms": 5.733143
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.12582700000000013
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 5.7515,
+              "encode_ms": 0.4067355,
+              "p95_ms": 5.888024
+            },
+            "current": {
+              "total_ms": 5.5677635,
+              "encode_ms": 0.2473255,
+              "p95_ms": 5.735843
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.19387399999999966
+          }
+        }
+      }
+    },
+    "scalar_replace_100": {
+      "digest": "22e7d91f5d905856b95f46d378b64ee5eec2b0def7fbbe25d29eab499d3cee50",
+      "sql_bindings_sha256": {
+        "baseline": "6e474fea773554f6906c43cc58bd6aac6c597e33b1325044821f9a6442be9b6d",
+        "current": "6e474fea773554f6906c43cc58bd6aac6c597e33b1325044821f9a6442be9b6d"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 5.5996245,
+              "p95_ms": 5.703697
+            },
+            "current": {
+              "total_ms": 5.465347,
+              "p95_ms": 5.538464
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.12694600000000023
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 5.6321775,
+              "encode_ms": 0.4059685,
+              "p95_ms": 5.701211
+            },
+            "current": {
+              "total_ms": 5.5195215,
+              "encode_ms": 0.2823745,
+              "p95_ms": 5.607036
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.11419600000000019
+          }
+        }
+      }
+    },
+    "scalar_insert_500": {
+      "digest": "effb70c873ff2bffbfc235ce73fb5ae82c2d52fdcd80d8af774b24a38dddf277",
+      "sql_bindings_sha256": {
+        "baseline": "2585fcb3a06060636261074d1af5efa5c5b85694ba8e7506e5a590512c037dd0",
+        "current": "2585fcb3a06060636261074d1af5efa5c5b85694ba8e7506e5a590512c037dd0"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 24.370869499999998,
+              "p95_ms": 24.705397
+            },
+            "current": {
+              "total_ms": 23.7128545,
+              "p95_ms": 24.030627
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.6234109999999973
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 24.5218855,
+              "encode_ms": 1.888233,
+              "p95_ms": 24.955886
+            },
+            "current": {
+              "total_ms": 23.6068345,
+              "encode_ms": 1.133402,
+              "p95_ms": 23.992881
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.9480155000000003
+          }
+        }
+      }
+    },
+    "scalar_replace_500": {
+      "digest": "effb70c873ff2bffbfc235ce73fb5ae82c2d52fdcd80d8af774b24a38dddf277",
+      "sql_bindings_sha256": {
+        "baseline": "0b7639f90696ad604a9d0dc5ff60a498b7e6320700daf6a96841918498eafdcc",
+        "current": "0b7639f90696ad604a9d0dc5ff60a498b7e6320700daf6a96841918498eafdcc"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 24.262842,
+              "p95_ms": 24.55969
+            },
+            "current": {
+              "total_ms": 23.589775500000002,
+              "p95_ms": 23.787819
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.724907
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 24.328419,
+              "encode_ms": 1.9068960000000001,
+              "p95_ms": 24.672791
+            },
+            "current": {
+              "total_ms": 23.3684345,
+              "encode_ms": 1.14173,
+              "p95_ms": 23.723207
+            }
+          },
+          "paired_difference_ms": {
+            "current": -0.982467999999999
+          }
+        }
+      }
+    },
+    "scalar_insert_1000": {
+      "digest": "647c5ff0e43948db4a9e84ec52925102be8bdbc56d4bae32e2ee15c82fbdd86d",
+      "sql_bindings_sha256": {
+        "baseline": "553f48ee5140232260d0f5a10c1c9c245172b84debbcf5d54209eaeb6a407914",
+        "current": "553f48ee5140232260d0f5a10c1c9c245172b84debbcf5d54209eaeb6a407914"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 47.280069,
+              "p95_ms": 47.878319
+            },
+            "current": {
+              "total_ms": 45.932550500000005,
+              "p95_ms": 46.426499
+            }
+          },
+          "paired_difference_ms": {
+            "current": -1.375721500000001
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 47.387029999999996,
+              "encode_ms": 3.7641985,
+              "p95_ms": 48.249225
+            },
+            "current": {
+              "total_ms": 45.6766935,
+              "encode_ms": 2.223316,
+              "p95_ms": 46.781735
+            }
+          },
+          "paired_difference_ms": {
+            "current": -1.8947649999999996
+          }
+        }
+      }
+    },
+    "scalar_replace_1000": {
+      "digest": "647c5ff0e43948db4a9e84ec52925102be8bdbc56d4bae32e2ee15c82fbdd86d",
+      "sql_bindings_sha256": {
+        "baseline": "b4b62cc9a0adacd72fc2992c0aad861a42d3ed9b0e3e6729799959c4994bcb72",
+        "current": "b4b62cc9a0adacd72fc2992c0aad861a42d3ed9b0e3e6729799959c4994bcb72"
+      },
+      "phases": {
+        "plain": {
+          "summary": {
+            "baseline": {
+              "total_ms": 47.339197999999996,
+              "p95_ms": 48.032839
+            },
+            "current": {
+              "total_ms": 45.6163315,
+              "p95_ms": 46.282621
+            }
+          },
+          "paired_difference_ms": {
+            "current": -1.7428474999999999
+          }
+        },
+        "profile": {
+          "summary": {
+            "baseline": {
+              "total_ms": 47.139253499999995,
+              "encode_ms": 3.7550815,
+              "p95_ms": 48.553268
+            },
+            "current": {
+              "total_ms": 45.572174000000004,
+              "encode_ms": 2.2347675000000002,
+              "p95_ms": 46.076876
+            }
+          },
+          "paired_difference_ms": {
+            "current": -1.7734445
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "source_files_verified_after_run": {
+    "current": 32,
+    "v3_driver": 13,
+    "v3_standalone": 21
+  },
+  "shared_dependencies_with_matching_versions_and_source_dist_references": 77,
+  "sql_behavior_verified_cases": 16
+}

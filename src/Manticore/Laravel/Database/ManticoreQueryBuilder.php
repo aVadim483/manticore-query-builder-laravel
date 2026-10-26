@@ -219,6 +219,29 @@ class ManticoreQueryBuilder extends Builder
             ? $this->connection->getTableSchema($table) : [];
         $multiple = array_is_list($values) && is_array($values[0]);
         $rows = $multiple ? $values : [$values];
+        // Resolve each column's handler once per batch. Custom connections keep the
+        // per-value schema lookup; their metadata can have application-defined behavior.
+        if ($multiple && count($rows) > 1 && get_class($this->connection) === ManticoreConnection::class) {
+            $encoders = [];
+            foreach ($rows as &$row) {
+                foreach ($row as $column => &$value) {
+                    $encode = $encoders[$column] ??= isset($schema[$column])
+                        ? AttributeCodec::encoder($schema[$column]['type'])
+                        : static function (mixed $value): mixed {
+                            if (is_array($value) || (is_object($value) && !$value instanceof ExpressionContract)) {
+                                throw new InvalidArgumentException('A structured value requires a known JSON, MVA or vector column.');
+                            }
+
+                            return $value;
+                        };
+                    $value = $encode($value);
+                }
+                unset($value);
+            }
+            unset($row);
+
+            return $rows;
+        }
         foreach ($rows as &$row) {
             foreach ($row as $column => &$value) {
                 if (isset($schema[$column])) {

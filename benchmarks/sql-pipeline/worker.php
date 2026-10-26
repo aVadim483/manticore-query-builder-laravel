@@ -22,12 +22,13 @@ if($client==='v4')require __DIR__.'/probes-v4.php';
 $config=json_decode(file_get_contents($configPath),true,512,JSON_THROW_ON_ERROR);
 $config['count_sql']=false;
 $driver=new DriverComparison($client,$config);
-$pdo=new PipelinePDO('mysql:host=127.0.0.1;port=19306',null,null,[
+$pdoClass=($config['plain_pdo']??false)?PDO::class:PipelinePDO::class;
+$pdo=new $pdoClass('mysql:host=127.0.0.1;port=19306',null,null,[
     PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>true,
     PDO::ATTR_STRINGIFY_FETCHES=>false,PDO::MYSQL_ATTR_USE_BUFFERED_QUERY=>true,
     PDO::ATTR_TIMEOUT=>5,
 ]);
-$pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS,[PipelineStatement::class,[]]);
+if(!($config['plain_pdo']??false))$pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS,[PipelineStatement::class,[]]);
 $driver->pdo=$pdo;
 $connectionProperty=new ReflectionProperty(DriverComparison::class,'connection');
 if($client==='v4') {
@@ -53,13 +54,23 @@ if(isset($config['write_size']) && $config['write_size']!==500) {
     }
 }
 $GLOBALS['comparison_write_rows']=$rows;
+if(($config['write_fixture']??'structured')==='scalar') {
+    foreach($rows as &$row)unset($row['details'],$row['tags']);
+    unset($row);
+    $GLOBALS['comparison_write_rows']=$rows;
+}
 $captures=[]; $ownsRead=false;
 $loaded=$client==='v4'?(new ReflectionClass(avadim\Manticore\Laravel\Database\ManticoreQueryBuilder::class))->getFileName():null;
 echo json_encode(['ready'=>true,'php'=>PHP_VERSION,'laravel'=>$app->version(),'client'=>$client,
     'package'=>Composer\InstalledVersions::getPrettyVersion('avadim/manticore-query-builder-laravel'),
     'native_builder'=>$config['native_builder']??false,
+    'pdo_class'=>get_class($pdo),
+    'pdo_statement_class'=>get_class($pdo->prepare('SELECT 1')),
     'grammar_class'=>$client==='v4'?get_class($connection->getQueryGrammar()):null,
     'source'=>$loaded,'source_sha256'=>$loaded?hash_file('sha256',$loaded):null,
+    'codec_source'=>$client==='v4'?(new ReflectionClass(avadim\Manticore\Laravel\Database\AttributeCodec::class))->getFileName():null,
+    'connection_source'=>(new ReflectionClass($connectionProperty->getValue($driver)))->getFileName(),
+    'standalone_version'=>$client==='v3'?Composer\InstalledVersions::getPrettyVersion('avadim/manticore-query-builder-php'):null,
     'xdebug'=>extension_loaded('xdebug'),'emulated_prepares'=>$pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES),
     'buffered'=>$pdo->getAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY)],JSON_THROW_ON_ERROR).PHP_EOL;
 
@@ -73,6 +84,7 @@ function normalizeScenario(string $scenario,mixed $result):mixed {
     if(isset($config['write_size']) && str_starts_with($scenario,'write_')) {
         $stored=$driver->raw("SELECT id,title,brand,price,category,details,tags FROM $write ORDER BY id ASC LIMIT ".count($rows));
         $normalizer=new ReflectionMethod(DriverComparison::class,'rows');
+        if(($config['write_fixture']??'structured')==='scalar')return $normalizer->invoke($driver,$stored);
         return array_map(static fn($a,$b)=>array_merge($a,$b),
             $normalizer->invoke($driver,$stored),$normalizer->invoke($driver,$stored,true));
     }
@@ -173,8 +185,11 @@ try {
             resetWrite($scenario);
             if($command['op']==='plain') {
                 PipelineTrace::$enabled=false;
+                $GLOBALS['encoding_plan_ns']=0;
                 $start=hrtime(true);$result=runScenario($scenario);$elapsed=(hrtime(true)-$start)/1e6;
-                echo json_encode(['ok'=>true,'metrics'=>['total_ms'=>$elapsed],
+                $metrics=['total_ms'=>$elapsed];
+                if($config['codec_profile']??false)$metrics['encode_ms']=$GLOBALS['encoding_plan_ns']/1e6;
+                echo json_encode(['ok'=>true,'metrics'=>$metrics,
                     'digest'=>digest(normalizeScenario($scenario,$result))],JSON_THROW_ON_ERROR).PHP_EOL;
                 continue;
             }
