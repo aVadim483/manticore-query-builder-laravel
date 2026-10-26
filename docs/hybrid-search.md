@@ -6,7 +6,7 @@ Hybrid search combines documents found by words with documents found by vector p
 A document can enter through either branch. In this driver, Manticore runs two separate
 queries; PHP merges their results by ID and orders them using weighted RRF.
 
-This guide describes **4.0.0-alpha.3**. Alpha.2 used `hybrid(...)->search()` instead of the
+This guide describes **4.0.0-beta.1**. Alpha.2 used `hybrid(...)->search()` instead of the
 terminal methods below; see the migration section at the end.
 
 ## 1. The simplest search

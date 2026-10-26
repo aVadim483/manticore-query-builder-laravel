@@ -6,8 +6,14 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.0-beta.1] - 2026-10-26
+
 ### Added
 
+* Repeatable upsert, bulk-read, HNSW hybrid and long-running Laravel worker measurements;
+  120 jobs completed in one worker with no retained-memory growth after warm-up.
+* Repeated 3.0.0-to-current application migration: all 32 cases, 31 comparable results,
+  11 browser scenarios and additional native/current-API checks preserve 2,105 original documents.
 * Reviewed API catalog for 299 Laravel/driver methods and frozen parameter/result contracts
   for 19 full-text, JSON and conditional-write methods. CI checks catalog drift and installs
   minimum Illuminate 11.0.0/12.0.0/13.0.0 consumers without dev dependencies.
