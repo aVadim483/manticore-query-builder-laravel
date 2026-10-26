@@ -95,11 +95,15 @@ final class QueryCapabilities
         }
         $rows = array_is_list($values) ? $values : [$values];
         $columns = null;
+        $columnOrder = null;
         foreach ($rows as $row) {
             if (!is_array($row) || !$row || array_is_list($row)) {
                 throw new InvalidArgumentException('Write payloads must be associative rows.');
             }
             $keys = array_keys($row);
+            if ($keys === $columnOrder) {
+                continue; // The same keys have already passed name/path validation.
+            }
             foreach ($keys as $key) {
                 if (!is_string($key) || $key === '') {
                     throw new InvalidArgumentException('Write columns must have non-empty names.');
@@ -108,6 +112,7 @@ final class QueryCapabilities
                     throw new LogicException('JSON-path assignments are not supported; write the complete JSON attribute.');
                 }
             }
+            $columnOrder ??= $keys;
             sort($keys);
             $columns ??= $keys;
             if ($keys !== $columns) {

@@ -40,6 +40,10 @@ path may be possible for verified scalar float attribute values in ordinary buil
 while preserving expression/vector handling, finite-number checks and event/exception contracts.
 No library or vendor changes were made by this experiment.
 
+A separate [string-float vs Expression timing comparison](../benchmarks/sql-pipeline/float-string-writes.md)
+on Manticore 29.9.0 found no consistent end-to-end benefit from string conversion alone.
+For 500-document batches, strings took about 2% longer: fewer Expressions meant more PDO bindings.
+
 See the [detailed report](ru/float-string-bindings.md),
 [summary JSON](experiments/float-string-bindings-2026-10-26.json) and
 [full JSON gzip](experiments/float-string-bindings-2026-10-26.raw.json.gz).

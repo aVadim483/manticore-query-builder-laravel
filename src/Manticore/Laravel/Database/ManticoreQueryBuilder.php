@@ -236,7 +236,11 @@ class ManticoreQueryBuilder extends Builder
 
     private function encodeInsertRows(array $values): array
     {
-        $values = $this->encodeWriteRows($values);
+        return $this->renderInsertFloats($this->encodeWriteRows($values));
+    }
+
+    private function renderInsertFloats(array $values): array
+    {
         if (!$values) {
             return [];
         }
@@ -261,6 +265,101 @@ class ManticoreQueryBuilder extends Builder
         return $multiple ? $rows : $rows[0];
     }
 
+    public function cleanBindings(array $bindings)
+    {
+        $clean = [];
+        foreach ($bindings as $binding) {
+            if (!$binding instanceof ExpressionContract) {
+                $clean[] = $this->castBinding($binding);
+            }
+        }
+
+        return $clean;
+    }
+
+    private function canCompileBatch(array $values): bool
+    {
+        // Subclasses may override encoding, binding or Grammar hooks. Keep their existing path.
+        return count($values) > 1 && array_is_list($values)
+            && get_class($this) === self::class && get_class($this->grammar) === ManticoreGrammar::class;
+    }
+
+    /** Encode through the existing hook, then collect SQL values and bindings in one pass. */
+    private function compileBatch(array $values, bool $replace): array
+    {
+        $values = $this->encodeWriteRows($values);
+        if (!$replace) {
+            // Match Laravel INSERT: schema-query listeners may register before-query callbacks.
+            if ($this->beforeQueryCallbacks) {
+                // The generic path freezes referenced values/floats before those callbacks run.
+                $values = $this->renderInsertFloats($values);
+                $this->applyBeforeQueryCallbacks();
+                QueryCapabilities::write($this, true);
+
+                return $this->compileGenericBatch($values, false);
+            }
+            $this->applyBeforeQueryCallbacks();
+        }
+        QueryCapabilities::write($this, true);
+        if (!$this->canCompileBatch($values)) {
+            // DESCRIBE listeners/callbacks can replace the Grammar after the initial check.
+            return $this->compileGenericBatch($values, $replace);
+        }
+
+        $columns = array_keys($values[0]);
+        sort($columns);
+        $grammar = $this->grammar;
+        $table = $grammar->wrapTable($this->from);
+        $columnSql = $grammar->columnize($columns);
+        $parameters = [];
+        $bindings = [];
+        foreach ($values as $row) {
+            $slots = [];
+            foreach ($columns as $column) {
+                $value = $row[$column];
+                if (is_float($value)) {
+                    if (!is_finite($value)) {
+                        throw new InvalidArgumentException('Manticore parameters must be finite numbers.');
+                    }
+                    $slots[] = json_encode($value, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
+                } elseif ($value instanceof ExpressionContract) {
+                    // Custom/nested expressions may have side effects. Preserve their original
+                    // evaluation order after every float and referenced value has been copied.
+                    if (get_class($value) !== Expression::class) {
+                        unset($parameters, $bindings, $slots);
+                        return $this->compileGenericBatch($values, $replace);
+                    }
+                    $literal = $value->getValue($grammar);
+                    if (!is_string($literal) && !is_int($literal) && !is_float($literal)) {
+                        unset($parameters, $bindings, $slots);
+                        return $this->compileGenericBatch($values, $replace);
+                    }
+                    $slots[] = $literal;
+                } else {
+                    $slots[] = '?';
+                    $bindings[] = $this->castBinding($value);
+                }
+            }
+            $parameters[] = '('.implode(', ', $slots).')';
+        }
+        $verb = $replace ? 'replace' : 'insert';
+
+        return ["$verb into $table ($columnSql) values ".implode(', ', $parameters), $bindings];
+    }
+
+    private function compileGenericBatch(array $values, bool $replace): array
+    {
+        $values = $this->renderInsertFloats($values);
+        foreach ($values as &$row) {
+            ksort($row);
+        }
+        unset($row);
+        $sql = $this->grammar->compileInsert($this, $values);
+
+        return [$replace ? preg_replace('/^insert\b/', 'replace', $sql) : $sql,
+            $this->cleanBindings(Arr::flatten($values, 1))];
+    }
+
     public function insert(array $values)
     {
         if (!$values) {
@@ -269,6 +368,11 @@ class ManticoreQueryBuilder extends Builder
         $this->applyBeforeQueryCallbacks();
         QueryCapabilities::write($this, true);
         QueryCapabilities::payload($values);
+        if ($this->canCompileBatch($values)) {
+            [$sql, $bindings] = $this->compileBatch($values, false);
+
+            return $this->connection->insert($sql, $bindings);
+        }
         return parent::insert($this->encodeInsertRows($values));
     }
 
@@ -352,6 +456,9 @@ class ManticoreQueryBuilder extends Builder
         $this->applyBeforeQueryCallbacks();
         QueryCapabilities::write($this, true);
         QueryCapabilities::payload($values);
+        if ($this->canCompileBatch($values)) {
+            return $this->compileBatch($values, true);
+        }
         $values = $this->encodeInsertRows($values);
         if (!array_is_list($values)) {
             $values = [$values];

@@ -8,6 +8,12 @@ All notable changes to this package are documented here. The format follows
 
 ### Changed
 
+* Prepare multi-row INSERT/REPLACE SQL and bindings together with the stock builder and
+  Grammar, preserving schema encoding and numeric literal formatting. Builder/Grammar
+  subclasses retain their existing hooks and compilation path, including changes made
+  while loading schema metadata. Reuse validated column order across matching rows.
+* Clean bindings in one loop while preserving Laravel's castBinding behavior and dense
+  output indexes, including Expression filtering and enum conversion.
 * Compile finite scalar floats directly as numeric SQL literals for builder INSERT/REPLACE,
   including the GetId variants and writes delegated through these methods. This avoids
   scanning the generated SQL in NumericBindings while preserving JSON/MVA/vector encoding.

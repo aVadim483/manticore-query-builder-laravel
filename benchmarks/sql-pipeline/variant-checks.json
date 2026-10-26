@@ -1,0 +1,451 @@
+{
+  "variants": {
+    "base": {
+      "source_sha256": "fbf69b7e5da8412950321f89cdfb0be6700c9309a0158efaf148f219e67c77a9",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        },
+        "search": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": true,
+      "encoding_hook_matches_base": true
+    },
+    "single_compile": {
+      "source_sha256": "f761ec2d2625af28e31739457eb00649b7b76f4c30f1f35a63460278f9c48f82",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": false,
+          "exception": "Illuminate\\Database\\QueryException",
+          "error": "SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens"
+        },
+        "search": {
+          "ok": false,
+          "exception": "Illuminate\\Database\\QueryException",
+          "error": "SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens"
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": false,
+      "encoding_hook_matches_base": true
+    },
+    "vector_json": {
+      "source_sha256": "fbf69b7e5da8412950321f89cdfb0be6700c9309a0158efaf148f219e67c77a9",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        },
+        "search": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": true,
+      "encoding_hook_matches_base": true
+    },
+    "fused_rows": {
+      "source_sha256": "7ec789cd1714f93b3e9f0b871460eda61c75f5e21788c1e4d017b82e1285497c",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        },
+        "search": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": true,
+      "encoding_hook_matches_base": false
+    },
+    "loop_bindings": {
+      "source_sha256": "97ce21c5faef979c0c62177a7df0f6e8d4db43e68b9c214ec228621aeee684f0",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        },
+        "search": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": true,
+      "encoding_hook_matches_base": true
+    },
+    "update_validation": {
+      "source_sha256": "a73ce7226362d53447d256badd267291dab56146f797f969b95edd0c56233e4c",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        },
+        "search": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": true,
+      "encoding_hook_matches_base": true
+    },
+    "execute_array": {
+      "source_sha256": "fbf69b7e5da8412950321f89cdfb0be6700c9309a0158efaf148f219e67c77a9",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 1
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 4
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        },
+        "search": {
+          "ok": true,
+          "ids": [
+            2
+          ]
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": true,
+      "encoding_hook_matches_base": true
+    },
+    "combined_safe": {
+      "source_sha256": "f9797d15203ff5d68acafa8eaedefb7e01fd6ff52e6e30ad5268e16840041e36",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": false,
+          "exception": "Illuminate\\Database\\QueryException",
+          "error": "SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens"
+        },
+        "search": {
+          "ok": false,
+          "exception": "Illuminate\\Database\\QueryException",
+          "error": "SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens"
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": false,
+      "encoding_hook_matches_base": false
+    },
+    "combined": {
+      "source_sha256": "f9797d15203ff5d68acafa8eaedefb7e01fd6ff52e6e30ad5268e16840041e36",
+      "clean_bindings_cases": 1000,
+      "vector_cases": 1000,
+      "writes": {
+        "insert": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "replace": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "insertGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        },
+        "replaceGetId": {
+          "ok": true,
+          "digest": "be49cdb3677dbc4eb82ce6870068c232585f2738b098e6a87e3ada280010aa47",
+          "encoder_hook_calls": 0
+        }
+      },
+      "cold_schema_listener": {
+        "get": {
+          "ok": false,
+          "exception": "Illuminate\\Database\\QueryException",
+          "error": "SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens"
+        },
+        "search": {
+          "ok": false,
+          "exception": "Illuminate\\Database\\QueryException",
+          "error": "SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens"
+        }
+      },
+      "scalar_null": {
+        "accepted": false,
+        "exception": "Illuminate\\Database\\QueryException",
+        "previous_code": "42000"
+      },
+      "ok": true,
+      "cold_schema_listener_matches_base": false,
+      "encoding_hook_matches_base": false
+    }
+  },
+  "harness_manifest": {
+    "check-variants.php": "eeaad6d487b55933f00a607977837ed0ed8c631a40ebb4e69ce65841b8804f1e",
+    "check-variants.py": "8bdb23807801223d85c50c3be88ebea2718cc6c32e223b795243150047b9290f",
+    "make-variants.py": "620d45d550c64e9137b82f30bcaa1aca98847bfff1108b08975b8b7bcf1fb7f1",
+    "probes-v4.php": "4b079c0b4fb09a2b39bb8d55476dbb50d7a568f5e3024c3e1508ae96b4da1d9d",
+    "render.py": "3995eb6c0f3cd7e25f4e859a2f73165000cc46499b9ccb584796413e03b121d6",
+    "run.py": "3b457b062b5a9fd6b93e56d4e9d9422877d684364e43ed16093188082347b95c",
+    "trace.php": "b13840a54d43fafbdfbb044c8e56fb92b4d2608d7be4ec35fb3e464daee43dda",
+    "verify-environment.py": "3231febb16af96bcff0765019e3305f67f478b8b7e9e769c6019f15486c5eff9",
+    "worker.php": "9ba2535c7301811a7c45a17eedc495721760614b2c5f7ab6d353da18f65875a1"
+  },
+  "ok": true
+}

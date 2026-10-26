@@ -14,8 +14,26 @@ logs expose the float literal in SQL, without a corresponding float binding.
 UPDATE, WHERE and raw SQL continue to use `NumericBindings::prepare()`.
 See the [bulk-write optimization comparison](../benchmarks/profile-writes/optimized-results-2026-10-26.md)
 for released 3.0.0/4.0.0 and optimized source measurements.
+The [SQL pipeline analysis](../benchmarks/sql-pipeline/results-2026-10-26.md) separately
+measures preparation, actual PDO calls and replayed SQL, with six experimental optimization
+hypotheses and compatibility checks. That report describes isolated experimental snapshots;
+the implemented changes are described below.
 
-Measured on October 26, 2026 against current 4.x source, PHP CLI 8.3.6, Laravel 12.70.1,
+Multi-row INSERT/REPLACE now have a specialized preparation path for the stock
+`ManticoreQueryBuilder` and `ManticoreGrammar`. Schema encoding still runs through
+`encodeWriteRows()`; SQL fragments and dense bindings are then collected together,
+using one sorted column list and rendering finite scalar floats directly. Repeated
+column order reuses validation of column names. Strings remain PDO parameters.
+Builder/Grammar subclasses, custom or nested Expressions, and Grammar changes during
+schema loading or callbacks registered by schema listeners retain the generic compilation path.
+`cleanBindings()` uses one loop
+and still delegates scalar conversion to Laravel's `castBinding()`. Single-row and
+GetId methods retain their existing preparation path.
+
+See the [implemented bulk-write comparison](../benchmarks/sql-pipeline/batch-writes.md).
+
+The earlier 4.x measurements below predate the specialized bulk preparation. They were
+recorded on October 26, 2026 with PHP CLI 8.3.6, Laravel 12.70.1,
 Manticore 29.9.0 with Columnar/KNN 14.2.1. One client used local TCP on the test server;
 these are measurements of this fixture, not throughput or latency guarantees.
 
