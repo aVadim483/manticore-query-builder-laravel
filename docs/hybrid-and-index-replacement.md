@@ -2,14 +2,13 @@
 
 [Русский](ru/hybrid-and-index-replacement.md)
 
-Diagnostics and replacement APIs were added in alpha.2.
-See also [Schema Builder](schema-alter.md) and [API contracts](parent-search-contracts.md).
+See also [Schema Builder](schema-alter.md) and the [Laravel API profile](laravel-api-audit.md).
 
 ## Independent text and vector search
 
 See the [dedicated hybrid search guide](hybrid-search.md): a minimal call, the first document,
-filters, weights, metadata, pagination and advanced options. Alpha.3 uses
-hybridSearch()/hybridGet()/hybridFirst(); migration instructions from alpha.2 are included there.
+filters, weights, metadata, pagination and advanced options through
+hybridSearch(), hybridGet() and hybridFirst().
 
 ## Explicit capability evidence
 

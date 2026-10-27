@@ -8,8 +8,8 @@
 Нативный драйвер Laravel Database для ManticoreSearch. Используйте менеджер соединений Laravel,
 Query Builder, коллекции, пагинацию, события запросов и Schema Builder через MySQL-протокол PDO.
 
-Версия `4.0.0` — стабильный нативный драйвер с API, зафиксированным в beta.1.
-Проверки и ограничения перечислены в [заметках к 4.0](docs/ru/releases/4.0.0.md).
+Версия `4.0.1` — стабильный нативный драйвер.
+Изменения и ограничения перечислены в [заметках к 4.0.1](docs/ru/releases/4.0.1.md).
 Старый API обёртки 3.x и зависимость от `avadim/manticore-query-builder-php` удалены.
 Для существующих приложений подготовлено [руководство перехода с 3.x](docs/ru/upgrading-3.x-to-4.x.md).
 
@@ -50,8 +50,8 @@ composer require "avadim/manticore-query-builder-laravel:^4.0"
 composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 ```
 
-Миграция работающего демонстрационного Laravel-приложения [проверена](docs/ru/migration-app-verification.md).
-Миграция других приложений пока не проверена.
+[Руководство миграции](docs/ru/upgrading-3.x-to-4.x.md) проверено на Laravel 12
+с сохранением исходных документов. Другие приложения требуют собственных проверок.
 
 Laravel автоматически обнаруживает `avadim\Manticore\Laravel\ServiceProvider`.
 Если обнаружение пакетов отключено, зарегистрируйте его в `bootstrap/providers.php`.
@@ -242,6 +242,7 @@ SQL-драйверов Laravel на этот драйвер. Возможнос�
 ## Тесты и benchmarks
 
 ```sh
+# Из клона репозитория
 composer install
 composer test
 ```
@@ -253,6 +254,6 @@ Bootstrap по умолчанию отклоняет загрузку класс
 Для основной таблицы учёта миграций в тестах нужен `pdo_sqlite`.
 Запуск изолированной production-установки и матриц описан в [инструкции проверок](docs/ru/testing.md).
 
-[Benchmarks](benchmarks/README.md) сравнивают нативный драйвер с PDO и официальным HTTP-клиентом.
-Отдельно опубликованы [замеры upsert, чтения, hybrid и долгоживущего воркера](docs/ru/performance.md)
-со сценариями повторного запуска и границами проверенного набора данных.
+[Benchmarks](https://github.com/aVadim483/manticore-query-builder-laravel/blob/main/benchmarks/README.md) сравнивают нативный драйвер с PDO и официальным HTTP-клиентом.
+[Производительность](docs/ru/performance.md) описывает актуальное сравнение пакетной записи
+и ранние замеры upsert, чтения, hybrid и воркера с явными версиями и границами нагрузки.

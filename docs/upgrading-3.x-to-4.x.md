@@ -10,8 +10,9 @@ not compatibility aliases that redirect old calls automatically.
 The connection change alone does not rename, recreate or reindex existing Manticore tables.
 Keep their physical names and verify the prefix before moving application traffic. For the full
 supported API and server requirements, see the [native driver reference](laravel-driver.md).
-The guide has been exercised on a [live Laravel 12 application](migration-app-verification.md);
-that report records the application changes and checks without modifying the installed package.
+This guide was exercised on a real Laravel 12 application upgraded from 3.0.0 to 4.x
+with its original search documents preserved. That verifies this migration scenario,
+not automatic compatibility of every application or the full Eloquent API.
 
 ## 1. Inventory and entry points
 

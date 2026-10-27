@@ -6,8 +6,12 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-10-27
+
 ### Changed
 
+* Consolidate usage, migration, testing and performance documentation; remove completed
+  experiments and prerelease verification diaries while preserving practical SQL examples.
 * Select attribute encoders once per column for multi-row INSERT/REPLACE on the stock
   connection. Keep the plan local to each write, share validation with single-value
   encoding, and preserve custom connection metadata behavior and builder hooks.
@@ -133,7 +137,7 @@ All notable changes to this package are documented here. The format follows
 
 First alpha of the native Laravel Database driver. This is a breaking upgrade from 3.x,
 intended for early testing. A real application migration and Scout adapter compatibility
-have not yet been validated; see the [release notes](docs/releases/4.0.0-alpha.1.md).
+have not yet been validated; see the [release notes](https://github.com/aVadim483/manticore-query-builder-laravel/releases/tag/v4.0.0-alpha.1).
 
 ### Removed
 
@@ -409,7 +413,9 @@ builder it is built on.
 
 The first release: service provider, facade, connection manager and the configuration file.
 
-[Unreleased]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v4.0.0-alpha.1...dev-4.x
+[Unreleased]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v4.0.1...main
+[4.0.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v4.0.0...v4.0.1
+[4.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v3.0.0...v4.0.0
 [4.0.0-alpha.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v3.0.0...v4.0.0-alpha.1
 [3.0.0]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.1...v3.0.0
 [2.1.1]: https://github.com/aVadim483/manticore-query-builder-laravel/compare/v2.1.0...v2.1.1

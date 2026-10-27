@@ -64,6 +64,15 @@ float parameters are rendered as checked numeric literals during execution; othe
 remain PDO-bound. Laravel's SQL, bindings, events and exceptions retain the original parameters.
 This applies to both positional and named parameters. Non-finite values are rejected.
 
+For builder INSERT/REPLACE, including the GetId variants, finite scalar floats are
+formatted as numeric SQL literals during compilation. Query events and logs therefore
+contain the literal in SQL without a separate float binding. JSON numbers remain
+JSON-bound values; strings and other scalar parameters remain PDO-bound.
+
+Pass numeric values as numbers. Replacing floats with strings is not a general workaround:
+UPDATE, filters, JSON and vector expressions can fail or change meaning.
+See the [paired SQL examples (Russian)](ru/float-values-sql.md).
+
 `option($name, $value)` accepts finite numbers, escaped strings, and positive integer maps for
 `field_weights` / `index_weights`. Setting an option again replaces its value;
 `option($name, null)` removes it. Rankers use validated names, never unescaped SQL.

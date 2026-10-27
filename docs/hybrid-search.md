@@ -6,8 +6,7 @@ Hybrid search combines documents found by words with documents found by vector p
 A document can enter through either branch. In this driver, Manticore runs two separate
 queries; PHP merges their results by ID and orders them using weighted RRF.
 
-This guide describes the **4.0 API**. Alpha.2 used `hybrid(...)->search()` instead of the
-terminal methods below; see the migration section at the end.
+This guide describes the **4.0 API**.
 
 ## 1. The simplest search
 
@@ -244,11 +243,3 @@ application fields are not overwritten with scores.
 
 `knn()->match()` remains intersection: documents must satisfy both conditions. `hybrid*()`
 merges independent lists in the library without SQL UNION.
-
-## Migrating from alpha.2
-
-Replace `->hybrid($text, $column, $vector, $options)->search()` with
-`->hybridSearch($text, $column, $vector, $options)` to keep the result and metadata.
-Use `hybridGet()` or `hybridFirst()` when only documents are needed. The separate `hybrid()`
-method is removed without an alias; `HybridSearch` remains an internal executor.
-Ordinary `search()`, `get()` and `first()` retain their contracts.

@@ -1,36 +1,51 @@
-# Performance and worker verification
+# Performance
 
 [Русский](ru/performance.md)
 
-A separate [3.0.0 vs 4.0.0 A/B report](../benchmarks/compare-versions/results-2026-10-26.md)
-covers the same 20,000 documents and dependencies across API, HTTP and queue scenarios.
-The measurements below concern 4.x alone.
+These are measurements of particular datasets and one client on local TCP, not latency
+or concurrent-throughput guarantees for other applications.
 
-Builder INSERT/REPLACE now render finite scalar PHP floats during SQL compilation,
-after schema encoding. JSON numbers remain JSON-bound strings; strings and other
-scalar bindings still use PDO parameters. This also applies to `insertGetId()` and
-`replaceGetId()`, and writes delegated through these methods. Query events and query
-logs expose the float literal in SQL, without a corresponding float binding.
-UPDATE, WHERE and raw SQL continue to use `NumericBindings::prepare()`.
-See the [bulk-write optimization comparison](../benchmarks/profile-writes/optimized-results-2026-10-26.md)
-for released 3.0.0/4.0.0 and optimized source measurements.
-The [SQL pipeline analysis](../benchmarks/sql-pipeline/results-2026-10-26.md) separately
-measures preparation, actual PDO calls and replayed SQL, with six experimental optimization
-hypotheses and compatibility checks. That report describes isolated experimental snapshots;
-the implemented changes are described below.
+## INSERT/REPLACE compared with 3.x
 
-Multi-row INSERT/REPLACE now have a specialized preparation path for the stock
-`ManticoreQueryBuilder` and `ManticoreGrammar`. Schema encoding still runs through
-`encodeWriteRows()`; SQL fragments and dense bindings are then collected together,
-using one sorted column list and rendering finite scalar floats directly. Repeated
-column order reuses validation of column names. Strings remain PDO parameters.
-Builder/Grammar subclasses, custom or nested Expressions, and Grammar changes during
-schema loading or callbacks registered by schema listeners retain the generic compilation path.
-`cleanBindings()` uses one loop
-and still delegates scalar conversion to Laravel's `castBinding()`. Single-row and
-GetId methods retain their existing preparation path.
+Measured on October 27, 2026: published 3.0.0 with standalone PHP builder 2.6.0 versus
+4.x source commit 52a1f89, after bulk-write and column-encoding optimizations.
+PHP 8.3.6, Laravel 12.70.1, Manticore 29.9.0 and 77 shared dependencies were identical.
+Query logging and Xdebug were disabled.
 
-See the [implemented bulk-write comparison](../benchmarks/sql-pipeline/batch-writes.md).
+Each scenario has 60 measurements after five warm-ups, with alternating version order.
+Primary totals use ordinary PDO/PDOStatement without tracing wrappers. Connections and
+schema are warm; data creation, table reset, replacement seeding and result validation
+are outside the timer. All written documents matched between versions.
+
+Seven fields, including a float price, JSON with a 128-byte payload and a two-element MVA:
+
+| Operation, documents | 3.0.0, ms | 4.x at 52a1f89, ms | Difference from 3.x |
+| --- | ---: | ---: | ---: |
+| INSERT, 1 | 1.290 | 1.068 | -17.22% |
+| REPLACE, 1 | 1.185 | 0.969 | -18.23% |
+| INSERT, 100 | 7.864 | 8.121 | +3.27% |
+| REPLACE, 100 | 7.901 | 8.163 | +3.31% |
+| INSERT, 500 | 33.379 | 36.091 | +8.13% |
+| REPLACE, 500 | 33.201 | 36.004 | +8.44% |
+| INSERT, 1000 | 64.044 | 69.299 | +8.21% |
+| REPLACE, 1000 | 63.989 | 65.241 | +1.96% |
+
+For five scalar fields without JSON/MVA, 500-document INSERT took 21.901 / 23.516 ms
+in 3.x / 4.x (+7.37%); REPLACE took 21.743 / 23.259 ms (+6.97%).
+Thus 4.x took about 7–8% longer for these 500-document batches.
+Single-row overhead differs: 3.x also executes SELECT LAST_INSERT_ID(), while ordinary
+4.x insert/replace executes only the write.
+
+A separate traced series of real 500-document writes with JSON/MVA measured preparation
+before PDO at about 6.3–6.5 ms in both versions. Binding and execution accounted for most
+of the remaining difference. Traced timings are not substituted for the primary totals.
+Observed variation, particularly on REPLACE, means percentages should not be generalized.
+
+The [recorded measurements and source manifests](https://github.com/aVadim483/manticore-query-builder-laravel/blob/52a1f891db84045c187f5a55bbc5e4ba13be6976/benchmarks/sql-pipeline/current-v3.md) remain in Git history.
+The separate [published 3.0.0/4.0.0 comparison](https://github.com/aVadim483/manticore-query-builder-laravel/tree/main/benchmarks/compare-versions) covers API, HTTP and queue
+scenarios; its 4.0.0 numbers predate the optimizations above.
+
+## Earlier 4.x workloads: upsert, reads and hybrid
 
 The earlier 4.x measurements below predate the specialized bulk preparation. They were
 recorded on October 26, 2026 with PHP CLI 8.3.6, Laravel 12.70.1,
@@ -78,17 +93,18 @@ completed in 16.63 s. Retained PHP memory grew by 4,544 bytes including measurem
 allocated memory grew by 0. A separate real database queue worker processed 120 jobs,
 15 operations per job, without restarting. Between jobs 20 and 120 both retained and allocated
 memory growth were 0. Jobs included JSON/full-text reads, hybrid search and upsert.
-The queue drained, the final write was verified, and the application's original 2,105 documents
-and fingerprint were preserved. These finite runs found no continuing memory growth.
+The queue drained and the final write was verified. These finite runs found no continuing memory growth.
 
 ## Repeating the measurements
 
-Use a clone of this repository and an autoloader from a Laravel application, which supplies
-the event dispatcher used for SQL counters. The native benchmark creates and drops only its
-random scratch table. An example on the test server is:
+Clone the repository: tests/ and benchmarks/ are excluded from Composer dist archives.
+See the [benchmark instructions](https://github.com/aVadim483/manticore-query-builder-laravel/blob/main/benchmarks/README.md).
+
+Use a Laravel application's autoloader to supply the event dispatcher for SQL counters.
+The native benchmark creates and drops only its random scratch table:
 
 ```sh
-MANTICORE_TEST_HOST=127.0.0.1 MANTICORE_TEST_PORT=19306 \
+MANTICORE_TEST_HOST=127.0.0.1 MANTICORE_TEST_PORT=9306 \
 MANTICORE_BENCHMARK_REPORT=/tmp/driver-benchmark.json \
 php -d memory_limit=512M tests/benchmarks/native-driver.php /path/to/application/vendor/autoload.php
 ```
@@ -99,4 +115,4 @@ then run `php tests/benchmarks/laravel-worker.php /path/to/application`. It uses
 `manticore` connection and a private database queue, with random table/queue names. The
 application needs its normal database queue tables, the `bin/php` CLI wrapper (or an equivalent
 executable), and the migration verification application's `Catalog` service for preservation
-checks. Full JSON measurements are retained under the application's `storage/app/`.
+checks. Adapt this application-specific fixture to your own test application before use.

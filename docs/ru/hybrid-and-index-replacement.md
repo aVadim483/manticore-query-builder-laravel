@@ -2,14 +2,13 @@
 
 [English](../hybrid-and-index-replacement.md)
 
-API диагностики и замены индекса добавлены в alpha.2.
-См. также [Schema Builder](schema-alter.md) и [контракты API](../parent-search-contracts.md).
+См. также [Schema Builder](schema-alter.md) и [профиль Laravel API](laravel-api-audit.md).
 
 ## Независимые текстовая и векторная ветви
 
 Гибридному поиску посвящено [отдельное руководство](hybrid-search.md): простейший вызов,
 первый документ, фильтры, веса, метаданные, пагинация и расширенные опции.
-В alpha.3 используются hybridSearch()/hybridGet()/hybridFirst(); инструкция перехода с alpha.2 находится там же.
+Для выполнения используются hybridSearch(), hybridGet() и hybridFirst().
 
 ## Явная проверка возможностей
 

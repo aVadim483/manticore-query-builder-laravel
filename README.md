@@ -8,8 +8,8 @@
 A native Laravel Database driver for ManticoreSearch. Use Laravel's database manager, Query Builder,
 collections, pagination, query events and Schema Builder over PDO's MySQL protocol.
 
-Version `4.0.0` is the stable native driver, with the public API frozen since beta.1.
-See the [4.0 release notes](docs/releases/4.0.0.md) for verification and limitations.
+Version `4.0.1` is the stable native driver.
+See the [4.0.1 release notes](docs/releases/4.0.1.md) for changes and limitations.
 The 3.x wrapper API and its dependency on `avadim/manticore-query-builder-php` have been removed.
 Existing applications should follow the [3.x migration guide](docs/upgrading-3.x-to-4.x.md).
 
@@ -50,8 +50,8 @@ To test subsequent development changes:
 composer require avadim/manticore-query-builder-laravel:dev-dev-4.x
 ```
 
-A live Laravel 12 demonstration application's migration has been [verified](docs/migration-app-verification.md).
-Migration of other applications remains unverified.
+The [migration guide](docs/upgrading-3.x-to-4.x.md) has been exercised on a Laravel 12
+application with its original documents preserved. Other applications require their own checks.
 
 Laravel discovers `avadim\Manticore\Laravel\ServiceProvider` automatically.
 If package discovery is disabled, register that provider in `bootstrap/providers.php`.
@@ -239,6 +239,7 @@ Build a single MATCH expression per query.
 ## Testing and benchmarks
 
 ```sh
+# From a repository clone
 composer install
 composer test
 ```
@@ -249,6 +250,6 @@ CI uses `--fail-on-skipped`. The default bootstrap rejects loading standalone PH
 Tests also require `pdo_sqlite` for the primary migration repository.
 See [verification instructions](docs/testing.md) for isolated production consumers and test matrices.
 
-[Benchmarks](benchmarks/README.md) compare the native driver with PDO and the official HTTP client.
-Current [upsert, bulk-read, hybrid and long-running worker measurements](docs/performance.md)
-include reproducible scenarios and their dataset limits.
+[Benchmarks](https://github.com/aVadim483/manticore-query-builder-laravel/blob/main/benchmarks/README.md) compare the native driver with PDO and the official HTTP client.
+[Performance](docs/performance.md) covers current bulk-write comparisons and earlier
+upsert, read, hybrid and worker measurements, with explicit versions and workload limits.
